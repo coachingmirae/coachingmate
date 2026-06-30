@@ -120,7 +120,7 @@
               </button>
 
               <button type="submit" id="submitButton" class="primary-button hidden">
-                다음: 코칭 니즈조사
+                리더십 진단 제출하기
               </button>
             </div>
           </div>
@@ -734,6 +734,50 @@
       return data;
     }
 
+async function fetchParticipantState() {
+  const participantCode = getParticipantCode();
+
+  const { data, error } = await supabaseClient.rpc("get_participant_state", {
+    p_participant_code: participantCode
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+async function submitLeadershipToDb() {
+  const participantCode = getParticipantCode();
+  const basicInfo = loadBasicInfo() || {};
+
+  if (!participantCode) {
+    throw new Error("참여코드를 확인할 수 없습니다.");
+  }
+
+  const { data, error } = await supabaseClient.rpc("submit_leadership_response", {
+    p_participant_code: participantCode,
+    p_basic_info: basicInfo,
+    p_answers: answers
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data || data.ok !== true) {
+    const message = data && data.message
+      ? data.message
+      : "리더십 진단 제출에 실패했습니다.";
+
+    throw new Error(message);
+  }
+
+  console.log("리더십 진단 제출 성공:", data);
+  return data;
+}   
+
     function scheduleAutoSave() {
       saveStatus.textContent = "입력 중...";
 
@@ -1005,7 +1049,7 @@
       respondentMetaText.textContent = metaParts.length ? metaParts.join(" / ") : "-";
     }
 
-    function initializePage() {
+    async function initializePage() {
       const participantCode = getParticipantCode();
 
       if (!participantCode) {
