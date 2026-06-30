@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
+r"""
 sync_supabase_to_google_sheet.py
 
 CoachingMate Supabase → Google Sheet 동기화 스크립트
@@ -197,7 +197,7 @@ def get_or_create_worksheet(spreadsheet, title, headers):
     else:
         existing_headers = values[0]
         if existing_headers != headers:
-            worksheet.update("A1", [headers])
+            worksheet.update(range_name="A1", values=[headers])
 
     return worksheet
 

@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CoachingMate 관리자 대시보드</title>
+  <link rel="stylesheet" href="./style.css" />
+
+  <style>
+    body {
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .admin-wrap {
+      width: min(1180px, calc(100% - 32px));
+      margin: 32px auto 64px;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .admin-title h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+
+    .admin-title p {
+      margin: 0;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .admin-button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      background: #111827;
+      color: #fff;
+    }
+
+    .admin-button.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .admin-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .summary-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .summary-label {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .summary-value {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .admin-panel {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .admin-panel-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 16px 18px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .admin-panel-top strong {
+      font-size: 16px;
+    }
+
+    .admin-status {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table.admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f3f4f6;
+      text-align: left;
+      font-size: 14px;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .admin-table th {
+      background: #f9fafb;
+      color: #4b5563;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .admin-table tr:hover td {
+      background: #f9fafb;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 12px;
+      font-weight: 800;
+      background: #ecfdf5;
+      color: #047857;
+    }
+
+    .badge.warn {
+      background: #fffbeb;
+      color: #b45309;
+    }
+
+    .detail-button {
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #111827;
+      border-radius: 9px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .empty {
+      padding: 40px 18px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 14px 16px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 1000;
+    }
+
+    .modal {
+      background: #fff;
+      width: min(980px, 100%);
+      max-height: 88vh;
+      overflow: hidden;
+      border-radius: 18px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .modal-header h2 {
+      margin: 0 0 4px;
+      font-size: 20px;
+    }
+
+    .modal-header p {
+      margin: 0;
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    .modal-close {
+      border: 0;
+      background: #f3f4f6;
+      border-radius: 10px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 18px 20px 22px;
+      overflow-y: auto;
+    }
+
+    .detail-section {
+      margin-bottom: 22px;
+    }
+
+    .detail-section h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      border-left: 4px solid #111827;
+      padding-left: 8px;
+    }
+
+    .kv-grid {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .kv-label,
+    .kv-value {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 14px;
+    }
+
+    .kv-label {
+      background: #f9fafb;
+      color: #4b5563;
+      font-weight: 800;
+    }
+
+    .kv-value {
+      background: #fff;
+    }
+
+    .answer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .answer-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 9px 10px;
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .answer-item strong {
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .needs-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .needs-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #fff;
+    }
+
+    .needs-item strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+      color: #374151;
+    }
+
+    .needs-item p {
+      margin: 0;
+      white-space: pre-wrap;
+      color: #111827;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 820px) {
+      .admin-header {
+        flex-direction: column;
+      }
+
+      .admin-actions {
+        justify-content: flex-start;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .answer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .kv-grid {
+        grid-template-columns: 110px 1fr;
+      }
+
+      .answer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="admin-wrap">
+    <header class="admin-header">
+      <div class="admin-title">
+        <h1>CoachingMate 관리자 대시보드</h1>
+        <p>Leadership Coaching Platform · 제출 현황 조회</p>
+      </div>
+
+      <div class="admin-actions">
+        <button id="refreshBtn" class="admin-button">새로고침</button>
+        <button id="sheetBtn" class="admin-button secondary">Google Sheet 열기</button>
+      </div>
+    </header>
+
+    <div id="errorBox" class="error-box"></div>
+
+    <section class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">총 제출 건수</div>
+        <div id="totalCount" class="summary-value">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">응답 완료 건수</div>
+        <div id="completedCount" class="summary-value">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">최근 제출</div>
+        <div id="latestSubmittedAt" class="summary-value" style="font-size: 16px;">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">조회 상태</div>
+        <div id="loadStatus" class="summary-value" style="font-size: 16px;">대기</div>
+      </div>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel-top">
+        <strong>제출 목록</strong>
+        <span id="tableStatus" class="admin-status">-</span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>제출일시</th>
+              <th>참여코드</th>
+              <th>회사</th>
+              <th>성명</th>
+              <th>부서</th>
+              <th>직책</th>
+              <th>리더십</th>
+              <th>니즈</th>
+              <th>상태</th>
+              <th>상세</th>
+            </tr>
+          </thead>
+          <tbody id="submissionTableBody">
+            <tr>
+              <td colspan="10" class="empty">데이터를 불러오는 중입니다.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="detailModalBackdrop" class="modal-backdrop">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div>
+          <h2 id="modalTitle">제출 상세</h2>
+          <p id="modalSubtitle">-</p>
+        </div>
+        <button id="modalCloseBtn" class="modal-close" type="button">×</button>
+      </div>
+
+      <div id="modalBody" class="modal-body">
+        데이터를 불러오는 중입니다.
+      </div>
+    </div>
+  </div>
+
+  <script src="./config.public.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./admin.js"></script>
+</body>
+</html>

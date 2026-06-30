@@ -1,0 +1,18 @@
+{
+  "synced_at": "2026-06-30T11:31:06+00:00",
+  "supabase_submission_count": 1,
+  "synced_submission_count": 1,
+  "skipped_count": 0,
+  "appended_submissions_rows": 1,
+  "appended_leadership_rows": 32,
+  "appended_needs_rows": 12,
+  "synced_items": [
+    {
+      "participant_code": "swon.cho7",
+      "submitted_at": "2026-06-30T11:24:57.952+00:00",
+      "leadership_count": 32,
+      "needs_count": 12,
+      "synced_at": "2026-06-30T11:31:05+00:00"
+    }
+  ]
+}
