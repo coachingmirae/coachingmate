@@ -4,6 +4,8 @@
   const GOOGLE_SHEET_URL =
     "https://docs.google.com/spreadsheets/d/1BLuOy-hPyEZ0mYYvjjxQoy4YZu239kQuxTLnQCq1a8s/edit";
 
+  const ADMIN_KEY_STORAGE_KEY = "coachingmate_admin_key";
+
   const NEEDS_LABELS = {
     currentWork: "N00. 현재 주요 역할/업무",
     need1: "N01. 코칭을 통해 얻고 싶은 것",
@@ -51,18 +53,31 @@
 
   function init() {
     const params = new URLSearchParams(window.location.search);
-    adminKey = String(params.get("key") || "").trim();
+const keyFromUrl = String(params.get("key") || "").trim();
+const keyFromStorage = String(
+  localStorage.getItem(ADMIN_KEY_STORAGE_KEY) || ""
+).trim();
 
-    bindEvents();
+adminKey = keyFromUrl || keyFromStorage;
 
-    if (!adminKey) {
-      showError(
-        "관리자 키가 없습니다.\n\n접속 예:\n/admin.html?key=운영자키"
-      );
-      setLoadStatus("접근 차단");
-      renderEmpty("관리자 키가 없어 조회할 수 없습니다.");
-      return;
-    }
+if (keyFromUrl) {
+  localStorage.setItem(ADMIN_KEY_STORAGE_KEY, keyFromUrl);
+  removeKeyFromUrl();
+}
+
+bindEvents();
+
+if (!adminKey) {
+  showError(
+    "관리자 키가 없습니다.\n\n" +
+    "최초 1회는 아래 형식으로 접속하세요.\n" +
+    "/admin?key=운영자키\n\n" +
+    "한 번 인증되면 이후에는 /admin 으로 접속할 수 있습니다."
+  );
+  setLoadStatus("접근 차단");
+  renderEmpty("관리자 키가 없어 조회할 수 없습니다.");
+  return;
+} 
 
     const config =
   window.COACHINGMATE_CONFIG ||
@@ -109,6 +124,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
     const refreshBtn = document.getElementById("refreshBtn");
     const csvBtn = document.getElementById("csvBtn");
     const sheetBtn = document.getElementById("sheetBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
     const searchInput = document.getElementById("searchInput");
     const clearSearchBtn = document.getElementById("clearSearchBtn");
     const modalCloseBtn = document.getElementById("modalCloseBtn");
@@ -126,6 +142,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
       sheetBtn.addEventListener("click", function () {
         window.open(GOOGLE_SHEET_URL, "_blank", "noopener,noreferrer");
       });
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", clearStoredAdminKey);
     }
 
     if (searchInput) {
@@ -504,6 +524,23 @@ function applySearchFilter() {
     }
   }
 
+function removeKeyFromUrl() {
+  const url = new URL(window.location.href);
+
+  if (!url.searchParams.has("key")) {
+    return;
+  }
+
+  url.searchParams.delete("key");
+
+  const cleanUrl =
+    url.pathname +
+    (url.searchParams.toString() ? "?" + url.searchParams.toString() : "") +
+    url.hash;
+
+  window.history.replaceState({}, document.title, cleanUrl);
+}
+
   function showError(message) {
     const box = document.getElementById("errorBox");
     if (!box) {
@@ -640,6 +677,24 @@ if (!csvSource || csvSource.length === 0) {
   document.body.removeChild(link);
 
   URL.revokeObjectURL(url);
+}
+
+function clearStoredAdminKey() {
+  const ok = confirm(
+    "이 브라우저에 저장된 관리자 키를 삭제하시겠습니까?\n\n" +
+    "삭제 후에는 다시 key가 포함된 관리자 URL로 접속해야 합니다."
+  );
+
+  if (!ok) {
+    return;
+  }
+
+  localStorage.removeItem(ADMIN_KEY_STORAGE_KEY);
+  adminKey = "";
+
+  alert("관리자 키가 삭제되었습니다.");
+
+  window.location.href = "/admin";
 }
 
 function csvEscape(value) {
