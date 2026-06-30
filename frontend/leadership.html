@@ -686,11 +686,103 @@
       if (!saved) return {};
 
       try {
-        return JSON.parse(saved);
+        const payload = JSON.parse(saved);
+        const participantCode = getParticipantCode();
+
+        if (
+          payload &&
+          payload.participant_code &&
+          participantCode &&
+          payload.participant_code !== participantCode
+        ) {
+          return {};
+        }
+
+        return payload;
       } catch (error) {
         console.warn("리더십 진단 응답을 불러오지 못했습니다.", error);
         return {};
       }
+    }
+
+    function hasAnswerObject(value) {
+      return Boolean(
+        value &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        Object.keys(value).length > 0
+      );
+    }
+
+    function saveBasicInfoFromServerState(state) {
+      if (!state || !state.basic_info) return;
+
+      const basicInfo = {
+        company: state.basic_info.company || "",
+        name: state.basic_info.name || "",
+        position: state.basic_info.position || "",
+        department: state.basic_info.department || "",
+        email: state.basic_info.email || "",
+        phone: state.basic_info.phone || "",
+        participant_code: state.participant_code || getParticipantCode()
+      };
+
+      const hasMeaningfulBasicInfo = Boolean(
+        basicInfo.company ||
+        basicInfo.name ||
+        basicInfo.position ||
+        basicInfo.department ||
+        basicInfo.email ||
+        basicInfo.phone
+      );
+
+      if (hasMeaningfulBasicInfo) {
+        localStorage.setItem(STORAGE_KEYS.basicInfo, JSON.stringify(basicInfo));
+      }
+    }
+
+    function getFirstIncompletePageFromAnswers(sourceAnswers) {
+      const answerMap = sourceAnswers || {};
+
+      const firstMissingIndex = QUESTIONS.findIndex(function (question) {
+        return (
+          answerMap[question.code] === undefined ||
+          answerMap[question.code] === null ||
+          answerMap[question.code] === ""
+        );
+      });
+
+      if (firstMissingIndex < 0) {
+        return getTotalPages();
+      }
+
+      return Math.floor(firstMissingIndex / QUESTIONS_PER_PAGE) + 1;
+    }
+
+    function restoreLeadershipAnswersFromServerState(state) {
+      if (
+        !state ||
+        !state.leadership_answers ||
+        !hasAnswerObject(state.leadership_answers.answers)
+      ) {
+        return false;
+      }
+
+      const participantCode = state.participant_code || getParticipantCode();
+      const serverAnswers = state.leadership_answers.answers || {};
+
+      answers = serverAnswers;
+      currentPage = getFirstIncompletePageFromAnswers(serverAnswers);
+
+      localStorage.setItem(STORAGE_KEYS.leadershipAnswers, JSON.stringify({
+        participant_code: participantCode,
+        answers: serverAnswers,
+        updated_at: state.leadership_answers.updated_at || new Date().toISOString()
+      }));
+
+      localStorage.setItem(STORAGE_KEYS.currentStep, "leadership");
+
+      return true;
     }
 
     function formatDateTime(date) {
@@ -1089,6 +1181,10 @@ async function submitLeadershipToDb() {
         return;
       }
 
+      participantCodeText.textContent = participantCode;
+
+      let restoredFromServer = false;
+
       try {
         const state = await fetchParticipantState();
 
@@ -1101,33 +1197,46 @@ async function submitLeadershipToDb() {
           window.location.href = `${PAGE_PATHS.needs}?id=${encodeURIComponent(participantCode)}`;
           return;
         }
+
+        if (state && state.exists) {
+          saveBasicInfoFromServerState(state);
+          restoredFromServer = restoreLeadershipAnswersFromServerState(state);
+        }
       } catch (error) {
         console.warn("참여 상태 조회 실패:", error);
         // 서버 상태 조회 실패 시에는 localStorage 기준으로 계속 진행합니다.
       }
 
-      participantCodeText.textContent = participantCode;
+      if (!restoredFromServer) {
+        const savedPayload = loadLeadershipAnswers();
+
+        if (savedPayload && savedPayload.answers) {
+          answers = savedPayload.answers;
+          currentPage = getFirstIncompletePageFromAnswers(answers);
+        } else {
+          answers = {};
+          currentPage = 1;
+        }
+      }
 
       validView.classList.remove("hidden");
       invalidView.classList.add("hidden");
 
       initializeRespondentInfo();
 
-      const savedPayload = loadLeadershipAnswers();
-
-      if (savedPayload && savedPayload.answers) {
-        answers = savedPayload.answers;
-      } else {
-        answers = {};
-      }
-
       localStorage.setItem(STORAGE_KEYS.currentStep, "leadership");
 
       renderQuestions();
       updateProgress();
 
-      if (savedPayload && savedPayload.updated_at) {
-        saveStatus.textContent = "저장된 리더십 진단 응답을 불러왔습니다.";
+      if (restoredFromServer) {
+        saveStatus.textContent = "서버에 임시저장된 리더십 진단 응답을 불러왔습니다.";
+      } else {
+        const savedPayload = loadLeadershipAnswers();
+
+        if (savedPayload && savedPayload.updated_at) {
+          saveStatus.textContent = "저장된 리더십 진단 응답을 불러왔습니다.";
+        }
       }
     }
 
@@ -1225,7 +1334,7 @@ submitLeadershipToDb()
     submitButton.disabled = false;
     submitButton.textContent = "리더십 진단 제출하기";
   });
-    }); 
+    });
 
     backButton.addEventListener("click", function () {
       saveLeadershipAnswers();

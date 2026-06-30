@@ -82,6 +82,9 @@
             필수 문항에는 <span class="required-mark">*</span> 표시가 있습니다.
             당장 답변이 어려운 문항은 “해당 없음” 또는 “코칭시 답변 예정”으로 입력할 수 있습니다.
           </p>
+          <p>
+            다른 기기에서 이어서 작성하려면 문항 작성 후 <strong>이 문항까지 임시저장</strong> 버튼을 눌러 주세요.
+          </p>
         </div>
 
         <form id="needsForm" novalidate>
@@ -100,7 +103,7 @@
 
             <div class="button-row-inline">
               <button type="button" id="tempSaveButton" class="secondary-button">
-                임시저장
+                전체 임시저장
               </button>
 
               <button type="submit" id="submitButton" class="primary-button">
@@ -135,10 +138,12 @@
      * CoachingMate needs.html
      * 역할:
      * 1. 코칭 니즈조사 렌더링
-     * 2. localStorage 자동저장
-     * 3. 임시저장 버튼 클릭 시 Supabase draft 저장
-     * 4. 제출하기 클릭 시 Supabase 최종 제출
-     * 5. N11은 선택 문항 처리
+     * 2. 입력 중 localStorage 자동저장
+     * 3. 문항별 "이 문항까지 임시저장" 버튼 클릭 시 Supabase draft 저장
+     * 4. 전체 임시저장 버튼 클릭 시 Supabase draft 저장
+     * 5. 다른 기기 접속 시 Supabase needs_answers를 localStorage로 복원
+     * 6. 제출하기 클릭 시 Supabase 최종 제출
+     * 7. N11은 선택 문항 처리
      */
 
     const STORAGE_KEYS = {
@@ -309,7 +314,7 @@
       localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
       localStorage.setItem(STORAGE_KEYS.lastSavedAt, now.toISOString());
 
-      saveStatus.textContent = `자동 저장됨 · ${formatDateTime(now)}`;
+      saveStatus.textContent = `브라우저 자동 저장됨 · ${formatDateTime(now)}`;
     }
 
     function scheduleAutoSave() {
@@ -336,7 +341,7 @@
         const isRequired = requiredFieldNames.includes(fieldName);
 
         const wrap = document.createElement("div");
-        wrap.className = "form-field";
+        wrap.className = "form-field needs-question-card";
 
         wrap.innerHTML = `
           <label for="${fieldName}">
@@ -353,6 +358,16 @@
             name="${fieldName}"
             placeholder="자유롭게 작성해 주세요."
           ></textarea>
+
+          <div class="needs-question-actions">
+            <button
+              type="button"
+              class="secondary-button needs-single-save-button"
+              data-field-name="${fieldName}"
+            >
+              이 문항까지 임시저장
+            </button>
+          </div>
         `;
 
         needsList.appendChild(wrap);
@@ -367,8 +382,8 @@
         fieldNames.forEach(function (fieldName) {
           const element = document.getElementById(fieldName);
 
-          if (element && answers[fieldName]) {
-            element.value = answers[fieldName];
+          if (element && Object.prototype.hasOwnProperty.call(answers, fieldName)) {
+            element.value = answers[fieldName] || "";
           }
         });
       } catch (error) {
@@ -413,6 +428,40 @@
       return data;
     }
 
+    function restoreStateToLocalStorage(state) {
+      const participantCode = cmGetParticipantCode();
+
+      if (!state || !state.exists) return;
+
+      if (state.basic_info) {
+        localStorage.setItem(STORAGE_KEYS.basicInfo, JSON.stringify({
+          company: state.basic_info.company || "",
+          name: state.basic_info.name || "",
+          position: state.basic_info.position || "",
+          department: state.basic_info.department || "",
+          email: state.basic_info.email || "",
+          phone: state.basic_info.phone || "",
+          participant_code: participantCode
+        }));
+      }
+
+      if (state.leadership_answers && state.leadership_answers.answers) {
+        localStorage.setItem(STORAGE_KEYS.leadershipAnswers, JSON.stringify({
+          participant_code: participantCode,
+          answers: state.leadership_answers.answers || {},
+          updated_at: state.leadership_answers.updated_at || new Date().toISOString()
+        }));
+      }
+
+      if (state.needs_answers && state.needs_answers.answers) {
+        localStorage.setItem(STORAGE_KEYS.needsAnswers, JSON.stringify({
+          participant_code: participantCode,
+          answers: state.needs_answers.answers || {},
+          updated_at: state.needs_answers.updated_at || new Date().toISOString()
+        }));
+      }
+    }
+
     async function saveNeedsDraftToDb() {
       const { data, error } = await supabaseClient.rpc("save_needs_draft", {
         p_participant_code: cmGetParticipantCode(),
@@ -429,6 +478,31 @@
       }
 
       return data;
+    }
+
+    async function saveNeedsDraftFromButton(buttonElement) {
+      clearError();
+      saveNeedsAnswers();
+
+      const originalText = buttonElement.textContent;
+      buttonElement.disabled = true;
+      buttonElement.textContent = "저장 중...";
+
+      try {
+        await saveNeedsDraftToDb();
+
+        const now = new Date();
+        saveStatus.textContent = `서버 임시저장 완료 · ${formatDateTime(now)}`;
+
+        return true;
+      } catch (error) {
+        console.error("니즈조사 임시저장 오류:", error);
+        alert("서버 임시저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+        return false;
+      } finally {
+        buttonElement.disabled = false;
+        buttonElement.textContent = originalText;
+      }
     }
 
     function buildSubmissionPayload() {
@@ -518,6 +592,14 @@
           element.addEventListener("input", scheduleAutoSave);
         }
       });
+
+      const singleSaveButtons = document.querySelectorAll(".needs-single-save-button");
+
+      singleSaveButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          saveNeedsDraftFromButton(button);
+        });
+      });
     }
 
     async function initializePage() {
@@ -534,7 +616,7 @@
         const state = await fetchParticipantState();
 
         if (state && state.status === "submitted") {
-          window.location.href = PAGE_PATHS.complete;
+          window.location.href = `${PAGE_PATHS.complete}?id=${encodeURIComponent(code)}`;
           return;
         }
 
@@ -550,13 +632,7 @@
           }
         }
 
-        if (state && state.needs_answers && state.needs_answers.answers) {
-          localStorage.setItem(STORAGE_KEYS.needsAnswers, JSON.stringify({
-            participant_code: code,
-            answers: state.needs_answers.answers,
-            updated_at: state.needs_answers.updated_at || new Date().toISOString()
-          }));
-        }
+        restoreStateToLocalStorage(state);
 
       } catch (error) {
         console.warn("참여 상태 조회 실패:", error);
@@ -573,24 +649,11 @@
     }
 
     tempSaveButton.addEventListener("click", function () {
-      clearError();
-      saveNeedsAnswers();
-
-      tempSaveButton.disabled = true;
-      tempSaveButton.textContent = "저장 중...";
-
-      saveNeedsDraftToDb()
-        .then(function () {
+      saveNeedsDraftFromButton(tempSaveButton).then(function (ok) {
+        if (ok) {
           alert("임시저장되었습니다. 같은 링크로 다시 접속하면 이어서 작성할 수 있습니다.");
-        })
-        .catch(function (error) {
-          console.error("니즈조사 임시저장 오류:", error);
-          alert("서버 임시저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
-        })
-        .finally(function () {
-          tempSaveButton.disabled = false;
-          tempSaveButton.textContent = "임시저장";
-        });
+        }
+      });
     });
 
     needsForm.addEventListener("submit", function (event) {
@@ -620,7 +683,7 @@
           });
         })
         .then(function () {
-          window.location.href = PAGE_PATHS.complete;
+          window.location.href = `${PAGE_PATHS.complete}?id=${encodeURIComponent(cmGetParticipantCode())}`;
         })
         .catch(function (error) {
           console.error("최종 제출 오류:", error);
