@@ -1,496 +1,968 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CoachingMate | Leadership Coaching Platform</title>
-
   <meta
     name="description"
-    content="CoachingMate 리더십 코칭 진단 플랫폼입니다."
+    content="CoachingMate는 리더십 진단과 코칭 니즈조사를 통해 리더의 성장을 조직의 성과로 연결하는 코칭 플랫폼입니다."
   />
 
-  <link rel="stylesheet" href="./style.css" />
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --primary: #111827;
+      --primary-soft: #f3f4f6;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --success-soft: #ecfdf5;
+      --success: #047857;
+      --shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./config.public.js"></script>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans KR",
+        "Apple SD Gothic Neo",
+        Arial,
+        sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 32%),
+        radial-gradient(circle at top right, rgba(17, 24, 39, 0.08), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      min-height: 100vh;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      background: rgba(246, 247, 251, 0.84);
+      border-bottom: 1px solid rgba(229, 231, 235, 0.75);
+    }
+
+    .nav {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #111827, #2563eb);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .brand-text strong {
+      font-size: 18px;
+    }
+
+    .brand-text span {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      padding: 9px 11px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #374151;
+    }
+
+    .nav-links a:hover {
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .nav-cta {
+      background: var(--primary) !important;
+      color: #fff !important;
+      padding: 10px 14px !important;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 72px 0 48px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.18fr 0.82fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-card {
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(229, 231, 235, 0.82);
+      border-radius: var(--radius-lg);
+      padding: 44px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -80px;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #dbeafe;
+      color: #1d4ed8;
+      background: var(--accent-soft);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(36px, 5vw, 58px);
+      line-height: 1.08;
+      letter-spacing: -0.065em;
+      max-width: 760px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero-copy {
+      margin: 22px 0 0;
+      color: #4b5563;
+      font-size: 18px;
+      line-height: 1.75;
+      max-width: 720px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-actions {
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .button {
+      border: 0;
+      border-radius: 14px;
+      padding: 13px 18px;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+    }
+
+    .button.primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 14px 30px rgba(17, 24, 39, 0.18);
+    }
+
+    .button.secondary {
+      background: #fff;
+      color: var(--primary);
+      border: 1px solid var(--line);
+    }
+
+    .survey-box {
+      background: #111827;
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .survey-box::before {
+      content: "";
+      position: absolute;
+      right: -40px;
+      bottom: -40px;
+      width: 180px;
+      height: 180px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.30);
+    }
+
+    .survey-box h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .survey-box p {
+      margin: 0;
+      color: #d1d5db;
+      font-size: 15px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .survey-form {
+      margin-top: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 13px;
+      color: #e5e7eb;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .survey-input {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.10);
+      color: #fff;
+      border-radius: 14px;
+      padding: 14px 14px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .survey-input::placeholder {
+      color: #9ca3af;
+    }
+
+    .survey-input:focus {
+      border-color: rgba(96, 165, 250, 0.95);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.24);
+    }
+
+    .survey-submit {
+      width: 100%;
+      margin-top: 12px;
+      background: #fff;
+      color: #111827;
+    }
+
+    .survey-help {
+      margin-top: 12px !important;
+      color: #9ca3af !important;
+      font-size: 13px !important;
+    }
+
+    .error-message {
+      display: none;
+      margin-top: 10px;
+      color: #fecaca;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .section {
+      padding: 42px 0;
+    }
+
+    .section-heading {
+      max-width: 760px;
+      margin-bottom: 22px;
+    }
+
+    .section-kicker {
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .section h2 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.18;
+      letter-spacing: -0.055em;
+    }
+
+    .section-desc {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .cards-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    }
+
+    .info-card .num {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: var(--primary-soft);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .info-card h3 {
+      margin: 0 0 8px;
+      font-size: 19px;
+      letter-spacing: -0.035em;
+    }
+
+    .info-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .program {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .program-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+    }
+
+    .program-side {
+      background: linear-gradient(135deg, #111827, #1d4ed8);
+      color: #fff;
+      padding: 34px;
+    }
+
+    .program-side h3 {
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: -0.055em;
+      line-height: 1.15;
+    }
+
+    .program-side p {
+      margin: 14px 0 0;
+      color: #dbeafe;
+      font-size: 16px;
+    }
+
+    .program-body {
+      padding: 30px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #edf2f7;
+      border-radius: 14px;
+      background: #fafafa;
+    }
+
+    .feature-row strong {
+      color: #111827;
+      font-size: 15px;
+    }
+
+    .feature-row span {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .step-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      position: relative;
+    }
+
+    .step-card .step-no {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .step-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      letter-spacing: -0.035em;
+    }
+
+    .step-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .notice {
+      margin-top: 18px;
+      background: var(--success-soft);
+      border: 1px solid #bbf7d0;
+      color: var(--success);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      font-weight: 800;
+      line-height: 1.7;
+    }
+
+    .bottom-cta {
+      padding: 42px 0 72px;
+    }
+
+    .bottom-box {
+      background: #111827;
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 34px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+
+    .bottom-box h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: -0.04em;
+    }
+
+    .bottom-box p {
+      margin: 0;
+      color: #d1d5db;
+    }
+
+    .bottom-box .button {
+      background: #fff;
+      color: #111827;
+      white-space: nowrap;
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--line);
+      padding: 24px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-inner {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid,
+      .program-grid,
+      .bottom-box {
+        grid-template-columns: 1fr;
+      }
+
+      .cards-3,
+      .steps {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .hero {
+        padding-top: 44px;
+      }
+
+      .hero-card {
+        padding: 32px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .nav-links a {
+        padding: 8px 9px;
+        font-size: 13px;
+      }
+
+      .hero-card,
+      .survey-box,
+      .program-side,
+      .program-body,
+      .bottom-box {
+        padding: 24px;
+      }
+
+      .cards-3,
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <script>
+    // 기존 진단 링크 호환:
+    // https://coachingmate.co.kr/?id=참여코드
+    // → https://coachingmate.co.kr/survey-start.html?id=참여코드
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var id = String(params.get("id") || "").trim();
+
+      if (id) {
+        var nextUrl = "/survey-start.html?id=" + encodeURIComponent(id);
+        window.location.replace(nextUrl);
+      }
+    })();
+  </script>
 </head>
 
 <body>
-  <main class="app-shell">
-    <section class="intro-card">
-      <header class="brand-header">
-        <div class="logo-box">
-          <span class="logo-text">CM</span>
-        </div>
+  <div class="page">
+    <header class="site-header">
+      <nav class="nav">
+        <a class="brand" href="/">
+          <span class="brand-mark">CM</span>
+          <span class="brand-text">
+            <strong>CoachingMate</strong>
+            <span>Leadership Coaching Platform</span>
+          </span>
+        </a>
 
-        <div>
-          <h1>CoachingMate</h1>
-          <p>Leadership Coaching Platform</p>
+        <div class="nav-links">
+          <a href="#intro">코칭 소개</a>
+          <a href="#program">코칭 프로그램</a>
+          <a href="#process">진행 방식</a>
+          <a class="nav-cta" href="#survey">사전조사 응답하기</a>
         </div>
-      </header>
+      </nav>
+    </header>
 
-      <section id="loadingView" class="content-section">
-        <div class="notice-box">
-          <strong>참여 링크 확인 중</strong>
-          <p>잠시만 기다려 주세요. 참여코드와 응답 상태를 확인하고 있습니다.</p>
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="hero-card">
+            <div class="eyebrow">Dual Growth · Real Coaching</div>
+
+            <h1>
+              리더의 성장을<br />
+              <span>조직의 성과</span>로 연결합니다
+            </h1>
+
+            <p class="hero-copy">
+              CoachingMate는 리더십 진단과 코칭 니즈조사를 통해
+              코칭의 출발점을 명확히 하고, 리더 개인의 성장과 조직의 변화를
+              함께 준비하는 Leadership Coaching Platform입니다.
+            </p>
+
+            <div class="hero-actions">
+              <a class="button primary" href="#survey">사전조사 응답하기</a>
+              <a class="button secondary" href="#intro">코칭 소개 보기</a>
+            </div>
+          </div>
+
+          <aside id="survey" class="survey-box">
+            <div>
+              <h2>사전조사 응답하기</h2>
+              <p>
+                이메일 또는 문자로 안내받은 참여코드를 입력해 주세요.
+                입력 후 기본정보, 리더십 진단, 코칭 니즈조사 순서로 진행됩니다.
+              </p>
+
+              <form id="surveyCodeForm" class="survey-form">
+                <label class="input-label" for="participantCodeInput">
+                  참여코드
+                </label>
+                <input
+                  id="participantCodeInput"
+                  class="survey-input"
+                  type="text"
+                  inputmode="text"
+                  autocomplete="off"
+                  placeholder="예: swon.cho7"
+                />
+
+                <button class="button survey-submit" type="submit">
+                  사전조사 시작하기
+                </button>
+
+                <div id="surveyErrorMessage" class="error-message">
+                  참여코드를 입력해 주세요.
+                </div>
+
+                <p class="survey-help">
+                  참여코드는 대소문자와 특수문자를 포함할 수 있습니다.
+                  안내받은 코드 그대로 입력해 주세요.
+                </p>
+              </form>
+            </div>
+          </aside>
         </div>
       </section>
 
-      <section id="validParticipantView" class="content-section hidden">
-        <div class="page-title-box">
-          <p class="eyebrow">WELCOME</p>
-          <h3>리더십 코칭을 위한 사전조사 실시 안내</h3>
-          <p>본 조사는 귀하의 리더십 역량을 객관적으로 파악하고, 코칭니즈를 파악하여, 향후 코칭 세션의 방향과 목표를 설정하기 위한 기초 자료로 활용하기 위해 실시됩니다.</p>
-          <p>모든 응답은 통계 분석 및 코칭 목적으로만 사용되며, 진단 결과는 본인과 담당 코치에게만 공유됩니다. 이를 제외한 제3자에게는 어떠한 경우에도 개별 결과가 공개되지 않으며, 관련 정보는 개인정보 보호 기준을 준수하여 엄격히 관리됩니다.</p> 
-          <p>* 진단 완료 후, 리더십 역량 진단 결과 보고서는 코칭 시작 이전에 귀하의 이메일로 개별 발송해 드릴 예정입니다.</p>
-          <p>준비되셨으면 "시작하기" 단추를 눌러주시기 바랍니다"</p>
-          </p>
-        </div>
-
-        <div class="participant-box">
-          <span class="info-label">참여코드</span>
-          <strong id="participantCodeText">-</strong>
-        </div>
-
-        <div class="progress-steps" aria-label="진행 단계">
-          <div class="step-item active">
-            <span class="step-dot">1</span>
-            <span>기본정보</span>
-          </div>
-
-          <div class="step-line"></div>
-
-          <div class="step-item">
-            <span class="step-dot">2</span>
-            <span>리더십 진단</span>
-          </div>
-
-          <div class="step-line"></div>
-
-          <div class="step-item">
-            <span class="step-dot">3</span>
-            <span>코칭 니즈</span>
-          </div>
-
-          <div class="step-line"></div>
-
-          <div class="step-item">
-            <span class="step-dot">4</span>
-            <span>완료</span>
-          </div>
-        </div>
-
-        <div id="startBox" class="button-panel">
-          <button type="button" id="startButton" class="primary-button full-width">
-            시작하기
-          </button>
-        </div>
-
-        <div id="resumeBox" class="resume-box hidden">
-          <h3>이전에 작성 중인 응답이 있습니다.</h3>
-          <p>
-            같은 참여코드로 저장된 응답이 있습니다.
-            이어서 작성하거나 처음부터 다시 시작할 수 있습니다.
-          </p>
-
-          <div class="button-row">
-            <button type="button" id="resumeButton" class="primary-button">
-              이어서 작성하기
-            </button>
-
-            <button type="button" id="resetButton" class="secondary-button">
-              처음부터 다시 작성
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section id="submittedView" class="content-section hidden">
-        <div class="complete-card">
-          <div class="complete-icon">✓</div>
-
-          <p class="eyebrow">ALREADY SUBMITTED</p>
-
-          <h2>이미 제출 완료되었습니다.</h2>
-
-          <p class="description">
-            이 참여 링크로 이미 리더십 진단과 코칭 니즈조사가 제출되었습니다.
-            다시 응답하려면 기존 제출 내용을 삭제한 후 재응답을 시작할 수 있습니다.
-          </p>
-
-          <div class="participant-box">
-            <span class="info-label">참여코드</span>
-            <strong id="submittedParticipantCodeText">-</strong>
-          </div>
-
-          <div class="button-row complete-button-row">
-            <button type="button" id="resetResponseButton" class="secondary-button">
-              제출 내용 삭제 후 재응답하기
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section id="invalidParticipantView" class="content-section hidden">
-        <div class="error-card">
-          <h2>참여코드를 확인할 수 없습니다.</h2>
-          <p>
-            올바른 참여 링크로 접속해 주세요.
-            문자 또는 이메일로 받은 링크를 다시 확인해 주세요.
-          </p>
-
-          <div class="notice-box">
-            <strong>참여 링크 예시</strong>
-            <p>
-              https://coachingmate.co.kr/?id=swon.cho7
+      <section id="intro" class="section">
+        <div class="container">
+          <div class="section-heading">
+            <div class="section-kicker">CoachingMate Coaching</div>
+            <h2>코칭을 시작하기 전, 리더의 현재와 니즈를 먼저 이해합니다.</h2>
+            <p class="section-desc">
+              효과적인 코칭은 막연한 대화에서 시작되지 않습니다.
+              CoachingMate는 사전진단과 니즈조사를 통해 리더의 현재 상태,
+              주요 고민, 조직 맥락, 코칭 기대를 구조화하여 코칭의 방향을 선명하게 만듭니다.
             </p>
           </div>
+
+          <div class="cards-3">
+            <article class="info-card">
+              <div class="num">01</div>
+              <h3>Dual Growth</h3>
+              <p>
+                리더 개인의 성장과 조직의 성과를 분리하지 않고,
+                함께 성장하는 방향을 설계합니다.
+              </p>
+            </article>
+
+            <article class="info-card">
+              <div class="num">02</div>
+              <h3>Real Coaching</h3>
+              <p>
+                실제 업무, 팀 운영, 구성원 관계, 조직문화 등
+                리더가 마주하는 현실 이슈를 중심으로 코칭합니다.
+              </p>
+            </article>
+
+            <article class="info-card">
+              <div class="num">03</div>
+              <h3>Prepared Coaching</h3>
+              <p>
+                리더십 진단과 코칭 니즈조사를 바탕으로
+                코칭 전 준비도를 높이고 코칭의 초점을 명확히 합니다.
+              </p>
+            </article>
+          </div>
         </div>
       </section>
 
-      <footer class="page-footer">
-        <p>© CoachingMate. All rights reserved.</p>
-      </footer>
-    </section>
-  </main>
+      <section id="program" class="section">
+        <div class="container">
+          <div class="program">
+            <div class="program-grid">
+              <div class="program-side">
+                <h3>
+                  자신과 조직이<br />
+                  함께 성장하는 코칭
+                </h3>
+                <p>
+                  CoachingMate 코칭은 리더의 자기이해, 관계 이해,
+                  조직 내 역할 인식을 바탕으로 실제 변화 행동까지 연결하는 것을 지향합니다.
+                </p>
+              </div>
+
+              <div class="program-body">
+                <div class="feature-row">
+                  <strong>리더십 진단</strong>
+                  <span>
+                    리더십 행동과 인식 수준을 점검하고 현재 리더십의 강점과
+                    개선 포인트를 확인합니다.
+                  </span>
+                </div>
+
+                <div class="feature-row">
+                  <strong>니즈조사</strong>
+                  <span>
+                    코칭에서 다루고 싶은 주제, 기대 효과, 현재 고민,
+                    조직 맥락을 사전에 정리합니다.
+                  </span>
+                </div>
+
+                <div class="feature-row">
+                  <strong>코칭 준비</strong>
+                  <span>
+                    코치는 제출된 내용을 바탕으로 피코치에게 더 적합한 질문과
+                    코칭 방향을 준비합니다.
+                  </span>
+                </div>
+
+                <div class="feature-row">
+                  <strong>실행 중심</strong>
+                  <span>
+                    코칭은 이해에서 끝나지 않고, 실제 리더십 상황에서 적용 가능한
+                    행동 변화와 실천 과제로 이어집니다.
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="process" class="section">
+        <div class="container">
+          <div class="section-heading">
+            <div class="section-kicker">Process</div>
+            <h2>사전조사는 코칭을 더 효과적으로 준비하기 위한 첫 단계입니다.</h2>
+            <p class="section-desc">
+              참여코드를 받은 피코치는 간단한 기본정보 입력 후
+              리더십 진단과 코칭 니즈조사에 응답합니다.
+              제출된 내용은 담당 코치가 코칭 준비 자료로 활용합니다.
+            </p>
+          </div>
+
+          <div class="steps">
+            <article class="step-card">
+              <div class="step-no">1</div>
+              <h3>참여코드 안내</h3>
+              <p>
+                운영자가 코칭 대상자를 등록한 후 이메일 또는 문자로 참여코드를 안내합니다.
+              </p>
+            </article>
+
+            <article class="step-card">
+              <div class="step-no">2</div>
+              <h3>사전조사 응답</h3>
+              <p>
+                기본정보, 리더십 진단, 코칭 니즈조사에 순서대로 응답합니다.
+              </p>
+            </article>
+
+            <article class="step-card">
+              <div class="step-no">3</div>
+              <h3>코칭 방향 설정</h3>
+              <p>
+                담당 코치가 응답 내용을 확인하고 코칭의 주요 주제와 접근 방향을 준비합니다.
+              </p>
+            </article>
+
+            <article class="step-card">
+              <div class="step-no">4</div>
+              <h3>코칭 진행</h3>
+              <p>
+                리더의 실제 과제와 조직 맥락을 중심으로 코칭을 진행합니다.
+              </p>
+            </article>
+          </div>
+
+          <div class="notice">
+            CoachingMate는 현재 개별 회원가입을 지원하지 않습니다.
+            사전조사는 소속 기관 또는 운영자가 안내한 참여코드를 통해 진행됩니다.
+          </div>
+        </div>
+      </section>
+
+      <section class="bottom-cta">
+        <div class="container">
+          <div class="bottom-box">
+            <div>
+              <h2>참여코드를 받으셨나요?</h2>
+              <p>
+                안내받은 참여코드를 입력하고 사전조사를 시작해 주세요.
+                응답은 코칭 준비를 위한 자료로 활용됩니다.
+              </p>
+            </div>
+
+            <a class="button" href="#survey">사전조사 응답하기</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>© CoachingMate. Leadership Coaching Platform.</span>
+        <span>Dual Growth · Real Coaching</span>
+      </div>
+    </footer>
+  </div>
 
   <script>
-    /**
-     * CoachingMate index.html
-     * 역할:
-     * 1. URL의 참여코드 확인
-     * 2. Supabase DB에서 제출 상태 조회
-     * 3. submitted 상태이면 제출 완료 화면 표시
-     * 4. draft / leadership_submitted 상태이면 DB 응답을 localStorage로 복원
-     * 5. reset_participant_response 이후 남아 있는 브라우저 저장값을 정리
-     */
+    (function () {
+      var form = document.getElementById("surveyCodeForm");
+      var input = document.getElementById("participantCodeInput");
+      var error = document.getElementById("surveyErrorMessage");
 
-    const STORAGE_KEYS = {
-      participantCode: "cm_participant_code",
-      basicInfo: "cm_basic_info",
-      leadershipAnswers: "cm_leadership_answers",
-      needsAnswers: "cm_needs_answers",
-      currentStep: "cm_current_step",
-      lastSavedAt: "cm_last_saved_at",
-      submittedAt: "cm_submitted_at",
-      finalSubmission: "cm_final_submission"
-    };
-
-    const PAGE_PATHS = {
-      basicInfo: "./basic-info.html",
-      leadership: "./leadership.html",
-      needs: "./needs.html",
-      complete: "./complete.html"
-    };
-
-    const SUPABASE_URL = window.CM_CONFIG && window.CM_CONFIG.SUPABASE_URL;
-    const SUPABASE_ANON_KEY = window.CM_CONFIG && window.CM_CONFIG.SUPABASE_ANON_KEY;
-
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
-
-    const loadingView = document.getElementById("loadingView");
-    const validParticipantView = document.getElementById("validParticipantView");
-    const invalidParticipantView = document.getElementById("invalidParticipantView");
-    const submittedView = document.getElementById("submittedView");
-
-    const participantCodeText = document.getElementById("participantCodeText");
-    const submittedParticipantCodeText = document.getElementById("submittedParticipantCodeText");
-
-    const startBox = document.getElementById("startBox");
-    const resumeBox = document.getElementById("resumeBox");
-
-    const startButton = document.getElementById("startButton");
-    const resumeButton = document.getElementById("resumeButton");
-    const resetButton = document.getElementById("resetButton");
-    const resetResponseButton = document.getElementById("resetResponseButton");
-
-    let currentParticipantCode = "";
-    let currentServerState = null;
-
-    function getParticipantCodeFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get("id");
-
-      return code ? code.trim() : "";
-    }
-
-    function makePath(path) {
-      if (!currentParticipantCode) return path;
-
-      return `${path}?id=${encodeURIComponent(currentParticipantCode)}`;
-    }
-
-    function showOnly(viewElement) {
-      loadingView.classList.add("hidden");
-      validParticipantView.classList.add("hidden");
-      invalidParticipantView.classList.add("hidden");
-      submittedView.classList.add("hidden");
-
-      viewElement.classList.remove("hidden");
-    }
-
-    function clearLocalResponseData(keepParticipantCode) {
-      const participantCode = currentParticipantCode || localStorage.getItem(STORAGE_KEYS.participantCode);
-
-      localStorage.removeItem(STORAGE_KEYS.basicInfo);
-      localStorage.removeItem(STORAGE_KEYS.leadershipAnswers);
-      localStorage.removeItem(STORAGE_KEYS.needsAnswers);
-      localStorage.removeItem(STORAGE_KEYS.currentStep);
-      localStorage.removeItem(STORAGE_KEYS.lastSavedAt);
-      localStorage.removeItem(STORAGE_KEYS.submittedAt);
-      localStorage.removeItem(STORAGE_KEYS.finalSubmission);
-
-      if (!keepParticipantCode) {
-        localStorage.removeItem(STORAGE_KEYS.participantCode);
-      } else if (participantCode) {
-        localStorage.setItem(STORAGE_KEYS.participantCode, participantCode);
-      }
-    }
-
-    function hasSavedProgress() {
-      return Boolean(
-        localStorage.getItem(STORAGE_KEYS.basicInfo) ||
-        localStorage.getItem(STORAGE_KEYS.leadershipAnswers) ||
-        localStorage.getItem(STORAGE_KEYS.needsAnswers)
-      );
-    }
-
-    function hasRemoteProgress(state) {
-      if (!state || !state.exists) return false;
-
-      if (state.status === "submitted" || state.status === "leadership_submitted") {
-        return true;
-      }
-
-      if (state.leadership_answers && state.leadership_answers.answers) {
-        return Object.keys(state.leadership_answers.answers).length > 0;
-      }
-
-      if (state.needs_answers && state.needs_answers.answers) {
-        return Object.keys(state.needs_answers.answers).length > 0;
-      }
-
-      return false;
-    }
-
-    function getCurrentStep() {
-      return localStorage.getItem(STORAGE_KEYS.currentStep) || "basicInfo";
-    }
-
-    function getResumePath() {
-      const currentStep = getCurrentStep();
-
-      if (currentStep === "leadership") {
-        return makePath(PAGE_PATHS.leadership);
-      }
-
-      if (currentStep === "needs") {
-        return makePath(PAGE_PATHS.needs);
-      }
-
-      if (currentStep === "complete") {
-        return makePath(PAGE_PATHS.complete);
-      }
-
-      return makePath(PAGE_PATHS.basicInfo);
-    }
-
-    function restoreStateToLocalStorage(state) {
-      if (!state || !state.exists) return;
-
-      localStorage.setItem(STORAGE_KEYS.participantCode, state.participant_code);
-
-      if (state.basic_info && hasRemoteProgress(state)) {
-        localStorage.setItem(STORAGE_KEYS.basicInfo, JSON.stringify({
-          company: state.basic_info.company || "",
-          name: state.basic_info.name || "",
-          position: state.basic_info.position || "",
-          department: state.basic_info.department || "",
-          email: state.basic_info.email || "",
-          phone: state.basic_info.phone || "",
-          participant_code: state.participant_code
-        }));
-      }
-
-      if (state.leadership_answers && state.leadership_answers.answers) {
-        localStorage.setItem(STORAGE_KEYS.leadershipAnswers, JSON.stringify({
-          participant_code: state.participant_code,
-          answers: state.leadership_answers.answers || {},
-          updated_at: state.leadership_answers.updated_at || new Date().toISOString()
-        }));
-
-        localStorage.setItem(STORAGE_KEYS.currentStep, "leadership");
-      }
-
-      if (state.needs_answers && state.needs_answers.answers) {
-        localStorage.setItem(STORAGE_KEYS.needsAnswers, JSON.stringify({
-          participant_code: state.participant_code,
-          answers: state.needs_answers.answers || {},
-          updated_at: state.needs_answers.updated_at || new Date().toISOString()
-        }));
-
-        localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
-      }
-
-      if (state.status === "leadership_submitted") {
-        localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
-      }
-    }
-
-    async function fetchParticipantState(participantCode) {
-      const { data, error } = await supabaseClient.rpc("get_participant_state", {
-        p_participant_code: participantCode
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    }
-
-    async function resetParticipantResponse(participantCode) {
-      const { data, error } = await supabaseClient.rpc("reset_participant_response", {
-        p_participant_code: participantCode
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    }
-
-    async function initializePage() {
-      const participantCode = getParticipantCodeFromUrl();
-
-      if (!participantCode) {
-        showOnly(invalidParticipantView);
-        return;
-      }
-
-      currentParticipantCode = participantCode;
-
-      localStorage.setItem(STORAGE_KEYS.participantCode, participantCode);
-
-      participantCodeText.textContent = participantCode;
-      submittedParticipantCodeText.textContent = participantCode;
-
-      try {
-        const state = await fetchParticipantState(participantCode);
-        currentServerState = state;
-
-        if (state && state.status === "submitted") {
-          showOnly(submittedView);
+      function showError(message) {
+        if (!error) {
           return;
         }
 
-        /*
-          중요:
-          reset_participant_response()는 participants 행을 남겨두고
-          leadership_responses / needs_responses / submissions만 삭제합니다.
-          따라서 state.exists=true 이더라도 응답 데이터가 없으면
-          과거 localStorage를 반드시 지워야 합니다.
-        */
-        if (!hasRemoteProgress(state)) {
-          clearLocalResponseData(true);
-          localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
-        } else {
-          restoreStateToLocalStorage(state);
-        }
-
-        showOnly(validParticipantView);
-
-        if (hasSavedProgress()) {
-          startBox.classList.add("hidden");
-          resumeBox.classList.remove("hidden");
-        } else {
-          startBox.classList.remove("hidden");
-          resumeBox.classList.add("hidden");
-        }
-
-      } catch (error) {
-        console.error("참여 상태 조회 오류:", error);
-
-        showOnly(validParticipantView);
-
-        if (hasSavedProgress()) {
-          startBox.classList.add("hidden");
-          resumeBox.classList.remove("hidden");
-        } else {
-          startBox.classList.remove("hidden");
-          resumeBox.classList.add("hidden");
-        }
-
-        alert(
-          "서버 상태 조회 중 오류가 발생했습니다. 현재 브라우저에 저장된 내용으로 계속 진행합니다."
-        );
+        error.textContent = message;
+        error.style.display = "block";
       }
-    }
 
-    startButton.addEventListener("click", function () {
-      clearLocalResponseData(true);
-      localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
-      window.location.href = makePath(PAGE_PATHS.basicInfo);
-    });
-
-    resumeButton.addEventListener("click", function () {
-      window.location.href = getResumePath();
-    });
-
-    resetButton.addEventListener("click", async function () {
-      const confirmed = window.confirm(
-        "작성 중인 응답을 삭제하고 처음부터 다시 작성하시겠습니까?"
-      );
-
-      if (!confirmed) return;
-
-      try {
-        if (currentParticipantCode) {
-          await resetParticipantResponse(currentParticipantCode);
+      function hideError() {
+        if (!error) {
+          return;
         }
 
-        clearLocalResponseData(true);
-        localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
-
-        window.location.href = makePath(PAGE_PATHS.basicInfo);
-
-      } catch (error) {
-        console.error("처음부터 다시 작성 초기화 오류:", error);
-        alert("초기화 중 오류가 발생했습니다. 담당자에게 문의해 주세요.");
+        error.textContent = "";
+        error.style.display = "none";
       }
-    });
 
-    resetResponseButton.addEventListener("click", async function () {
-      const participantCode = getParticipantCodeFromUrl();
-
-      const confirmed = window.confirm(
-        "기존 제출 내용을 삭제하고 다시 응답하시겠습니까?\n\n삭제 후에는 기존 제출 데이터가 초기화됩니다."
-      );
-
-      if (!confirmed) return;
-
-      try {
-        await resetParticipantResponse(participantCode);
-
-        currentParticipantCode = participantCode;
-        clearLocalResponseData(true);
-        localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
-
-        window.location.href = makePath(PAGE_PATHS.basicInfo);
-
-      } catch (error) {
-        console.error("재응답 초기화 오류:", error);
-        alert("재응답 초기화 중 오류가 발생했습니다. 담당자에게 문의해 주세요.");
+      function normalizeCode(value) {
+        return String(value || "").trim();
       }
-    });
 
-    initializePage();
+      if (input) {
+        input.addEventListener("input", hideError);
+      }
+
+      if (form) {
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          var code = normalizeCode(input ? input.value : "");
+
+          if (!code) {
+            showError("참여코드를 입력해 주세요.");
+            if (input) {
+              input.focus();
+            }
+            return;
+          }
+
+          window.location.href =
+            "/survey-start.html?id=" + encodeURIComponent(code);
+        });
+      }
+    })();
   </script>
 </body>
 </html>
