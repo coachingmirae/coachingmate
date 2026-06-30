@@ -26,11 +26,11 @@
         <div class="page-title-box"><p class="eyebrow">STEP 1</p><h2>기본정보</h2><p>코칭 준비를 위해 필요한 기본정보를 입력해 주세요.</p></div>
         <form id="basicInfoForm" novalidate>
           <div class="form-grid">
-            <div class="form-field"><label for="company">회사명</label><input id="company" name="company" type="text" required /></div>
-            <div class="form-field"><label for="name">성명</label><input id="name" name="name" type="text" required /></div>
-            <div class="form-field"><label for="department">부서</label><input id="department" name="department" type="text" required /></div>
-            <div class="form-field"><label for="position">직책/직위</label><input id="position" name="position" type="text" required /></div>
-            <div class="form-field full"><label for="email">이메일</label><input id="email" name="email" type="email" required /></div>
+            <div class="form-field"><label for="company">회사명<span class="required-mark">*</span></label><input id="company" name="company" type="text" required /></div>
+            <div class="form-field"><label for="name">성명<span class="required-mark">*</span></label><input id="name" name="name" type="text" required /></div>
+            <div class="form-field"><label for="department">부서</label><input id="department" name="department" type="text" /></div>
+            <div class="form-field"><label for="position">직책/직위<span class="required-mark">*</span></label><input id="position" name="position" type="text" required /></div>
+            <div class="form-field full"><label for="email">이메일</label><input id="email" name="email" type="email" /></div>
             <!--
             <div class="form-field full"><label for="phone">연락처</label><input id="phone" name="phone" type="tel" /></div>
             -->
@@ -59,7 +59,12 @@
     const saveStatus = document.getElementById("saveStatus");
     const backButton = document.getElementById("backButton");
     const formFields = ["company", "name", "position", "department", "email"];
-    let autoSaveTimer = null;
+
+// 실제 필수 입력 항목
+// 부서(department), 이메일(email)은 선택 입력
+const requiredFields = ["company", "name", "position"];
+
+let autoSaveTimer = null;
 
     function formatDateTime(date) {
       return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")} ${String(date.getHours()).padStart(2,"0")}:${String(date.getMinutes()).padStart(2,"0")}`;
@@ -101,13 +106,22 @@
     }
     formFields.forEach(function(field){ document.getElementById(field).addEventListener("input", scheduleAutoSave); });
     form.addEventListener("submit", function(event){
-      event.preventDefault(); clearError();
-      const missing = formFields.filter(function(field){ return !document.getElementById(field).value.trim(); });
-      if (missing.length) { showError("필수 입력 항목을 모두 입력해 주세요."); return; }
-      saveBasicInfo();
-      localStorage.setItem(STORAGE_KEYS.currentStep, "leadership");
-      window.location.href = "./leadership.html";
-    });
+  event.preventDefault();
+  clearError();
+
+  const missing = requiredFields.filter(function(field){
+    return !document.getElementById(field).value.trim();
+  });
+
+  if (missing.length) {
+    showError("필수 입력 항목을 모두 입력해 주세요.");
+    return;
+  }
+
+  saveBasicInfo();
+  localStorage.setItem(STORAGE_KEYS.currentStep, "leadership");
+  window.location.href = "./leadership.html";
+});
     backButton.addEventListener("click", function(){ window.location.href = "./index.html?id=" + encodeURIComponent(cmGetParticipantCode()); });
     initializePage();
   </script>

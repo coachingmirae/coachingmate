@@ -3,71 +3,644 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>코칭 니즈조사 | CoachingMate</title>
+
+  <meta
+    name="description"
+    content="CoachingMate 코칭 니즈조사 페이지입니다."
+  />
+
   <link rel="stylesheet" href="./style.css" />
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./config.public.js"></script>
   <script src="./script.js"></script>
 </head>
-<body>
-  <main class="app-shell"><section class="survey-card">
-    <header class="survey-header"><div class="brand-mini"><div class="logo-box small">CM</div><div><h1>CoachingMate</h1><p>Leadership Coaching Platform</p></div></div><div class="participant-badge">참여코드 <strong id="participantCodeText">-</strong></div></header>
-    <section class="progress-steps compact"><div class="step-item done"><span class="step-dot">✓</span><span>기본정보</span></div><div class="step-line active"></div><div class="step-item done"><span class="step-dot">✓</span><span>리더십 진단</span></div><div class="step-line active"></div><div class="step-item active"><span class="step-dot">3</span><span>코칭 니즈</span></div><div class="step-line"></div><div class="step-item"><span class="step-dot">4</span><span>완료</span></div></section>
-    <section id="validView" class="content-section hidden">
-      <div class="page-title-box"><p class="eyebrow">STEP 3</p><h2>코칭 니즈조사</h2><p>아래 문항은 향후 코칭 목표와 방향을 설정하기 위한 사전 질문입니다. 각 문항에 자유롭게 작성해 주세요.</p></div>
-      <form id="needsForm" novalidate><div id="needsList"></div><div id="errorMessage" class="error-message hidden"></div>
-        <!--
-리더십 진단 제출 후에는 수정 방지를 위해 이전 버튼을 숨김 처리합니다.
 
-<button type="button" id="backButton" class="secondary-button">
-  이전: 리더십 진단
-</button>
--->
-            <div class="button-row-inline"><button type="button" id="tempSaveButton" class="secondary-button">임시저장</button><button type="submit" class="primary-button">제출하기</button></div></div><p id="saveStatus" class="save-status">자동 저장 대기 중</p></form>
+<body>
+  <main class="app-shell">
+    <section class="survey-card">
+      <header class="survey-header">
+        <div class="brand-mini">
+          <div class="logo-box small">
+            <span class="logo-text">CM</span>
+          </div>
+
+          <div>
+            <h1>CoachingMate</h1>
+            <p>Leadership Coaching Platform</p>
+          </div>
+        </div>
+
+        <div class="participant-badge">
+          참여코드 <strong id="participantCodeText">-</strong>
+        </div>
+      </header>
+
+      <section class="progress-steps compact" aria-label="진행 단계">
+        <div class="step-item done">
+          <span class="step-dot">✓</span>
+          <span>기본정보</span>
+        </div>
+
+        <div class="step-line active"></div>
+
+        <div class="step-item done">
+          <span class="step-dot">✓</span>
+          <span>리더십 진단</span>
+        </div>
+
+        <div class="step-line active"></div>
+
+        <div class="step-item active">
+          <span class="step-dot">3</span>
+          <span>코칭 니즈</span>
+        </div>
+
+        <div class="step-line"></div>
+
+        <div class="step-item">
+          <span class="step-dot">4</span>
+          <span>완료</span>
+        </div>
+      </section>
+
+      <section id="validView" class="content-section hidden">
+        <div class="page-title-box">
+          <p class="eyebrow">STEP 3</p>
+          <h2>코칭 니즈조사</h2>
+          <p>
+            아래 문항은 향후 코칭 목표와 방향을 설정하기 위한 사전 질문입니다.
+            각 문항에 자유롭게 작성해 주세요.
+          </p>
+        </div>
+
+        <div class="notice-box">
+          <strong>작성 안내</strong>
+          <p>
+            필수 문항에는 <span class="required-mark">*</span> 표시가 있습니다.
+            당장 답변이 어려운 문항은 “해당 없음” 또는 “코칭시 답변 예정”으로 입력할 수 있습니다.
+          </p>
+        </div>
+
+        <form id="needsForm" novalidate>
+          <div id="needsList"></div>
+
+          <div id="errorMessage" class="error-message hidden"></div>
+
+          <div class="form-actions">
+            <!--
+            리더십 진단 제출 후에는 수정 방지를 위해 이전 버튼을 숨김 처리합니다.
+
+            <button type="button" id="backButton" class="secondary-button">
+              이전: 리더십 진단
+            </button>
+            -->
+
+            <div class="button-row-inline">
+              <button type="button" id="tempSaveButton" class="secondary-button">
+                임시저장
+              </button>
+
+              <button type="submit" id="submitButton" class="primary-button">
+                제출하기
+              </button>
+            </div>
+          </div>
+
+          <p id="saveStatus" class="save-status">
+            자동 저장 대기 중
+          </p>
+        </form>
+      </section>
+
+      <section id="invalidView" class="content-section hidden">
+        <div class="error-card">
+          <h2>참여코드를 확인할 수 없습니다.</h2>
+          <p>
+            올바른 참여 링크로 다시 접속해 주세요.
+          </p>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <p>© CoachingMate. All rights reserved.</p>
+      </footer>
     </section>
-    <section id="invalidView" class="content-section hidden"><div class="error-card"><h2>참여코드를 확인할 수 없습니다.</h2><p>올바른 참여 링크로 다시 접속해 주세요.</p></div></section>
-    <footer class="page-footer"><p>© CoachingMate. All rights reserved.</p></footer>
-  </section></main>
+  </main>
 
   <script>
-    const STORAGE_KEYS = {participantCode:"cm_participant_code",basicInfo:"cm_basic_info",leadershipAnswers:"cm_leadership_answers",needsAnswers:"cm_needs_answers",currentStep:"cm_current_step",lastSavedAt:"cm_last_saved_at",submittedAt:"cm_submitted_at"};
+    /**
+     * CoachingMate needs.html
+     * 역할:
+     * 1. 코칭 니즈조사 렌더링
+     * 2. localStorage 자동저장
+     * 3. 임시저장 버튼 클릭 시 Supabase draft 저장
+     * 4. 제출하기 클릭 시 Supabase 최종 제출
+     * 5. N11은 선택 문항 처리
+     */
+
+    const STORAGE_KEYS = {
+      participantCode: "cm_participant_code",
+      basicInfo: "cm_basic_info",
+      leadershipAnswers: "cm_leadership_answers",
+      needsAnswers: "cm_needs_answers",
+      currentStep: "cm_current_step",
+      lastSavedAt: "cm_last_saved_at",
+      submittedAt: "cm_submitted_at",
+      finalSubmission: "cm_final_submission"
+    };
+
+    const PAGE_PATHS = {
+      index: "./index.html",
+      leadership: "./leadership.html",
+      complete: "./complete.html"
+    };
+
     const QUESTIONS = [
-      ["currentWork","현재 하고 계신 일(직책/직무/역할)을 간단히 소개해 주세요."],
-      ["need1","이번 코칭을 통해 꼭 이루고 싶은 목표는 무엇인가요?"],
-      ["need2","코칭이 끝났을 때, “코칭 받길 잘했다”고 느끼게 될 만한 상태는 어떤 모습일까요? 코칭이 성공적이었다는 것을 어떤 지표(KPI, 팀 분위기 변화 등)로 확인할 수 있을까요?"],
-      ["need3","코칭을 통해 특히 다루고 싶은 주제나 키워드가 있다면 자유롭게 적어 주세요."],
-      ["need4","본인이 꿈꾸는 이상적인 리더의 모습과 그 리더가 이끄는 조직은 어떤 모습입니까?"],
-      ["need5","본인이 가진 강점이나 장점이라고 생각하는 점을 3개 이상, 최대한 많이 적어 주세요."],
-      ["need6","본인이 스스로 생각하는 핵심 개선(단점) 영역은 무엇입니까?"],
-      ["need7","현재 소속 조직의 문화를 한 문장으로 정의한다면 무엇입니까? 필요시, 회사 전사와 소속 부서를 구분해 작성해 주세요."],
-      ["need8","현재 소속 조직(단위조직/부서)에서 목표를 달성하는 데 있어 현재 발목을 잡고 있는 조직(단위조직/부서) 차원의 가장 큰 걸림돌은 무엇입니까?"],
-      ["need9","상사, 동료, 부하 직원과의 관계에서 느끼는 만족도와 최근 받은 주요 피드백의 핵심은 무엇입니까?"],
-      ["need10","직원(팀원/부하)들을 차세대 리더로 육성하는 과정에서 본인이 느끼는 가장 어려운 점은 무엇입니까?"],
-      ["need11","코칭 전에 코치가 꼭 알고 있었으면 하는 추가 정보나 요청하고 싶은 말이 있다면 자유롭게 적어 주세요."]
+      [
+        "currentWork",
+        "현재 하고 계신 일(직책/직무/역할)을 간단히 소개해 주세요."
+      ],
+      [
+        "need1",
+        "이번 코칭을 통해 꼭 이루고 싶은 목표는 무엇인가요?"
+      ],
+      [
+        "need2",
+        "코칭이 끝났을 때, “코칭 받길 잘했다”고 느끼게 될 만한 상태는 어떤 모습일까요? 코칭이 성공적이었다는 것을 어떤 지표(KPI, 팀 분위기 변화 등)로 확인할 수 있을까요?"
+      ],
+      [
+        "need3",
+        "코칭을 통해 특히 다루고 싶은 주제나 키워드가 있다면 자유롭게 적어 주세요."
+      ],
+      [
+        "need4",
+        "본인이 꿈꾸는 이상적인 리더의 모습과 그 리더가 이끄는 조직은 어떤 모습입니까?"
+      ],
+      [
+        "need5",
+        "본인이 가진 강점이나 장점이라고 생각하는 점을 3개 이상, 최대한 많이 적어 주세요."
+      ],
+      [
+        "need6",
+        "본인이 스스로 생각하는 핵심 개선(단점) 영역은 무엇입니까?"
+      ],
+      [
+        "need7",
+        "현재 소속 조직의 문화를 한 문장으로 정의한다면 무엇입니까? 필요시, 회사 전사와 소속 부서를 구분해 작성해 주세요."
+      ],
+      [
+        "need8",
+        "현재 소속 조직(단위조직/부서)에서 목표를 달성하는 데 있어 현재 발목을 잡고 있는 조직(단위조직/부서) 차원의 가장 큰 걸림돌은 무엇입니까?"
+      ],
+      [
+        "need9",
+        "상사, 동료, 부하 직원과의 관계에서 느끼는 만족도와 최근 받은 주요 피드백의 핵심은 무엇입니까?"
+      ],
+      [
+        "need10",
+        "직원(팀원/부하)들을 차세대 리더로 육성하는 과정에서 본인이 느끼는 가장 어려운 점은 무엇입니까?"
+      ],
+      [
+        "need11",
+        "코칭 전에 코치가 꼭 알고 있었으면 하는 추가 정보나 요청하고 싶은 말이 있다면 자유롭게 적어 주세요."
+      ]
     ];
-    const supabaseClient=cmGetSupabaseClient();
-    const participantCodeText=document.getElementById("participantCodeText"), validView=document.getElementById("validView"), invalidView=document.getElementById("invalidView"), needsForm=document.getElementById("needsForm"), needsList=document.getElementById("needsList"), errorMessage=document.getElementById("errorMessage"), saveStatus=document.getElementById("saveStatus"), tempSaveButton=document.getElementById("tempSaveButton");
-    let autoSaveTimer=null;
-    function formatDateTime(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;}
-    function loadBasicInfo(){try{return JSON.parse(localStorage.getItem(STORAGE_KEYS.basicInfo)||"{}");}catch(e){return {};}}
-    function loadLeadershipAnswers(){try{return JSON.parse(localStorage.getItem(STORAGE_KEYS.leadershipAnswers)||"{}");}catch(e){return {};}}
-    function getNeedsFromForm(){const data={}; QUESTIONS.forEach(function(q){data[q[0]]=document.getElementById(q[0]).value.trim();}); return data;}
-    function saveNeedsAnswers(){const now=new Date(); localStorage.setItem(STORAGE_KEYS.needsAnswers,JSON.stringify({participant_code:cmGetParticipantCode(),answers:getNeedsFromForm(),updated_at:now.toISOString()})); localStorage.setItem(STORAGE_KEYS.currentStep,"needs"); localStorage.setItem(STORAGE_KEYS.lastSavedAt,now.toISOString()); saveStatus.textContent=`자동 저장됨 · ${formatDateTime(now)}`;}
-    function scheduleAutoSave(){saveStatus.textContent="입력 중..."; if(autoSaveTimer)clearTimeout(autoSaveTimer); autoSaveTimer=setTimeout(saveNeedsAnswers,600);}
-    function renderNeeds(){needsList.innerHTML=""; QUESTIONS.forEach(function(q,i){const wrap=document.createElement("div"); wrap.className="form-field"; wrap.innerHTML=`<label for="${q[0]}">${i===0?"N00":"N"+String(i).padStart(2,"0")}. ${q[1]}</label><textarea id="${q[0]}" name="${q[0]}" placeholder="자유롭게 작성해 주세요."></textarea>`; needsList.appendChild(wrap);});}
-    function loadSaved(){try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEYS.needsAnswers)||"{}"); const ans=saved.answers||{}; QUESTIONS.forEach(q=>{if(ans[q[0]])document.getElementById(q[0]).value=ans[q[0]];});}catch(e){console.warn(e);}}
-    function showError(m){errorMessage.textContent=m; errorMessage.classList.remove("hidden");} function clearError(){errorMessage.textContent=""; errorMessage.classList.add("hidden");}
-    async function saveNeedsDraftToDb(){const {data,error}=await supabaseClient.rpc("save_needs_draft",{p_participant_code:cmGetParticipantCode(),p_basic_info:loadBasicInfo()||{},p_answers:getNeedsFromForm()}); if(error)throw error; return data;}
-    function buildSubmissionPayload(){const now=new Date(); const leadership=loadLeadershipAnswers(); return {participant_code:cmGetParticipantCode(),basic_info:loadBasicInfo()||{},leadership_answers:leadership||{},needs_answers:getNeedsFromForm(),submitted_at:now.toISOString()};}
-    function saveFinalSubmission(){const now=new Date(); const payload=buildSubmissionPayload(); saveNeedsAnswers(); localStorage.setItem("cm_final_submission",JSON.stringify(payload)); localStorage.setItem(STORAGE_KEYS.currentStep,"complete"); localStorage.setItem(STORAGE_KEYS.submittedAt,now.toISOString()); localStorage.setItem(STORAGE_KEYS.lastSavedAt,now.toISOString()); return payload;}
-    async function submitToSupabase(payload){const {data,error}=await supabaseClient.rpc("submit_coachingmate_response",{p_payload:payload}); if(error)throw error; return data;}
-    function submitToGoogleSheet(payload){const url=window.CM_CONFIG.GOOGLE_SCRIPT_URL||""; if(!url)return Promise.resolve(); return fetch(url,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});}
-    function validate(){const data=getNeedsFromForm(); return QUESTIONS.filter(q=>!data[q[0]]);}
-    function initializePage(){const code=cmGetParticipantCode(); if(!code){invalidView.classList.remove("hidden"); return;} participantCodeText.textContent=code; validView.classList.remove("hidden"); renderNeeds(); loadSaved(); QUESTIONS.forEach(q=>document.getElementById(q[0]).addEventListener("input",scheduleAutoSave)); localStorage.setItem(STORAGE_KEYS.currentStep,"needs");}
-    tempSaveButton.addEventListener("click",function(){clearError(); saveNeedsAnswers(); saveNeedsDraftToDb().then(()=>alert("임시저장되었습니다. 같은 링크로 다시 접속하면 이어서 작성할 수 있습니다.")).catch(function(error){console.error(error); alert("서버 임시저장 중 오류가 발생했습니다.");});});
-    needsForm.addEventListener("submit",function(e){e.preventDefault(); clearError(); const missing=validate(); if(missing.length){showError(`미응답 문항이 ${missing.length}개 있습니다. ‘해당 없음’ 또는 ‘코칭시 답변 예정’으로도 입력할 수 있습니다.`); document.getElementById(missing[0][0]).focus(); return;} const payload=saveFinalSubmission(); submitToSupabase(payload).then(()=>submitToGoogleSheet(payload).catch(err=>console.warn("Google Sheet 백업 오류",err))).then(()=>{window.location.href="./complete.html";}).catch(function(error){console.error(error); alert("서버 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");});});
-    
-    /*backButton.addEventListener("click",function(){saveNeedsAnswers(); window.location.href="./leadership.html";});*/
+
+    // 실제 필수 입력 문항
+    // N11은 선택 문항이므로 제외
+    const requiredFieldNames = [
+      "currentWork",
+      "need1",
+      "need2",
+      "need3",
+      "need4",
+      "need5",
+      "need6",
+      "need7",
+      "need8",
+      "need9",
+      "need10"
+    ];
+
+    // 저장 대상 전체 문항
+    const fieldNames = [
+      "currentWork",
+      "need1",
+      "need2",
+      "need3",
+      "need4",
+      "need5",
+      "need6",
+      "need7",
+      "need8",
+      "need9",
+      "need10",
+      "need11"
+    ];
+
+    const supabaseClient = cmGetSupabaseClient();
+
+    const participantCodeText = document.getElementById("participantCodeText");
+    const validView = document.getElementById("validView");
+    const invalidView = document.getElementById("invalidView");
+
+    const needsForm = document.getElementById("needsForm");
+    const needsList = document.getElementById("needsList");
+    const errorMessage = document.getElementById("errorMessage");
+    const saveStatus = document.getElementById("saveStatus");
+
+    const tempSaveButton = document.getElementById("tempSaveButton");
+    const submitButton = document.getElementById("submitButton");
+
+    let autoSaveTimer = null;
+
+    function formatDateTime(date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, "0");
+      const dd = String(date.getDate()).padStart(2, "0");
+      const hh = String(date.getHours()).padStart(2, "0");
+      const mi = String(date.getMinutes()).padStart(2, "0");
+
+      return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+    }
+
+    function loadBasicInfo() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.basicInfo) || "{}");
+      } catch (error) {
+        console.warn("기본정보를 불러오지 못했습니다.", error);
+        return {};
+      }
+    }
+
+    function loadLeadershipAnswers() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.leadershipAnswers) || "{}");
+      } catch (error) {
+        console.warn("리더십 진단 응답을 불러오지 못했습니다.", error);
+        return {};
+      }
+    }
+
+    function getNeedsFromForm() {
+      const data = {};
+
+      fieldNames.forEach(function (fieldName) {
+        const element = document.getElementById(fieldName);
+
+        data[fieldName] = element ? element.value.trim() : "";
+      });
+
+      return data;
+    }
+
+    function saveNeedsAnswers() {
+      const now = new Date();
+
+      localStorage.setItem(STORAGE_KEYS.needsAnswers, JSON.stringify({
+        participant_code: cmGetParticipantCode(),
+        answers: getNeedsFromForm(),
+        updated_at: now.toISOString()
+      }));
+
+      localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
+      localStorage.setItem(STORAGE_KEYS.lastSavedAt, now.toISOString());
+
+      saveStatus.textContent = `자동 저장됨 · ${formatDateTime(now)}`;
+    }
+
+    function scheduleAutoSave() {
+      saveStatus.textContent = "입력 중...";
+
+      if (autoSaveTimer) {
+        clearTimeout(autoSaveTimer);
+      }
+
+      autoSaveTimer = setTimeout(saveNeedsAnswers, 600);
+    }
+
+    function getQuestionCode(index) {
+      return index === 0 ? "N00" : "N" + String(index).padStart(2, "0");
+    }
+
+    function renderNeeds() {
+      needsList.innerHTML = "";
+
+      QUESTIONS.forEach(function (q, index) {
+        const fieldName = q[0];
+        const questionText = q[1];
+        const questionCode = getQuestionCode(index);
+        const isRequired = requiredFieldNames.includes(fieldName);
+
+        const wrap = document.createElement("div");
+        wrap.className = "form-field";
+
+        wrap.innerHTML = `
+          <label for="${fieldName}">
+            ${questionCode}. ${questionText}
+            ${
+              isRequired
+                ? '<span class="required-mark">*</span>'
+                : '<span class="optional-mark">선택</span>'
+            }
+          </label>
+
+          <textarea
+            id="${fieldName}"
+            name="${fieldName}"
+            placeholder="자유롭게 작성해 주세요."
+          ></textarea>
+        `;
+
+        needsList.appendChild(wrap);
+      });
+    }
+
+    function loadSavedNeedsAnswers() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.needsAnswers) || "{}");
+        const answers = saved.answers || {};
+
+        fieldNames.forEach(function (fieldName) {
+          const element = document.getElementById(fieldName);
+
+          if (element && answers[fieldName]) {
+            element.value = answers[fieldName];
+          }
+        });
+      } catch (error) {
+        console.warn("니즈조사 저장 내용을 불러오지 못했습니다.", error);
+      }
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.remove("hidden");
+    }
+
+    function clearError() {
+      errorMessage.textContent = "";
+      errorMessage.classList.add("hidden");
+    }
+
+    function validate() {
+      const data = getNeedsFromForm();
+
+      return QUESTIONS.filter(function (q) {
+        const fieldName = q[0];
+
+        return (
+          requiredFieldNames.includes(fieldName) &&
+          !data[fieldName]
+        );
+      });
+    }
+
+    async function fetchParticipantState() {
+      const participantCode = cmGetParticipantCode();
+
+      const { data, error } = await supabaseClient.rpc("get_participant_state", {
+        p_participant_code: participantCode
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    }
+
+    async function saveNeedsDraftToDb() {
+      const { data, error } = await supabaseClient.rpc("save_needs_draft", {
+        p_participant_code: cmGetParticipantCode(),
+        p_basic_info: loadBasicInfo() || {},
+        p_answers: getNeedsFromForm()
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data && data.ok === false && data.status === "submitted") {
+        throw new Error("이미 최종 제출 완료된 응답입니다.");
+      }
+
+      return data;
+    }
+
+    function buildSubmissionPayload() {
+      const now = new Date();
+      const leadership = loadLeadershipAnswers();
+
+      return {
+        participant_code: cmGetParticipantCode(),
+        basic_info: loadBasicInfo() || {},
+        leadership_answers: leadership || {},
+        needs_answers: getNeedsFromForm(),
+        submitted_at: now.toISOString()
+      };
+    }
+
+    function saveFinalSubmission() {
+      const now = new Date();
+      const payload = buildSubmissionPayload();
+
+      saveNeedsAnswers();
+
+      localStorage.setItem(STORAGE_KEYS.finalSubmission, JSON.stringify(payload));
+      localStorage.setItem(STORAGE_KEYS.currentStep, "complete");
+      localStorage.setItem(STORAGE_KEYS.submittedAt, now.toISOString());
+      localStorage.setItem(STORAGE_KEYS.lastSavedAt, now.toISOString());
+
+      return payload;
+    }
+
+    async function submitToSupabase(payload) {
+      const { data, error } = await supabaseClient.rpc("submit_coachingmate_response", {
+        p_payload: payload
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data || data.ok !== true) {
+        const message = data && data.message
+          ? data.message
+          : "서버 제출에 실패했습니다.";
+
+        throw new Error(message);
+      }
+
+      return data;
+    }
+
+    function submitToGoogleSheet(payload) {
+      const url = window.CM_CONFIG.GOOGLE_SCRIPT_URL || "";
+
+      if (!url) {
+        return Promise.resolve();
+      }
+
+      return fetch(url, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+      });
+    }
+
+    function focusFirstMissing(missingQuestions) {
+      if (!missingQuestions.length) return;
+
+      const firstFieldName = missingQuestions[0][0];
+      const element = document.getElementById(firstFieldName);
+
+      if (element) {
+        element.focus();
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }
+    }
+
+    function bindInputEvents() {
+      fieldNames.forEach(function (fieldName) {
+        const element = document.getElementById(fieldName);
+
+        if (element) {
+          element.addEventListener("input", scheduleAutoSave);
+        }
+      });
+    }
+
+    async function initializePage() {
+      const code = cmGetParticipantCode();
+
+      if (!code) {
+        invalidView.classList.remove("hidden");
+        return;
+      }
+
+      participantCodeText.textContent = code;
+
+      try {
+        const state = await fetchParticipantState();
+
+        if (state && state.status === "submitted") {
+          window.location.href = PAGE_PATHS.complete;
+          return;
+        }
+
+        if (state && state.status !== "leadership_submitted") {
+          const leadershipAnswers = state && state.leadership_answers;
+          const answeredCount = leadershipAnswers && leadershipAnswers.answered_count
+            ? Number(leadershipAnswers.answered_count)
+            : 0;
+
+          if (answeredCount < 32) {
+            window.location.href = `${PAGE_PATHS.leadership}?id=${encodeURIComponent(code)}`;
+            return;
+          }
+        }
+
+        if (state && state.needs_answers && state.needs_answers.answers) {
+          localStorage.setItem(STORAGE_KEYS.needsAnswers, JSON.stringify({
+            participant_code: code,
+            answers: state.needs_answers.answers,
+            updated_at: state.needs_answers.updated_at || new Date().toISOString()
+          }));
+        }
+
+      } catch (error) {
+        console.warn("참여 상태 조회 실패:", error);
+        // 상태 조회 실패 시에는 localStorage 기준으로 계속 진행
+      }
+
+      validView.classList.remove("hidden");
+
+      renderNeeds();
+      loadSavedNeedsAnswers();
+      bindInputEvents();
+
+      localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
+    }
+
+    tempSaveButton.addEventListener("click", function () {
+      clearError();
+      saveNeedsAnswers();
+
+      tempSaveButton.disabled = true;
+      tempSaveButton.textContent = "저장 중...";
+
+      saveNeedsDraftToDb()
+        .then(function () {
+          alert("임시저장되었습니다. 같은 링크로 다시 접속하면 이어서 작성할 수 있습니다.");
+        })
+        .catch(function (error) {
+          console.error("니즈조사 임시저장 오류:", error);
+          alert("서버 임시저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+        })
+        .finally(function () {
+          tempSaveButton.disabled = false;
+          tempSaveButton.textContent = "임시저장";
+        });
+    });
+
+    needsForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      clearError();
+
+      const missing = validate();
+
+      if (missing.length) {
+        showError(
+          `미응답 필수 문항이 ${missing.length}개 있습니다. ‘해당 없음’ 또는 ‘코칭시 답변 예정’으로도 입력할 수 있습니다.`
+        );
+
+        focusFirstMissing(missing);
+        return;
+      }
+
+      const payload = saveFinalSubmission();
+
+      submitButton.disabled = true;
+      submitButton.textContent = "제출 중...";
+
+      submitToSupabase(payload)
+        .then(function () {
+          return submitToGoogleSheet(payload).catch(function (sheetError) {
+            console.warn("Google Sheet 백업 오류:", sheetError);
+          });
+        })
+        .then(function () {
+          window.location.href = PAGE_PATHS.complete;
+        })
+        .catch(function (error) {
+          console.error("최종 제출 오류:", error);
+          alert("서버 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+        })
+        .finally(function () {
+          submitButton.disabled = false;
+          submitButton.textContent = "제출하기";
+        });
+    });
+
+    /*
+    리더십 진단 제출 후에는 수정 방지를 위해 이전 버튼을 사용하지 않습니다.
+
+    backButton.addEventListener("click", function () {
+      saveNeedsAnswers();
+      window.location.href = "./leadership.html";
+    });
+    */
+
     initializePage();
   </script>
 </body>
