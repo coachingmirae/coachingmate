@@ -1067,4 +1067,16 @@ textarea:focus {
   .page-footer {
     padding: 18px;
   }
+
+  /* leadership.html 문항 그룹 안보이게 
+  .question-group {
+    display: none;
+  }
+  */
+
+  .question-group {
+  display: none;
+  }
+
+
 }
