@@ -340,10 +340,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
       LEADERSHIP_CODES.map(function (code) {
         return (
           '<div class="answer-item"><strong>' +
-          escapeHtml(code) +
-          "</strong>" +
-          escapeHtml(valueOrDash(leadership[code])) +
-          "</div>"
+            escapeHtml(code) +
+          '</strong><span> : ' +
+            escapeHtml(valueOrDash(leadership[code])) +
+          '</span></div>'
         );
       }).join("") +
       "</div>" +
