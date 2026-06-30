@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0
   <title>제출 완료 | CoachingMate</title>
   <link rel="stylesheet" href="./style.css" />
   <script src="./script.js"></script>
@@ -25,6 +25,41 @@
   <script>
     function formatDateTime(iso){if(!iso)return "-"; const d=new Date(iso); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;}
     try{const payload=JSON.parse(localStorage.getItem("cm_final_submission")||"{}"); const basic=payload.basic_info||{}; document.getElementById("nameText").textContent=basic.name||"-"; document.getElementById("metaText").textContent=[basic.company,basic.department,basic.position].filter(Boolean).join(" / ")||"-"; document.getElementById("submittedAtText").textContent=formatDateTime(payload.submitted_at||localStorage.getItem("cm_submitted_at"));}catch(e){console.warn(e);}
+  </script>
+</body>
+</html>
+ck", function () {
+  window.close();
+
+  // 브라우저 정책상 사용자가 직접 연 창이 아니면 window.close()가 동작하지 않을 수 있습니다.
+  // 그 경우 안내 문구만 표시합니다.
+  setTimeout(function () {
+    alert("창이 자동으로 닫히지 않으면 브라우저의 닫기 버튼을 눌러 종료해 주세요.");
+  }, 300);
+});
+
+    goHomeButton.addEventListener("click", function () {
+      goHome();
+    });
+
+    initializePage();
+  </script>
+</body>
+</html>function () {
+  window.close();
+
+  // 브라우저 정책상 사용자가 직접 연 창이 아니면 window.close()가 동작하지 않을 수 있습니다.
+  // 그 경우 안내 문구만 표시합니다.
+  setTimeout(function () {
+    alert("창이 자동으로 닫히지 않으면 브라우저의 닫기 버튼을 눌러 종료해 주세요.");
+  }, 300);
+});
+
+    goHomeButton.addEventListener("click", function () {
+      goHome();
+    });
+
+    initializePage();
   </script>
 </body>
 </html>
