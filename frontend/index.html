@@ -12,7 +12,7 @@
   />
 
   <link rel="stylesheet" href="./style.css" />
-  
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./config.public.js"></script>
 </head>
@@ -162,11 +162,10 @@
      * 1. URL의 참여코드 확인
      * 2. Supabase DB에서 제출 상태 조회
      * 3. submitted 상태이면 제출 완료 화면 표시
-     * 4. draft 상태이면 localStorage 복원 후 이어서 작성 가능
-     * 5. 제출 내용 삭제 후 재응답 처리
+     * 4. draft / leadership_submitted 상태이면 DB 응답을 localStorage로 복원
+     * 5. reset_participant_response 이후 남아 있는 브라우저 저장값을 정리
      */
 
-     
     const STORAGE_KEYS = {
       participantCode: "cm_participant_code",
       basicInfo: "cm_basic_info",
@@ -209,11 +208,20 @@
     const resetButton = document.getElementById("resetButton");
     const resetResponseButton = document.getElementById("resetResponseButton");
 
+    let currentParticipantCode = "";
+    let currentServerState = null;
+
     function getParticipantCodeFromUrl() {
       const params = new URLSearchParams(window.location.search);
       const code = params.get("id");
 
       return code ? code.trim() : "";
+    }
+
+    function makePath(path) {
+      if (!currentParticipantCode) return path;
+
+      return `${path}?id=${encodeURIComponent(currentParticipantCode)}`;
     }
 
     function showOnly(viewElement) {
@@ -225,38 +233,8 @@
       viewElement.classList.remove("hidden");
     }
 
-    function hasSavedProgress() {
-      return Boolean(
-        localStorage.getItem(STORAGE_KEYS.basicInfo) ||
-        localStorage.getItem(STORAGE_KEYS.leadershipAnswers) ||
-        localStorage.getItem(STORAGE_KEYS.needsAnswers)
-      );
-    }
-
-    function getCurrentStep() {
-      return localStorage.getItem(STORAGE_KEYS.currentStep) || "basicInfo";
-    }
-
-    function getResumePath() {
-      const currentStep = getCurrentStep();
-
-      if (currentStep === "leadership") {
-        return PAGE_PATHS.leadership;
-      }
-
-      if (currentStep === "needs") {
-        return PAGE_PATHS.needs;
-      }
-
-      if (currentStep === "complete") {
-        return PAGE_PATHS.complete;
-      }
-
-      return PAGE_PATHS.basicInfo;
-    }
-
     function clearLocalResponseData(keepParticipantCode) {
-      const participantCode = localStorage.getItem(STORAGE_KEYS.participantCode);
+      const participantCode = currentParticipantCode || localStorage.getItem(STORAGE_KEYS.participantCode);
 
       localStorage.removeItem(STORAGE_KEYS.basicInfo);
       localStorage.removeItem(STORAGE_KEYS.leadershipAnswers);
@@ -273,12 +251,60 @@
       }
     }
 
+    function hasSavedProgress() {
+      return Boolean(
+        localStorage.getItem(STORAGE_KEYS.basicInfo) ||
+        localStorage.getItem(STORAGE_KEYS.leadershipAnswers) ||
+        localStorage.getItem(STORAGE_KEYS.needsAnswers)
+      );
+    }
+
+    function hasRemoteProgress(state) {
+      if (!state || !state.exists) return false;
+
+      if (state.status === "submitted" || state.status === "leadership_submitted") {
+        return true;
+      }
+
+      if (state.leadership_answers && state.leadership_answers.answers) {
+        return Object.keys(state.leadership_answers.answers).length > 0;
+      }
+
+      if (state.needs_answers && state.needs_answers.answers) {
+        return Object.keys(state.needs_answers.answers).length > 0;
+      }
+
+      return false;
+    }
+
+    function getCurrentStep() {
+      return localStorage.getItem(STORAGE_KEYS.currentStep) || "basicInfo";
+    }
+
+    function getResumePath() {
+      const currentStep = getCurrentStep();
+
+      if (currentStep === "leadership") {
+        return makePath(PAGE_PATHS.leadership);
+      }
+
+      if (currentStep === "needs") {
+        return makePath(PAGE_PATHS.needs);
+      }
+
+      if (currentStep === "complete") {
+        return makePath(PAGE_PATHS.complete);
+      }
+
+      return makePath(PAGE_PATHS.basicInfo);
+    }
+
     function restoreStateToLocalStorage(state) {
       if (!state || !state.exists) return;
 
       localStorage.setItem(STORAGE_KEYS.participantCode, state.participant_code);
 
-      if (state.basic_info) {
+      if (state.basic_info && hasRemoteProgress(state)) {
         localStorage.setItem(STORAGE_KEYS.basicInfo, JSON.stringify({
           company: state.basic_info.company || "",
           name: state.basic_info.name || "",
@@ -309,9 +335,10 @@
 
         localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
       }
+
       if (state.status === "leadership_submitted") {
-  localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
-}
+        localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
+      }
     }
 
     async function fetchParticipantState(participantCode) {
@@ -346,6 +373,8 @@
         return;
       }
 
+      currentParticipantCode = participantCode;
+
       localStorage.setItem(STORAGE_KEYS.participantCode, participantCode);
 
       participantCodeText.textContent = participantCode;
@@ -353,13 +382,24 @@
 
       try {
         const state = await fetchParticipantState(participantCode);
+        currentServerState = state;
 
         if (state && state.status === "submitted") {
           showOnly(submittedView);
           return;
         }
 
-        if (state && state.exists) {
+        /*
+          중요:
+          reset_participant_response()는 participants 행을 남겨두고
+          leadership_responses / needs_responses / submissions만 삭제합니다.
+          따라서 state.exists=true 이더라도 응답 데이터가 없으면
+          과거 localStorage를 반드시 지워야 합니다.
+        */
+        if (!hasRemoteProgress(state)) {
+          clearLocalResponseData(true);
+          localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
+        } else {
           restoreStateToLocalStorage(state);
         }
 
@@ -393,25 +433,36 @@
     }
 
     startButton.addEventListener("click", function () {
+      clearLocalResponseData(true);
       localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
-      window.location.href = PAGE_PATHS.basicInfo;
+      window.location.href = makePath(PAGE_PATHS.basicInfo);
     });
 
     resumeButton.addEventListener("click", function () {
       window.location.href = getResumePath();
     });
 
-    resetButton.addEventListener("click", function () {
+    resetButton.addEventListener("click", async function () {
       const confirmed = window.confirm(
-        "현재 브라우저에 저장된 작성 내용을 삭제하고 처음부터 다시 작성하시겠습니까?"
+        "작성 중인 응답을 삭제하고 처음부터 다시 작성하시겠습니까?"
       );
 
       if (!confirmed) return;
 
-      clearLocalResponseData(true);
-      localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
+      try {
+        if (currentParticipantCode) {
+          await resetParticipantResponse(currentParticipantCode);
+        }
 
-      window.location.href = PAGE_PATHS.basicInfo;
+        clearLocalResponseData(true);
+        localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
+
+        window.location.href = makePath(PAGE_PATHS.basicInfo);
+
+      } catch (error) {
+        console.error("처음부터 다시 작성 초기화 오류:", error);
+        alert("초기화 중 오류가 발생했습니다. 담당자에게 문의해 주세요.");
+      }
     });
 
     resetResponseButton.addEventListener("click", async function () {
@@ -426,10 +477,11 @@
       try {
         await resetParticipantResponse(participantCode);
 
+        currentParticipantCode = participantCode;
         clearLocalResponseData(true);
         localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
 
-        window.location.href = PAGE_PATHS.basicInfo;
+        window.location.href = makePath(PAGE_PATHS.basicInfo);
 
       } catch (error) {
         console.error("재응답 초기화 오류:", error);

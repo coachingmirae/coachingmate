@@ -86,49 +86,60 @@
           </div>
         </div>
 
-        <div class="survey-progress-box">
-          <div class="survey-progress-header">
-            <span id="answeredCountText">0 / 32 응답 완료</span>
-            <strong id="progressPercentText">0%</strong>
-          </div>
-          <div class="survey-progress-track">
-            <div id="progressBar" class="survey-progress-bar"></div>
-          </div>
-        </div>
-
-        <div class="page-progress-text">
-          <span id="pageInfoText">1 / 4 페이지</span>
-        </div>
-
-        <form id="leadershipForm" class="question-section" novalidate>
-          <div id="questionList"></div>
-
-          <div id="errorMessage" class="error-message hidden"></div>
-
-          <div class="form-actions">
-            <button type="button" id="backButton" class="secondary-button">
-              이전: 기본정보
-            </button>
-
-            <div class="button-row-inline">
-              <button type="button" id="prevPageButton" class="secondary-button">
-                이전 문항
-              </button>
-
-              <button type="button" id="nextPageButton" class="primary-button">
-                다음 문항
-              </button>
-
-              <button type="submit" id="submitButton" class="primary-button hidden">
-                리더십 진단 제출하기
-              </button>
+        <div class="leadership-fixed-panel">
+          <div class="survey-progress-box">
+            <div class="survey-progress-header">
+              <span id="answeredCountText">0 / 32 응답 완료</span>
+              <strong id="progressPercentText">0%</strong>
+            </div>
+            <div class="survey-progress-track">
+              <div id="progressBar" class="survey-progress-bar"></div>
             </div>
           </div>
 
-          <p id="saveStatus" class="save-status">
-            자동 저장 대기 중
-          </p>
-        </form>
+          <div class="page-progress-text">
+            <span id="pageInfoText">1 / 4 페이지</span>
+          </div>
+
+          <div class="scale-guide-box">
+            <strong>응답 척도</strong>
+            <p>
+              1 전혀 그렇지 않다 · 2 그렇지 않다 · 3 보통이다 · 4 그렇다 · 5 매우 그렇다
+            </p>
+          </div>
+        </div>
+
+        <div class="leadership-scroll-panel">
+          <form id="leadershipForm" class="question-section" novalidate>
+            <div id="questionList"></div>
+
+            <div id="errorMessage" class="error-message hidden"></div>
+
+            <div class="form-actions">
+              <button type="button" id="backButton" class="secondary-button">
+                이전: 기본정보
+              </button>
+
+              <div class="button-row-inline">
+                <button type="button" id="prevPageButton" class="secondary-button">
+                  이전 문항
+                </button>
+
+                <button type="button" id="nextPageButton" class="primary-button">
+                  다음 문항
+                </button>
+
+                <button type="submit" id="submitButton" class="primary-button hidden">
+                  리더십 진단 제출하기
+                </button>
+              </div>
+            </div>
+
+            <p id="saveStatus" class="save-status">
+              자동 저장 대기 중
+            </p>
+          </form>
+        </div>
       </section>
 
       <section id="invalidView" class="content-section hidden">
@@ -844,10 +855,19 @@ async function submitLeadershipToDb() {
       updateProgress();
       clearError();
 
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
+      const scrollTarget = document.querySelector(".leadership-scroll-panel");
+
+      if (scrollTarget) {
+        scrollTarget.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      } else {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+      }
     }
 
     function renderQuestions() {
@@ -910,9 +930,17 @@ async function submitLeadershipToDb() {
           scaleRow.appendChild(label);
         });
 
+        const scaleHint = document.createElement("div");
+        scaleHint.className = "scale-hint";
+        scaleHint.innerHTML = `
+          <span>전혀 그렇지 않다</span>
+          <span>매우 그렇다</span>
+        `;
+
         questionCard.appendChild(questionHeader);
         questionCard.appendChild(questionText);
         questionCard.appendChild(scaleRow);
+        questionCard.appendChild(scaleHint);
 
         questionList.appendChild(questionCard);
       });
@@ -1061,6 +1089,23 @@ async function submitLeadershipToDb() {
         return;
       }
 
+      try {
+        const state = await fetchParticipantState();
+
+        if (state && state.status === "submitted") {
+          window.location.href = `${PAGE_PATHS.index}?id=${encodeURIComponent(participantCode)}`;
+          return;
+        }
+
+        if (state && state.status === "leadership_submitted") {
+          window.location.href = `${PAGE_PATHS.needs}?id=${encodeURIComponent(participantCode)}`;
+          return;
+        }
+      } catch (error) {
+        console.warn("참여 상태 조회 실패:", error);
+        // 서버 상태 조회 실패 시에는 localStorage 기준으로 계속 진행합니다.
+      }
+
       participantCodeText.textContent = participantCode;
 
       validView.classList.remove("hidden");
@@ -1180,7 +1225,7 @@ submitLeadershipToDb()
     submitButton.disabled = false;
     submitButton.textContent = "리더십 진단 제출하기";
   });
-    });
+    }); 
 
     backButton.addEventListener("click", function () {
       saveLeadershipAnswers();
