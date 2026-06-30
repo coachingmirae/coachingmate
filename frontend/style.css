@@ -1083,16 +1083,6 @@ textarea:focus {
     align-items: center;
   }
 
-  /* leadership.html 문항 그룹 안보이게 
-  .question-group {
-    display: none;
-  }
-  */
-  .question-code,
-  .question-group {
-  display: none;
-  }
-
   .button-row-inline {
   display: flex;
   gap: 12px;
@@ -1105,5 +1095,16 @@ textarea:focus {
   font-size: 14px;
   font-weight: 700;
   text-align: right;
+}
+
+  /* leadership.html 문항 그룹 안보이게 
+  .question-group {
+    display: none;
+  }
+  */
+  .question-code,
+  .question.groupShort,
+  .question-group {
+  display: none;
 }
 }
