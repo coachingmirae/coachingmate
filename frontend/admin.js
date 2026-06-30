@@ -521,7 +521,9 @@ function downloadSubmissionsCsv() {
     "이메일",
     "휴대폰",
     "리더십응답수",
+    "리더십전체문항",
     "니즈응답수",
+    "니즈전체문항",
     "상태",
   ];
 
@@ -535,8 +537,10 @@ function downloadSubmissionsCsv() {
       row.position_title || "",
       row.email || "",
       row.phone || "",
-      String(row.leadership_answer_count || 0) + " / 32",
-      String(row.needs_answer_count || 0) + " / 12",
+      Number(row.leadership_answer_count || 0),
+      32,
+      Number(row.needs_answer_count || 0),
+      12,
       row.status || "",
     ];
   });
