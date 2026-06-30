@@ -1007,6 +1007,14 @@ textarea:focus {
   .button-row-inline .secondary-button {
     width: 100%;
   }
+  .complete-button-row {
+    align-items: center;
+  }
+
+  .complete-button-row .primary-button {
+    width: 100%;
+    max-width: 260px;
+  }
 }
 
 @media (max-width: 520px) {
@@ -1096,6 +1104,16 @@ textarea:focus {
   font-weight: 700;
   text-align: right;
 }
+
+.complete-button-row {
+  justify-content: center;
+}
+
+.complete-button-row .primary-button {
+  min-width: 180px;
+}
+
+
 
   /* leadership.html 문항 그룹 안보이게 
   .question-group {

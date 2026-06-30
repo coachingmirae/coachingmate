@@ -101,15 +101,23 @@
             </p>
           </div>
 
-          <div class="button-row">
-            <button type="button" id="summaryButton" class="secondary-button">
-              저장된 응답 요약 보기
-            </button>
+          <div class="button-row complete-button-row">
+  <!--
+  나중에 다시 사용할 수 있도록 임시 숨김 처리
 
-            <button type="button" id="homeButton" class="primary-button">
-              처음 화면으로
-            </button>
-          </div>
+  <button type="button" id="summaryButton" class="secondary-button">
+    저장된 응답 요약 보기
+  </button>
+
+  <button type="button" id="homeButton" class="primary-button">
+    처음 화면으로
+  </button>
+  -->
+
+  <button type="button" id="closeButton" class="primary-button">
+    창 닫기
+  </button>
+</div>
         </div>
 
         <div id="summaryPanel" class="summary-panel hidden">
@@ -189,8 +197,10 @@
     const respondentMetaText = document.getElementById("respondentMetaText");
     const submittedAtText = document.getElementById("submittedAtText");
 
-    const summaryButton = document.getElementById("summaryButton");
-    const homeButton = document.getElementById("homeButton");
+    // const summaryButton = document.getElementById("summaryButton");
+    // const homeButton = document.getElementById("homeButton");
+    const closeButton = document.getElementById("closeButton");
+
     const goHomeButton = document.getElementById("goHomeButton");
     const closeSummaryButton = document.getElementById("closeSummaryButton");
 
@@ -330,17 +340,33 @@
       initializeSubmittedAt();
     }
 
-    summaryButton.addEventListener("click", function () {
-      showSummaryPanel();
-    });
+    /*
+나중에 다시 사용할 수 있도록 임시 숨김 처리
 
-    closeSummaryButton.addEventListener("click", function () {
-      hideSummaryPanel();
-    });
+summaryButton.addEventListener("click", function () {
+  showSummaryPanel();
+});
 
-    homeButton.addEventListener("click", function () {
-      goHome();
-    });
+homeButton.addEventListener("click", function () {
+  goHome();
+});
+*/
+
+if (closeSummaryButton) {
+  closeSummaryButton.addEventListener("click", function () {
+    hideSummaryPanel();
+  });
+}
+
+closeButton.addEventListener("click", function () {
+  window.close();
+
+  // 브라우저 정책상 사용자가 직접 연 창이 아니면 window.close()가 동작하지 않을 수 있습니다.
+  // 그 경우 안내 문구만 표시합니다.
+  setTimeout(function () {
+    alert("창이 자동으로 닫히지 않으면 브라우저의 닫기 버튼을 눌러 종료해 주세요.");
+  }, 300);
+});
 
     goHomeButton.addEventListener("click", function () {
       goHome();
