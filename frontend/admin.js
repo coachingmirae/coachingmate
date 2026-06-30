@@ -338,14 +338,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
       "<h3>리더십 진단 응답</h3>" +
       '<div class="answer-grid">' +
       LEADERSHIP_CODES.map(function (code) {
-        return (
-          '<div class="answer-item"><strong>' +
-            escapeHtml(code) +
-          '</strong><span> : ' +
-            escapeHtml(valueOrDash(leadership[code])) +
-          '</span></div>'
-        );
-      }).join("") +
+  return (
+    '<div class="answer-item">' +
+    '<strong>' +
+    escapeHtml(code) +
+    '</strong>' +
+    '<span class="answer-value"> : ' +
+    escapeHtml(valueOrDash(leadership[code])) +
+    '</span>' +
+    '</div>'
+  );
+}).join("") +
       "</div>" +
       "</section>" +
 
