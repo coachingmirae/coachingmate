@@ -2,8 +2,10 @@
 .env
 .env.*
 *.local
-config.js
+
+# config.js
 secrets/
+frontend/html_backup/
 __pycache__/
 
 # google credentials
