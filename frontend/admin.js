@@ -62,21 +62,38 @@
       return;
     }
 
-    if (!window.COACHINGMATE_CONFIG) {
-      showError("config.public.js 설정을 찾을 수 없습니다.");
-      setLoadStatus("설정 오류");
-      renderEmpty("Supabase 설정 오류");
-      return;
-    }
+    const config =
+  window.COACHINGMATE_CONFIG ||
+  window.CoachingMateConfig ||
+  window.CM_CONFIG ||
+  window.SUPABASE_CONFIG ||
+  {};
 
-    const config = window.COACHINGMATE_CONFIG;
+const supabaseUrl =
+  config.SUPABASE_URL ||
+  config.supabaseUrl ||
+  config.supabase_url ||
+  "";
 
-    if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
-      showError("Supabase URL 또는 anon key 설정이 없습니다.");
-      setLoadStatus("설정 오류");
-      renderEmpty("Supabase 설정 오류");
-      return;
-    }
+const supabaseAnonKey =
+  config.SUPABASE_ANON_KEY ||
+  config.supabaseAnonKey ||
+  config.supabase_anon_key ||
+  config.ANON_KEY ||
+  "";
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  showError(
+    "config.public.js 설정을 찾을 수 없습니다.\n\n" +
+    "확인 필요:\n" +
+    "1. config.public.js 파일이 frontend 폴더에 있는지\n" +
+    "2. SUPABASE_URL / SUPABASE_ANON_KEY 값이 들어 있는지\n" +
+    "3. 설정 객체 이름이 COACHINGMATE_CONFIG, CM_CONFIG, SUPABASE_CONFIG 중 하나인지"
+  );
+  setLoadStatus("설정 오류");
+  renderEmpty("Supabase 설정 오류");
+  return;
+}
 
     supabaseClient = window.supabase.createClient(
       config.SUPABASE_URL,
