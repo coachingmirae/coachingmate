@@ -1092,4 +1092,18 @@ textarea:focus {
   .question-group {
   display: none;
   }
+
+  .button-row-inline {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+  .page-progress-text {
+  margin: -8px 0 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+}
 }

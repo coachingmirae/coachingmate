@@ -93,6 +93,10 @@
           </div>
         </div>
 
+        <div class="page-progress-text">
+          <span id="pageInfoText">1 / 4 페이지</span>
+        </div>
+
         <form id="leadershipForm" class="question-section" novalidate>
           <div id="questionList"></div>
 
@@ -100,23 +104,23 @@
 
           <div class="form-actions">
             <button type="button" id="backButton" class="secondary-button">
-            이전: 기본정보
+              이전: 기본정보
             </button>
 
-          <div class="button-row-inline">
-            <button type="button" id="prevPageButton" class="secondary-button">
-            이전 문항
-            </button>
+            <div class="button-row-inline">
+              <button type="button" id="prevPageButton" class="secondary-button">
+                이전 문항
+              </button>
 
-            <button type="button" id="nextPageButton" class="primary-button">
-            다음 문항
-            </button>
+              <button type="button" id="nextPageButton" class="primary-button">
+                다음 문항
+              </button>
 
-            <button type="submit" id="submitButton" class="primary-button hidden">
-            다음: 코칭 니즈조사
-            </button>
+              <button type="submit" id="submitButton" class="primary-button hidden">
+                다음: 코칭 니즈조사
+              </button>
             </div>
-        </div>
+          </div>
 
           <p id="saveStatus" class="save-status">
             자동 저장 대기 중
@@ -149,10 +153,11 @@
      * CoachingMate leadership.html
      * 역할:
      * 1. 리더십 진단 32문항 렌더링
-     * 2. 5점 척도 응답 저장
-     * 3. localStorage 자동저장
-     * 4. 미응답 문항 체크
-     * 5. needs.html 이동
+     * 2. 8문항씩 페이지 분할
+     * 3. 5점 척도 응답 저장
+     * 4. localStorage 자동저장
+     * 5. 현재 페이지 미응답 문항 체크
+     * 6. 전체 응답 완료 후 needs.html 이동
      */
 
     const STORAGE_KEYS = {
@@ -177,424 +182,424 @@
       { value: 5, label: "매우 그렇다" }
     ];
 
-const QUESTIONS = [
-  {
-    code: "Q01",
-    displayOrder: "s01",
-    groupCode: "G1",
-    subCode: "F1",
-    group: "전략적 통찰",
-    sub: "비전 수립 및 공유",
-    groupShort: "전략",
-    subShort: "비전 수립",
-    shortLabel: "미래 비전 수립",
-    reportLabel: "[전략]_Q01_미래 비전 수립",
-    text: "나는 조직의 미래 방향을 명확히 예측하고, 실현 가능한 비전을 수립한다."
-  },
-  {
-    code: "Q09",
-    displayOrder: "s02",
-    groupCode: "G2",
-    subCode: "F3",
-    group: "조직 구축 및 성장 견인",
-    sub: "고성과 팀 구축 및 책임 경영",
-    groupShort: "조직",
-    subShort: "조직 구축",
-    shortLabel: "목표 책임 부여",
-    reportLabel: "[조직]_Q09_목표 책임 부여",
-    text: "나는 팀원들에게 명확한 성과 목표와 책임을 부여한다."
-  },
-  {
-    code: "Q17",
-    displayOrder: "s03",
-    groupCode: "G3",
-    subCode: "F5",
-    group: "관계 및 소통 영향력",
-    sub: "인재 육성 & 조직 문화 정렬",
-    groupShort: "관계",
-    subShort: "인재 육성",
-    shortLabel: "핵심 인재 육성",
-    reportLabel: "[관계]_Q17_핵심 인재 육성",
-    text: "나는 고잠재력 인재를 조기에 식별하고 집중적으로 육성한다."
-  },
-  {
-    code: "Q25",
-    displayOrder: "s04",
-    groupCode: "G4",
-    subCode: "F7",
-    group: "자기 경영 및 민첩성",
-    sub: "평정심 및 존재감",
-    groupShort: "자기",
-    subShort: "자기 조절",
-    shortLabel: "위기 침착 판단",
-    reportLabel: "[자기]_Q25_위기 침착 판단",
-    text: "나는 위기 상황에서도 침착함을 유지하고 합리적으로 판단한다."
-  },
-  {
-    code: "Q02",
-    displayOrder: "s05",
-    groupCode: "G1",
-    subCode: "F1",
-    group: "전략적 통찰",
-    sub: "비전 수립 및 공유",
-    groupShort: "전략",
-    subShort: "비전 수립",
-    shortLabel: "비전 공감 강화",
-    reportLabel: "[전략]_Q02_비전 공감 강화",
-    text: "나는 팀원들이 이해하고 공감할 수 있도록 조직의 비전을 반복적으로 설명하고 강화한다."
-  },
-  {
-    code: "Q10",
-    displayOrder: "s06",
-    groupCode: "G2",
-    subCode: "F3",
-    group: "조직 구축 및 성장 견인",
-    sub: "고성과 팀 구축 및 책임 경영",
-    groupShort: "조직",
-    subShort: "조직 구축",
-    shortLabel: "역할 책임 명확",
-    reportLabel: "[조직]_Q10_역할 책임 명확",
-    text: "나는 각 팀원의 역할과 책임을 정확하게 정의하고 공유한다."
-  },
-  {
-    code: "Q18",
-    displayOrder: "s07",
-    groupCode: "G3",
-    subCode: "F5",
-    group: "관계 및 소통 영향력",
-    sub: "인재 육성 & 조직 문화 정렬",
-    groupShort: "관계",
-    subShort: "인재 육성",
-    shortLabel: "전략 문화 정렬",
-    reportLabel: "[관계]_Q18_전략 문화 정렬",
-    text: "나는 전략적 목표와 조직 문화를 정렬시키기 위해 적극적으로 노력한다."
-  },
-  {
-    code: "Q26",
-    displayOrder: "s08",
-    groupCode: "G4",
-    subCode: "F7",
-    group: "자기 경영 및 민첩성",
-    sub: "평정심 및 존재감",
-    groupShort: "자기",
-    subShort: "자기 조절",
-    shortLabel: "압박속 목표 유지",
-    reportLabel: "[자기]_Q26_압박속 목표 유지",
-    text: "나는 압박감 속에서도 본래의 목표와 원칙을 잃지 않는다."
-  },
-  {
-    code: "Q03",
-    displayOrder: "s09",
-    groupCode: "G1",
-    subCode: "F1",
-    group: "전략적 통찰",
-    sub: "비전 수립 및 공유",
-    groupShort: "전략",
-    subShort: "비전 수립",
-    shortLabel: "전략 우선순위 설정",
-    reportLabel: "[전략]_Q03_전략 우선순위 설정",
-    text: "나는 비전 달성을 위해 필요한 전략적 우선순위를 명확히 설정한다."
-  },
-  {
-    code: "Q11",
-    displayOrder: "s10",
-    groupCode: "G2",
-    subCode: "F3",
-    group: "조직 구축 및 성장 견인",
-    sub: "고성과 팀 구축 및 책임 경영",
-    groupShort: "조직",
-    subShort: "조직 구축",
-    shortLabel: "공정 평가와 보상",
-    reportLabel: "[조직]_Q11_공정 평가와 보상",
-    text: "나는 성과에 따라 공정한 평가와 보상을 실시한다."
-  },
-  {
-    code: "Q19",
-    displayOrder: "s11",
-    groupCode: "G3",
-    subCode: "F5",
-    group: "관계 및 소통 영향력",
-    sub: "인재 육성 & 조직 문화 정렬",
-    groupShort: "관계",
-    subShort: "인재 육성",
-    shortLabel: "도전 부여와 코칭",
-    reportLabel: "[관계]_Q19_도전 부여와 코칭",
-    text: "나는 팀원들에게 도전적인 과제를 부여하고 필요한 지원과 코칭을 제공한다."
-  },
-  {
-    code: "Q27",
-    displayOrder: "s12",
-    groupCode: "G4",
-    subCode: "F7",
-    group: "자기 경영 및 민첩성",
-    sub: "평정심 및 존재감",
-    groupShort: "자기",
-    subShort: "자기 조절",
-    shortLabel: "존재감과 신뢰 형성",
-    reportLabel: "[자기]_Q27_존재감과 신뢰 형성",
-    text: "나는 강력한 존재감으로 팀에 신뢰감과 안정감을 제공한다."
-  },
-  {
-    code: "Q04",
-    displayOrder: "s13",
-    groupCode: "G1",
-    subCode: "F1",
-    group: "전략적 통찰",
-    sub: "비전 수립 및 공유",
-    groupShort: "전략",
-    subShort: "비전 수립",
-    shortLabel: "목표 점검 및 조정",
-    reportLabel: "[전략]_Q04_목표 점검 및 조정",
-    text: "나는 주기적으로 비전(목표)과 현실의 괴리를 점검하고, 조정 방안을 모색한다."
-  },
-  {
-    code: "Q12",
-    displayOrder: "s14",
-    groupCode: "G2",
-    subCode: "F3",
-    group: "조직 구축 및 성장 견인",
-    sub: "고성과 팀 구축 및 책임 경영",
-    groupShort: "조직",
-    subShort: "조직 구축",
-    shortLabel: "전략적 자원 배분",
-    reportLabel: "[조직]_Q12_전략적 자원 배분",
-    text: "나는 팀의 최고 성과를 위해 최적의 자원을 전략적으로 배분한다."
-  },
-  {
-    code: "Q20",
-    displayOrder: "s15",
-    groupCode: "G3",
-    subCode: "F5",
-    group: "관계 및 소통 영향력",
-    sub: "인재 육성 & 조직 문화 정렬",
-    groupShort: "관계",
-    subShort: "인재 육성",
-    shortLabel: "변화 리더십 발휘",
-    reportLabel: "[관계]_Q20_변화 리더십 발휘",
-    text: "나는 조직 변화 과정에서 리더십을 발휘하여 임직원을 이끈다."
-  },
-  {
-    code: "Q28",
-    displayOrder: "s16",
-    groupCode: "G4",
-    subCode: "F7",
-    group: "자기 경영 및 민첩성",
-    sub: "평정심 및 존재감",
-    groupShort: "자기",
-    subShort: "자기 조절",
-    shortLabel: "긍정 에너지 전파",
-    reportLabel: "[자기]_Q28_긍정 에너지 전파",
-    text: "나는 어려운 상황에서도 긍정적 에너지를 유지하고 전파한다."
-  },
-  {
-    code: "Q05",
-    displayOrder: "s17",
-    groupCode: "G1",
-    subCode: "F2",
-    group: "전략적 통찰",
-    sub: "데이터 기반 전략적 의사결정",
-    groupShort: "전략",
-    subShort: "의사 결정",
-    shortLabel: "데이터 기반 의사결정",
-    reportLabel: "[전략]_Q05_데이터 기반 의사결정",
-    text: "나는 중요한 의사결정을 할 때 객관적 데이터와 사실을 우선적으로 검토한다."
-  },
-  {
-    code: "Q13",
-    displayOrder: "s18",
-    groupCode: "G2",
-    subCode: "F4",
-    group: "조직 구축 및 성장 견인",
-    sub: "조직 및 성과 관리",
-    groupShort: "조직",
-    subShort: "조직 관리",
-    shortLabel: "성과 점검 피드백",
-    reportLabel: "[조직]_Q13_성과 점검 피드백",
-    text: "나는 정기적으로 팀의 성과를 점검하고 피드백을 제공한다."
-  },
-  {
-    code: "Q21",
-    displayOrder: "s19",
-    groupCode: "G3",
-    subCode: "F6",
-    group: "관계 및 소통 영향력",
-    sub: "심리적 안전감 기반 갈등 조정",
-    groupShort: "관계",
-    subShort: "갈등 조정",
-    shortLabel: "심리적 안전감 조성",
-    reportLabel: "[관계]_Q21_심리적 안전감 조성",
-    text: "나는 팀원들이 안심하고 의견을 제시할 수 있는 심리적 안전감을 조성한다."
-  },
-  {
-    code: "Q29",
-    displayOrder: "s20",
-    groupCode: "G4",
-    subCode: "F8",
-    group: "자기 경영 및 민첩성",
-    sub: "회복탄력성 및 성장 마인드셋",
-    groupShort: "자기",
-    subShort: "회복 탄력",
-    shortLabel: "강점과 약점 인식",
-    reportLabel: "[자기]_Q29_강점과 약점 인식",
-    text: "나는 나의 강점과 개발 영역을 객관적으로 인식한다."
-  },
-  {
-    code: "Q06",
-    displayOrder: "s21",
-    groupCode: "G1",
-    subCode: "F2",
-    group: "전략적 통찰",
-    sub: "데이터 기반 전략적 의사결정",
-    groupShort: "전략",
-    subShort: "의사 결정",
-    shortLabel: "리스크 선제 대응",
-    reportLabel: "[전략]_Q06_리스크 선제 대응",
-    text: "나는 조직 내 잠재적 리스크를 조기에 인식하고 신속하게 대응한다."
-  },
-  {
-    code: "Q14",
-    displayOrder: "s22",
-    groupCode: "G2",
-    subCode: "F4",
-    group: "조직 구축 및 성장 견인",
-    sub: "조직 및 성과 관리",
-    groupShort: "조직",
-    subShort: "조직 관리",
-    shortLabel: "성과 저해 요인 제거",
-    reportLabel: "[조직]_Q14_성과 저해 요인 제거",
-    text: "나는 성과 저해 요인을 신속하게 파악하고 제거한다."
-  },
-  {
-    code: "Q22",
-    displayOrder: "s23",
-    groupCode: "G3",
-    subCode: "F6",
-    group: "관계 및 소통 영향력",
-    sub: "심리적 안전감 기반 갈등 조정",
-    groupShort: "관계",
-    subShort: "갈등 조정",
-    shortLabel: "건설적 갈등 중재",
-    reportLabel: "[관계]_Q22_건설적 갈등 중재",
-    text: "나는 팀 내 갈등을 건설적으로 중재하고 상호 이해를 촉진한다."
-  },
-  {
-    code: "Q30",
-    displayOrder: "s24",
-    groupCode: "G4",
-    subCode: "F8",
-    group: "자기 경영 및 민첩성",
-    sub: "회복탄력성 및 성장 마인드셋",
-    groupShort: "자기",
-    subShort: "회복 탄력",
-    shortLabel: "피드백 수용 성장",
-    reportLabel: "[자기]_Q30_피드백 수용 성장",
-    text: "나는 피드백을 적극적으로 수용하고 반영하여 계속 성장한다."
-  },
-  {
-    code: "Q07",
-    displayOrder: "s25",
-    groupCode: "G1",
-    subCode: "F2",
-    group: "전략적 통찰",
-    sub: "데이터 기반 전략적 의사결정",
-    groupShort: "전략",
-    subShort: "의사 결정",
-    shortLabel: "다각적 체계적 결정",
-    reportLabel: "[전략]_Q07_다각적 체계적 결정",
-    text: "나는 의사결정 시 다양한 관점을 고려하는 체계적 접근 방식을 활용한다."
-  },
-  {
-    code: "Q15",
-    displayOrder: "s26",
-    groupCode: "G2",
-    subCode: "F4",
-    group: "조직 구축 및 성장 견인",
-    sub: "조직 및 성과 관리",
-    groupShort: "조직",
-    subShort: "조직 관리",
-    shortLabel: "체계적 성과 관리",
-    reportLabel: "[조직]_Q15_체계적 성과 관리",
-    text: "나는 정기적인 리뷰회의를 통해 조직의 성과를 체계적으로 관리한다."
-  },
-  {
-    code: "Q23",
-    displayOrder: "s27",
-    groupCode: "G3",
-    subCode: "F6",
-    group: "관계 및 소통 영향력",
-    sub: "심리적 안전감 기반 갈등 조정",
-    groupShort: "관계",
-    subShort: "갈등 조정",
-    shortLabel: "실수를 통한 성장",
-    reportLabel: "[관계]_Q23_실수를 통한 성장",
-    text: "나는 팀원의 실수를 성장 기회로 전환하고 격려한다."
-  },
-  {
-    code: "Q31",
-    displayOrder: "s28",
-    groupCode: "G4",
-    subCode: "F8",
-    group: "자기 경영 및 민첩성",
-    sub: "회복탄력성 및 성장 마인드셋",
-    groupShort: "자기",
-    subShort: "회복 탄력",
-    shortLabel: "지속적 역량 개발",
-    reportLabel: "[자기]_Q31_지속적 역량 개발",
-    text: "나는 새로운 학습 기회를 적극적으로 추구하고 역량을 개발한다."
-  },
-  {
-    code: "Q08",
-    displayOrder: "s29",
-    groupCode: "G1",
-    subCode: "F2",
-    group: "전략적 통찰",
-    sub: "데이터 기반 전략적 의사결정",
-    groupShort: "전략",
-    subShort: "의사 결정",
-    shortLabel: "데이터 기반 전략",
-    reportLabel: "[전략]_Q08_데이터 기반 전략",
-    text: "나는 데이터 분석 결과를 바탕으로 성공 가능성이 높은 전략을 선택한다."
-  },
-  {
-    code: "Q16",
-    displayOrder: "s30",
-    groupCode: "G2",
-    subCode: "F4",
-    group: "조직 구축 및 성장 견인",
-    sub: "조직 및 성과 관리",
-    groupShort: "조직",
-    subShort: "조직 관리",
-    shortLabel: "실시간 성과 관리",
-    reportLabel: "[조직]_Q16_실시간 성과 관리",
-    text: "나는 성과 지표의 진행 상황을 실시간으로 모니터링하고 조정한다."
-  },
-  {
-    code: "Q24",
-    displayOrder: "s31",
-    groupCode: "G3",
-    subCode: "F6",
-    group: "관계 및 소통 영향력",
-    sub: "심리적 안전감 기반 갈등 조정",
-    groupShort: "관계",
-    subShort: "갈등 조정",
-    shortLabel: "공동 목표 우선시",
-    reportLabel: "[관계]_Q24_공동 목표 우선시",
-    text: "나는 개인의 이해관계를 넘어 공동의 목표 추구를 우선시하도록 유도한다."
-  },
-  {
-    code: "Q32",
-    displayOrder: "s32",
-    groupCode: "G4",
-    subCode: "F8",
-    group: "자기 경영 및 민첩성",
-    sub: "회복탄력성 및 성장 마인드셋",
-    groupShort: "자기",
-    subShort: "회복 탄력",
-    shortLabel: "개인 성장 실천",
-    reportLabel: "[자기]_Q32_개인 성장 실천",
-    text: "나는 개인의 발전 목표를 설정하고 꾸준히 실천한다."
-  }
-];
+    const QUESTIONS = [
+      {
+        code: "Q01",
+        displayOrder: "s01",
+        groupCode: "G1",
+        subCode: "F1",
+        group: "전략적 통찰",
+        sub: "비전 수립 및 공유",
+        groupShort: "전략",
+        subShort: "비전 수립",
+        shortLabel: "미래 비전 수립",
+        reportLabel: "[전략]_Q01_미래 비전 수립",
+        text: "나는 조직의 미래 방향을 명확히 예측하고, 실현 가능한 비전을 수립한다."
+      },
+      {
+        code: "Q09",
+        displayOrder: "s02",
+        groupCode: "G2",
+        subCode: "F3",
+        group: "조직 구축 및 성장 견인",
+        sub: "고성과 팀 구축 및 책임 경영",
+        groupShort: "조직",
+        subShort: "조직 구축",
+        shortLabel: "목표 책임 부여",
+        reportLabel: "[조직]_Q09_목표 책임 부여",
+        text: "나는 팀원들에게 명확한 성과 목표와 책임을 부여한다."
+      },
+      {
+        code: "Q17",
+        displayOrder: "s03",
+        groupCode: "G3",
+        subCode: "F5",
+        group: "관계 및 소통 영향력",
+        sub: "인재 육성 & 조직 문화 정렬",
+        groupShort: "관계",
+        subShort: "인재 육성",
+        shortLabel: "핵심 인재 육성",
+        reportLabel: "[관계]_Q17_핵심 인재 육성",
+        text: "나는 고잠재력 인재를 조기에 식별하고 집중적으로 육성한다."
+      },
+      {
+        code: "Q25",
+        displayOrder: "s04",
+        groupCode: "G4",
+        subCode: "F7",
+        group: "자기 경영 및 민첩성",
+        sub: "평정심 및 존재감",
+        groupShort: "자기",
+        subShort: "자기 조절",
+        shortLabel: "위기 침착 판단",
+        reportLabel: "[자기]_Q25_위기 침착 판단",
+        text: "나는 위기 상황에서도 침착함을 유지하고 합리적으로 판단한다."
+      },
+      {
+        code: "Q02",
+        displayOrder: "s05",
+        groupCode: "G1",
+        subCode: "F1",
+        group: "전략적 통찰",
+        sub: "비전 수립 및 공유",
+        groupShort: "전략",
+        subShort: "비전 수립",
+        shortLabel: "비전 공감 강화",
+        reportLabel: "[전략]_Q02_비전 공감 강화",
+        text: "나는 팀원들이 이해하고 공감할 수 있도록 조직의 비전을 반복적으로 설명하고 강화한다."
+      },
+      {
+        code: "Q10",
+        displayOrder: "s06",
+        groupCode: "G2",
+        subCode: "F3",
+        group: "조직 구축 및 성장 견인",
+        sub: "고성과 팀 구축 및 책임 경영",
+        groupShort: "조직",
+        subShort: "조직 구축",
+        shortLabel: "역할 책임 명확",
+        reportLabel: "[조직]_Q10_역할 책임 명확",
+        text: "나는 각 팀원의 역할과 책임을 정확하게 정의하고 공유한다."
+      },
+      {
+        code: "Q18",
+        displayOrder: "s07",
+        groupCode: "G3",
+        subCode: "F5",
+        group: "관계 및 소통 영향력",
+        sub: "인재 육성 & 조직 문화 정렬",
+        groupShort: "관계",
+        subShort: "인재 육성",
+        shortLabel: "전략 문화 정렬",
+        reportLabel: "[관계]_Q18_전략 문화 정렬",
+        text: "나는 전략적 목표와 조직 문화를 정렬시키기 위해 적극적으로 노력한다."
+      },
+      {
+        code: "Q26",
+        displayOrder: "s08",
+        groupCode: "G4",
+        subCode: "F7",
+        group: "자기 경영 및 민첩성",
+        sub: "평정심 및 존재감",
+        groupShort: "자기",
+        subShort: "자기 조절",
+        shortLabel: "압박속 목표 유지",
+        reportLabel: "[자기]_Q26_압박속 목표 유지",
+        text: "나는 압박감 속에서도 본래의 목표와 원칙을 잃지 않는다."
+      },
+      {
+        code: "Q03",
+        displayOrder: "s09",
+        groupCode: "G1",
+        subCode: "F1",
+        group: "전략적 통찰",
+        sub: "비전 수립 및 공유",
+        groupShort: "전략",
+        subShort: "비전 수립",
+        shortLabel: "전략 우선순위 설정",
+        reportLabel: "[전략]_Q03_전략 우선순위 설정",
+        text: "나는 비전 달성을 위해 필요한 전략적 우선순위를 명확히 설정한다."
+      },
+      {
+        code: "Q11",
+        displayOrder: "s10",
+        groupCode: "G2",
+        subCode: "F3",
+        group: "조직 구축 및 성장 견인",
+        sub: "고성과 팀 구축 및 책임 경영",
+        groupShort: "조직",
+        subShort: "조직 구축",
+        shortLabel: "공정 평가와 보상",
+        reportLabel: "[조직]_Q11_공정 평가와 보상",
+        text: "나는 성과에 따라 공정한 평가와 보상을 실시한다."
+      },
+      {
+        code: "Q19",
+        displayOrder: "s11",
+        groupCode: "G3",
+        subCode: "F5",
+        group: "관계 및 소통 영향력",
+        sub: "인재 육성 & 조직 문화 정렬",
+        groupShort: "관계",
+        subShort: "인재 육성",
+        shortLabel: "도전 부여와 코칭",
+        reportLabel: "[관계]_Q19_도전 부여와 코칭",
+        text: "나는 팀원들에게 도전적인 과제를 부여하고 필요한 지원과 코칭을 제공한다."
+      },
+      {
+        code: "Q27",
+        displayOrder: "s12",
+        groupCode: "G4",
+        subCode: "F7",
+        group: "자기 경영 및 민첩성",
+        sub: "평정심 및 존재감",
+        groupShort: "자기",
+        subShort: "자기 조절",
+        shortLabel: "존재감과 신뢰 형성",
+        reportLabel: "[자기]_Q27_존재감과 신뢰 형성",
+        text: "나는 강력한 존재감으로 팀에 신뢰감과 안정감을 제공한다."
+      },
+      {
+        code: "Q04",
+        displayOrder: "s13",
+        groupCode: "G1",
+        subCode: "F1",
+        group: "전략적 통찰",
+        sub: "비전 수립 및 공유",
+        groupShort: "전략",
+        subShort: "비전 수립",
+        shortLabel: "목표 점검 및 조정",
+        reportLabel: "[전략]_Q04_목표 점검 및 조정",
+        text: "나는 주기적으로 비전(목표)과 현실의 괴리를 점검하고, 조정 방안을 모색한다."
+      },
+      {
+        code: "Q12",
+        displayOrder: "s14",
+        groupCode: "G2",
+        subCode: "F3",
+        group: "조직 구축 및 성장 견인",
+        sub: "고성과 팀 구축 및 책임 경영",
+        groupShort: "조직",
+        subShort: "조직 구축",
+        shortLabel: "전략적 자원 배분",
+        reportLabel: "[조직]_Q12_전략적 자원 배분",
+        text: "나는 팀의 최고 성과를 위해 최적의 자원을 전략적으로 배분한다."
+      },
+      {
+        code: "Q20",
+        displayOrder: "s15",
+        groupCode: "G3",
+        subCode: "F5",
+        group: "관계 및 소통 영향력",
+        sub: "인재 육성 & 조직 문화 정렬",
+        groupShort: "관계",
+        subShort: "인재 육성",
+        shortLabel: "변화 리더십 발휘",
+        reportLabel: "[관계]_Q20_변화 리더십 발휘",
+        text: "나는 조직 변화 과정에서 리더십을 발휘하여 임직원을 이끈다."
+      },
+      {
+        code: "Q28",
+        displayOrder: "s16",
+        groupCode: "G4",
+        subCode: "F7",
+        group: "자기 경영 및 민첩성",
+        sub: "평정심 및 존재감",
+        groupShort: "자기",
+        subShort: "자기 조절",
+        shortLabel: "긍정 에너지 전파",
+        reportLabel: "[자기]_Q28_긍정 에너지 전파",
+        text: "나는 어려운 상황에서도 긍정적 에너지를 유지하고 전파한다."
+      },
+      {
+        code: "Q05",
+        displayOrder: "s17",
+        groupCode: "G1",
+        subCode: "F2",
+        group: "전략적 통찰",
+        sub: "데이터 기반 전략적 의사결정",
+        groupShort: "전략",
+        subShort: "의사 결정",
+        shortLabel: "데이터 기반 의사결정",
+        reportLabel: "[전략]_Q05_데이터 기반 의사결정",
+        text: "나는 중요한 의사결정을 할 때 객관적 데이터와 사실을 우선적으로 검토한다."
+      },
+      {
+        code: "Q13",
+        displayOrder: "s18",
+        groupCode: "G2",
+        subCode: "F4",
+        group: "조직 구축 및 성장 견인",
+        sub: "조직 및 성과 관리",
+        groupShort: "조직",
+        subShort: "조직 관리",
+        shortLabel: "성과 점검 피드백",
+        reportLabel: "[조직]_Q13_성과 점검 피드백",
+        text: "나는 정기적으로 팀의 성과를 점검하고 피드백을 제공한다."
+      },
+      {
+        code: "Q21",
+        displayOrder: "s19",
+        groupCode: "G3",
+        subCode: "F6",
+        group: "관계 및 소통 영향력",
+        sub: "심리적 안전감 기반 갈등 조정",
+        groupShort: "관계",
+        subShort: "갈등 조정",
+        shortLabel: "심리적 안전감 조성",
+        reportLabel: "[관계]_Q21_심리적 안전감 조성",
+        text: "나는 팀원들이 안심하고 의견을 제시할 수 있는 심리적 안전감을 조성한다."
+      },
+      {
+        code: "Q29",
+        displayOrder: "s20",
+        groupCode: "G4",
+        subCode: "F8",
+        group: "자기 경영 및 민첩성",
+        sub: "회복탄력성 및 성장 마인드셋",
+        groupShort: "자기",
+        subShort: "회복 탄력",
+        shortLabel: "강점과 약점 인식",
+        reportLabel: "[자기]_Q29_강점과 약점 인식",
+        text: "나는 나의 강점과 개발 영역을 객관적으로 인식한다."
+      },
+      {
+        code: "Q06",
+        displayOrder: "s21",
+        groupCode: "G1",
+        subCode: "F2",
+        group: "전략적 통찰",
+        sub: "데이터 기반 전략적 의사결정",
+        groupShort: "전략",
+        subShort: "의사 결정",
+        shortLabel: "리스크 선제 대응",
+        reportLabel: "[전략]_Q06_리스크 선제 대응",
+        text: "나는 조직 내 잠재적 리스크를 조기에 인식하고 신속하게 대응한다."
+      },
+      {
+        code: "Q14",
+        displayOrder: "s22",
+        groupCode: "G2",
+        subCode: "F4",
+        group: "조직 구축 및 성장 견인",
+        sub: "조직 및 성과 관리",
+        groupShort: "조직",
+        subShort: "조직 관리",
+        shortLabel: "성과 저해 요인 제거",
+        reportLabel: "[조직]_Q14_성과 저해 요인 제거",
+        text: "나는 성과 저해 요인을 신속하게 파악하고 제거한다."
+      },
+      {
+        code: "Q22",
+        displayOrder: "s23",
+        groupCode: "G3",
+        subCode: "F6",
+        group: "관계 및 소통 영향력",
+        sub: "심리적 안전감 기반 갈등 조정",
+        groupShort: "관계",
+        subShort: "갈등 조정",
+        shortLabel: "건설적 갈등 중재",
+        reportLabel: "[관계]_Q22_건설적 갈등 중재",
+        text: "나는 팀 내 갈등을 건설적으로 중재하고 상호 이해를 촉진한다."
+      },
+      {
+        code: "Q30",
+        displayOrder: "s24",
+        groupCode: "G4",
+        subCode: "F8",
+        group: "자기 경영 및 민첩성",
+        sub: "회복탄력성 및 성장 마인드셋",
+        groupShort: "자기",
+        subShort: "회복 탄력",
+        shortLabel: "피드백 수용 성장",
+        reportLabel: "[자기]_Q30_피드백 수용 성장",
+        text: "나는 피드백을 적극적으로 수용하고 반영하여 계속 성장한다."
+      },
+      {
+        code: "Q07",
+        displayOrder: "s25",
+        groupCode: "G1",
+        subCode: "F2",
+        group: "전략적 통찰",
+        sub: "데이터 기반 전략적 의사결정",
+        groupShort: "전략",
+        subShort: "의사 결정",
+        shortLabel: "다각적 체계적 결정",
+        reportLabel: "[전략]_Q07_다각적 체계적 결정",
+        text: "나는 의사결정 시 다양한 관점을 고려하는 체계적 접근 방식을 활용한다."
+      },
+      {
+        code: "Q15",
+        displayOrder: "s26",
+        groupCode: "G2",
+        subCode: "F4",
+        group: "조직 구축 및 성장 견인",
+        sub: "조직 및 성과 관리",
+        groupShort: "조직",
+        subShort: "조직 관리",
+        shortLabel: "체계적 성과 관리",
+        reportLabel: "[조직]_Q15_체계적 성과 관리",
+        text: "나는 정기적인 리뷰회의를 통해 조직의 성과를 체계적으로 관리한다."
+      },
+      {
+        code: "Q23",
+        displayOrder: "s27",
+        groupCode: "G3",
+        subCode: "F6",
+        group: "관계 및 소통 영향력",
+        sub: "심리적 안전감 기반 갈등 조정",
+        groupShort: "관계",
+        subShort: "갈등 조정",
+        shortLabel: "실수를 통한 성장",
+        reportLabel: "[관계]_Q23_실수를 통한 성장",
+        text: "나는 팀원의 실수를 성장 기회로 전환하고 격려한다."
+      },
+      {
+        code: "Q31",
+        displayOrder: "s28",
+        groupCode: "G4",
+        subCode: "F8",
+        group: "자기 경영 및 민첩성",
+        sub: "회복탄력성 및 성장 마인드셋",
+        groupShort: "자기",
+        subShort: "회복 탄력",
+        shortLabel: "지속적 역량 개발",
+        reportLabel: "[자기]_Q31_지속적 역량 개발",
+        text: "나는 새로운 학습 기회를 적극적으로 추구하고 역량을 개발한다."
+      },
+      {
+        code: "Q08",
+        displayOrder: "s29",
+        groupCode: "G1",
+        subCode: "F2",
+        group: "전략적 통찰",
+        sub: "데이터 기반 전략적 의사결정",
+        groupShort: "전략",
+        subShort: "의사 결정",
+        shortLabel: "데이터 기반 전략",
+        reportLabel: "[전략]_Q08_데이터 기반 전략",
+        text: "나는 데이터 분석 결과를 바탕으로 성공 가능성이 높은 전략을 선택한다."
+      },
+      {
+        code: "Q16",
+        displayOrder: "s30",
+        groupCode: "G2",
+        subCode: "F4",
+        group: "조직 구축 및 성장 견인",
+        sub: "조직 및 성과 관리",
+        groupShort: "조직",
+        subShort: "조직 관리",
+        shortLabel: "실시간 성과 관리",
+        reportLabel: "[조직]_Q16_실시간 성과 관리",
+        text: "나는 성과 지표의 진행 상황을 실시간으로 모니터링하고 조정한다."
+      },
+      {
+        code: "Q24",
+        displayOrder: "s31",
+        groupCode: "G3",
+        subCode: "F6",
+        group: "관계 및 소통 영향력",
+        sub: "심리적 안전감 기반 갈등 조정",
+        groupShort: "관계",
+        subShort: "갈등 조정",
+        shortLabel: "공동 목표 우선시",
+        reportLabel: "[관계]_Q24_공동 목표 우선시",
+        text: "나는 개인의 이해관계를 넘어 공동의 목표 추구를 우선시하도록 유도한다."
+      },
+      {
+        code: "Q32",
+        displayOrder: "s32",
+        groupCode: "G4",
+        subCode: "F8",
+        group: "자기 경영 및 민첩성",
+        sub: "회복탄력성 및 성장 마인드셋",
+        groupShort: "자기",
+        subShort: "회복 탄력",
+        shortLabel: "개인 성장 실천",
+        reportLabel: "[자기]_Q32_개인 성장 실천",
+        text: "나는 개인의 발전 목표를 설정하고 꾸준히 실천한다."
+      }
+    ];
 
     const participantCodeText = document.getElementById("participantCodeText");
     const validView = document.getElementById("validView");
@@ -611,13 +616,14 @@ const QUESTIONS = [
     const answeredCountText = document.getElementById("answeredCountText");
     const progressPercentText = document.getElementById("progressPercentText");
     const progressBar = document.getElementById("progressBar");
+    const pageInfoText = document.getElementById("pageInfoText");
 
     const backButton = document.getElementById("backButton");
     const goHomeButton = document.getElementById("goHomeButton");
 
     const prevPageButton = document.getElementById("prevPageButton");
     const nextPageButton = document.getElementById("nextPageButton");
-    const submitButton = document.getElementById("submitButton");;
+    const submitButton = document.getElementById("submitButton");
 
     let answers = {};
     let autoSaveTimer = null;
@@ -703,76 +709,136 @@ const QUESTIONS = [
       }, 600);
     }
 
-function renderQuestions() {
-  questionList.innerHTML = "";
+    function getTotalPages() {
+      return Math.ceil(QUESTIONS.length / QUESTIONS_PER_PAGE);
+    }
 
-  const startIndex = (currentPage - 1) * QUESTIONS_PER_PAGE;
-  const endIndex = startIndex + QUESTIONS_PER_PAGE;
-  const currentQuestions = QUESTIONS.slice(startIndex, endIndex);
+    function getCurrentPageQuestions() {
+      const startIndex = (currentPage - 1) * QUESTIONS_PER_PAGE;
+      const endIndex = startIndex + QUESTIONS_PER_PAGE;
 
-  currentQuestions.forEach(function (question, index) {
-    const globalIndex = startIndex + index;
-    const selectedValue = answers[question.code];
+      return QUESTIONS.slice(startIndex, endIndex);
+    }
 
-    const questionCard = document.createElement("article");
-    questionCard.className = "question-card";
-    questionCard.id = `question-${question.code}`;
+    function getMissingQuestionsInCurrentPage() {
+      return getCurrentPageQuestions().filter(function (question) {
+        return (
+          answers[question.code] === undefined ||
+          answers[question.code] === null ||
+          answers[question.code] === ""
+        );
+      });
+    }
 
-    const questionHeader = document.createElement("div");
-    questionHeader.className = "question-header";
+    function updatePageButtons() {
+      const totalPages = getTotalPages();
 
-    questionHeader.innerHTML = `
-      <div>
-        <span class="question-number">${globalIndex + 1}</span>
-        <span class="question-group">${question.groupShort} · ${question.subShort}</span>
-      </div>
-      <strong class="question-code">${question.code}</strong>
-    `;
-
-    const questionText = document.createElement("h3");
-    questionText.className = "question-text";
-    questionText.textContent = question.text;
-
-    const scaleRow = document.createElement("div");
-    scaleRow.className = "scale-row";
-    scaleRow.setAttribute("role", "radiogroup");
-    scaleRow.setAttribute("aria-label", question.text);
-
-    SCALE_OPTIONS.forEach(function (option) {
-      const inputId = `${question.code}_${option.value}`;
-
-      const label = document.createElement("label");
-      label.className = "scale-option";
-
-      if (Number(selectedValue) === option.value) {
-        label.classList.add("selected");
+      if (pageInfoText) {
+        pageInfoText.textContent = `${currentPage} / ${totalPages} 페이지`;
       }
 
-      label.innerHTML = `
-        <input
-          type="radio"
-          name="${question.code}"
-          id="${inputId}"
-          value="${option.value}"
-          ${Number(selectedValue) === option.value ? "checked" : ""}
-        />
-        <span class="scale-value">${option.value}</span>
-        <span class="scale-label">${option.label}</span>
-      `;
+      if (currentPage <= 1) {
+        prevPageButton.classList.add("hidden");
+      } else {
+        prevPageButton.classList.remove("hidden");
+      }
 
-      scaleRow.appendChild(label);
-    });
+      if (currentPage >= totalPages) {
+        nextPageButton.classList.add("hidden");
+        submitButton.classList.remove("hidden");
+      } else {
+        nextPageButton.classList.remove("hidden");
+        submitButton.classList.add("hidden");
+      }
+    }
 
-    questionCard.appendChild(questionHeader);
-    questionCard.appendChild(questionText);
-    questionCard.appendChild(scaleRow);
+    function goToPage(pageNumber) {
+      const totalPages = getTotalPages();
 
-    questionList.appendChild(questionCard);
-  });
+      if (pageNumber < 1 || pageNumber > totalPages) return;
 
-  bindQuestionEvents();
-  updatePageButtons();
-}
+      currentPage = pageNumber;
+
+      renderQuestions();
+      updateProgress();
+      clearError();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }
+
+    function renderQuestions() {
+      questionList.innerHTML = "";
+
+      const startIndex = (currentPage - 1) * QUESTIONS_PER_PAGE;
+      const endIndex = startIndex + QUESTIONS_PER_PAGE;
+      const currentQuestions = QUESTIONS.slice(startIndex, endIndex);
+
+      currentQuestions.forEach(function (question, index) {
+        const globalIndex = startIndex + index;
+        const selectedValue = answers[question.code];
+
+        const questionCard = document.createElement("article");
+        questionCard.className = "question-card";
+        questionCard.id = `question-${question.code}`;
+
+        const questionHeader = document.createElement("div");
+        questionHeader.className = "question-header";
+
+        questionHeader.innerHTML = `
+          <div>
+            <span class="question-number">${globalIndex + 1}</span>
+            <span class="question-group">${question.groupShort} · ${question.subShort}</span>
+          </div>
+          <strong class="question-code">${question.code}</strong>
+        `;
+
+        const questionText = document.createElement("h3");
+        questionText.className = "question-text";
+        questionText.textContent = question.text;
+
+        const scaleRow = document.createElement("div");
+        scaleRow.className = "scale-row";
+        scaleRow.setAttribute("role", "radiogroup");
+        scaleRow.setAttribute("aria-label", question.text);
+
+        SCALE_OPTIONS.forEach(function (option) {
+          const inputId = `${question.code}_${option.value}`;
+
+          const label = document.createElement("label");
+          label.className = "scale-option";
+
+          if (Number(selectedValue) === option.value) {
+            label.classList.add("selected");
+          }
+
+          label.innerHTML = `
+            <input
+              type="radio"
+              name="${question.code}"
+              id="${inputId}"
+              value="${option.value}"
+              ${Number(selectedValue) === option.value ? "checked" : ""}
+            />
+            <span class="scale-value">${option.value}</span>
+            <span class="scale-label">${option.label}</span>
+          `;
+
+          scaleRow.appendChild(label);
+        });
+
+        questionCard.appendChild(questionHeader);
+        questionCard.appendChild(questionText);
+        questionCard.appendChild(scaleRow);
+
+        questionList.appendChild(questionCard);
+      });
+
+      bindQuestionEvents();
+      updatePageButtons();
+    }
 
     function bindQuestionEvents() {
       const radioInputs = document.querySelectorAll("input[type='radio']");
@@ -808,7 +874,11 @@ function renderQuestions() {
 
     function updateProgress() {
       const answeredCount = QUESTIONS.filter(function (question) {
-        return answers[question.code] !== undefined && answers[question.code] !== null && answers[question.code] !== "";
+        return (
+          answers[question.code] !== undefined &&
+          answers[question.code] !== null &&
+          answers[question.code] !== ""
+        );
       }).length;
 
       const totalCount = QUESTIONS.length;
@@ -821,7 +891,11 @@ function renderQuestions() {
 
     function getMissingQuestions() {
       return QUESTIONS.filter(function (question) {
-        return answers[question.code] === undefined || answers[question.code] === null || answers[question.code] === "";
+        return (
+          answers[question.code] === undefined ||
+          answers[question.code] === null ||
+          answers[question.code] === ""
+        );
       });
     }
 
@@ -835,13 +909,17 @@ function renderQuestions() {
       errorMessage.classList.add("hidden");
     }
 
-    function markMissingQuestions(missingQuestions) {
+    function clearMissingMarks() {
       QUESTIONS.forEach(function (question) {
         const questionCard = document.getElementById(`question-${question.code}`);
         if (questionCard) {
           questionCard.classList.remove("invalid-question");
         }
       });
+    }
+
+    function markMissingQuestions(missingQuestions) {
+      clearMissingMarks();
 
       missingQuestions.forEach(function (question) {
         const questionCard = document.getElementById(`question-${question.code}`);
@@ -925,29 +1003,29 @@ function renderQuestions() {
     }
 
     prevPageButton.addEventListener("click", function () {
-  saveLeadershipAnswers();
-  goToPage(currentPage - 1);
-});
+      saveLeadershipAnswers();
+      goToPage(currentPage - 1);
+    });
 
-nextPageButton.addEventListener("click", function () {
-  clearError();
+    nextPageButton.addEventListener("click", function () {
+      clearError();
 
-  const missingQuestions = getMissingQuestionsInCurrentPage();
+      const missingQuestions = getMissingQuestionsInCurrentPage();
 
-  if (missingQuestions.length > 0) {
-    markMissingQuestions(missingQuestions);
+      if (missingQuestions.length > 0) {
+        markMissingQuestions(missingQuestions);
 
-    showError(
-      `현재 페이지에 미응답 문항이 ${missingQuestions.length}개 있습니다. 표시된 문항에 응답해 주세요.`
-    );
+        showError(
+          `현재 페이지에 미응답 문항이 ${missingQuestions.length}개 있습니다. 표시된 문항에 응답해 주세요.`
+        );
 
-    scrollToFirstMissingQuestion(missingQuestions);
-    return;
-  }
+        scrollToFirstMissingQuestion(missingQuestions);
+        return;
+      }
 
-  saveLeadershipAnswers();
-  goToPage(currentPage + 1);
-});
+      saveLeadershipAnswers();
+      goToPage(currentPage + 1);
+    });
 
     leadershipForm.addEventListener("submit", function (event) {
       event.preventDefault();
@@ -957,6 +1035,16 @@ nextPageButton.addEventListener("click", function () {
       const missingQuestions = getMissingQuestions();
 
       if (missingQuestions.length > 0) {
+        const firstMissingIndex = QUESTIONS.findIndex(function (question) {
+          return question.code === missingQuestions[0].code;
+        });
+
+        if (firstMissingIndex >= 0) {
+          currentPage = Math.floor(firstMissingIndex / QUESTIONS_PER_PAGE) + 1;
+          renderQuestions();
+          updateProgress();
+        }
+
         markMissingQuestions(missingQuestions);
 
         showError(
