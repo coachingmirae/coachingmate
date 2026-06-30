@@ -44,6 +44,8 @@
   let supabaseClient = null;
   let adminKey = "";
   let submissions = [];
+  let filteredSubmissions = [];
+    let searchKeyword = "";
 
   document.addEventListener("DOMContentLoaded", init);
 
@@ -107,6 +109,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
     const refreshBtn = document.getElementById("refreshBtn");
     const csvBtn = document.getElementById("csvBtn");
     const sheetBtn = document.getElementById("sheetBtn");
+    const searchInput = document.getElementById("searchInput");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
     const modalCloseBtn = document.getElementById("modalCloseBtn");
     const modalBackdrop = document.getElementById("detailModalBackdrop");
 
@@ -121,6 +125,23 @@ if (!supabaseUrl || !supabaseAnonKey) {
     if (sheetBtn) {
       sheetBtn.addEventListener("click", function () {
         window.open(GOOGLE_SHEET_URL, "_blank", "noopener,noreferrer");
+      });
+    }
+
+    if (searchInput) {
+  searchInput.addEventListener("input", function () {
+    searchKeyword = String(searchInput.value || "").trim();
+    applySearchFilter();
+  });
+}
+
+    if (clearSearchBtn) {
+      clearSearchBtn.addEventListener("click", function () {
+        searchKeyword = "";
+        if (searchInput) {
+         searchInput.value = "";
+         }
+         applySearchFilter();
       });
     }
 
@@ -175,12 +196,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
       submissions = Array.isArray(data) ? data : [];
 
-      renderSummary(submissions);
-      renderTable(submissions);
+      filteredSubmissions = submissions.slice();
+
+      applySearchFilter();
 
       setLoadStatus("정상");
-      setTableStatus("총 " + submissions.length + "건");
-
+      
     } catch (error) {
       const message = getErrorMessage(error);
       showError("제출 목록 조회 실패:\n" + message);
@@ -207,6 +228,45 @@ if (!supabaseUrl || !supabaseAnonKey) {
     setText("completedCount", String(completed));
     setText("latestSubmittedAt", latest ? formatDateTime(latest) : "-");
   }
+
+function applySearchFilter() {
+  const keyword = String(searchKeyword || "").trim().toLowerCase();
+
+  if (!keyword) {
+    filteredSubmissions = submissions.slice();
+  } else {
+    filteredSubmissions = submissions.filter(function (row) {
+      const haystack = [
+        row.participant_code || "",
+        row.company || "",
+        row.name || "",
+        row.department || "",
+        row.position_title || "",
+        row.email || "",
+        row.phone || "",
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return haystack.includes(keyword);
+    });
+  }
+
+  renderSummary(filteredSubmissions);
+  renderTable(filteredSubmissions);
+
+  if (keyword) {
+    setTableStatus(
+      "검색 결과 " +
+        filteredSubmissions.length +
+        "건 / 전체 " +
+        submissions.length +
+        "건"
+    );
+  } else {
+    setTableStatus("총 " + submissions.length + "건");
+  }
+} 
 
   function renderTable(rows) {
     const tbody = document.getElementById("submissionTableBody");
@@ -506,11 +566,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
   }
 
 function downloadSubmissionsCsv() {
-  if (!submissions || submissions.length === 0) {
-    alert("다운로드할 제출 목록이 없습니다.");
-    return;
-  }
+  const csvSource = filteredSubmissions && filteredSubmissions.length
+  ? filteredSubmissions
+  : submissions;
 
+if (!csvSource || csvSource.length === 0) {
+  alert("다운로드할 제출 목록이 없습니다.");
+  return;
+}
   const headers = [
     "제출일시",
     "참여코드",
@@ -527,7 +590,7 @@ function downloadSubmissionsCsv() {
     "상태",
   ];
 
-  const rows = submissions.map(function (row) {
+  const rows = csvSource.map(function (row) {
     return [
       formatDateTime(row.submitted_at),
       row.participant_code || "",

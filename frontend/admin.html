@@ -408,10 +408,20 @@
     </section>
 
     <section class="admin-panel">
-      <div class="admin-panel-top">
-        <strong>제출 목록</strong>
-        <span id="tableStatus" class="admin-status">-</span>
-      </div>
+  <div class="admin-panel-top">
+    <strong>제출 목록</strong>
+
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="참여코드, 회사, 성명, 부서, 직책 검색"
+        style="width: min(360px, 70vw); padding: 9px 11px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px;"
+      />
+      <button id="clearSearchBtn" class="detail-button" type="button">검색 초기화</button>
+      <span id="tableStatus" class="admin-status">-</span>
+    </div>
+  </div>  
 
       <div class="table-wrap">
         <table class="admin-table">
