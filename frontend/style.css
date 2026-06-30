@@ -998,6 +998,15 @@ textarea:focus {
     grid-template-columns: 1fr;
     gap: 4px;
   }
+  .button-row-inline {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .button-row-inline .primary-button,
+  .button-row-inline .secondary-button {
+    width: 100%;
+  }
 }
 
 @media (max-width: 520px) {
@@ -1066,6 +1075,12 @@ textarea:focus {
 
   .page-footer {
     padding: 18px;
+  }
+
+  .button-row-inline {
+    display: flex;
+    gap: 12px;
+    align-items: center;
   }
 
   /* leadership.html 문항 그룹 안보이게 

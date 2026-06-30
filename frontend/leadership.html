@@ -100,13 +100,23 @@
 
           <div class="form-actions">
             <button type="button" id="backButton" class="secondary-button">
-              이전: 기본정보
+            이전: 기본정보
             </button>
 
-            <button type="submit" class="primary-button">
-              다음: 코칭 니즈조사
+          <div class="button-row-inline">
+            <button type="button" id="prevPageButton" class="secondary-button">
+            이전 문항
             </button>
-          </div>
+
+            <button type="button" id="nextPageButton" class="primary-button">
+            다음 문항
+            </button>
+
+            <button type="submit" id="submitButton" class="primary-button hidden">
+            다음: 코칭 니즈조사
+            </button>
+            </div>
+        </div>
 
           <p id="saveStatus" class="save-status">
             자동 저장 대기 중
@@ -605,8 +615,15 @@ const QUESTIONS = [
     const backButton = document.getElementById("backButton");
     const goHomeButton = document.getElementById("goHomeButton");
 
+    const prevPageButton = document.getElementById("prevPageButton");
+    const nextPageButton = document.getElementById("nextPageButton");
+    const submitButton = document.getElementById("submitButton");;
+
     let answers = {};
     let autoSaveTimer = null;
+
+    const QUESTIONS_PER_PAGE = 8;
+    let currentPage = 1;
 
     function getParticipantCode() {
       const params = new URLSearchParams(window.location.search);
@@ -686,65 +703,76 @@ const QUESTIONS = [
       }, 600);
     }
 
-    function renderQuestions() {
-      questionList.innerHTML = "";
+function renderQuestions() {
+  questionList.innerHTML = "";
 
-      QUESTIONS.forEach(function (question, index) {
-        const selectedValue = answers[question.code];
+  const startIndex = (currentPage - 1) * QUESTIONS_PER_PAGE;
+  const endIndex = startIndex + QUESTIONS_PER_PAGE;
+  const currentQuestions = QUESTIONS.slice(startIndex, endIndex);
 
-        const questionCard = document.createElement("article");
-        questionCard.className = "question-card";
-        questionCard.id = `question-${question.code}`;
+  currentQuestions.forEach(function (question, index) {
+    const globalIndex = startIndex + index;
+    const selectedValue = answers[question.code];
 
-        const questionHeader = document.createElement("div");
-        questionHeader.className = "question-header";
+    const questionCard = document.createElement("article");
+    questionCard.className = "question-card";
+    questionCard.id = `question-${question.code}`;
 
-        questionHeader.innerHTML = `
-          <div>
-            <span class="question-number">${index + 1}</span>
-          </div>
-        `;
+    const questionHeader = document.createElement("div");
+    questionHeader.className = "question-header";
 
-        const questionText = document.createElement("h3");
-        questionText.className = "question-text";
-        questionText.textContent = question.text;
+    questionHeader.innerHTML = `
+      <div>
+        <span class="question-number">${globalIndex + 1}</span>
+        <span class="question-group">${question.groupShort} · ${question.subShort}</span>
+      </div>
+      <strong class="question-code">${question.code}</strong>
+    `;
 
-        const scaleRow = document.createElement("div");
-        scaleRow.className = "scale-row";
-        scaleRow.setAttribute("role", "radiogroup");
-        scaleRow.setAttribute("aria-label", question.text);
+    const questionText = document.createElement("h3");
+    questionText.className = "question-text";
+    questionText.textContent = question.text;
 
-        SCALE_OPTIONS.forEach(function (option) {
-          const inputId = `${question.code}_${option.value}`;
+    const scaleRow = document.createElement("div");
+    scaleRow.className = "scale-row";
+    scaleRow.setAttribute("role", "radiogroup");
+    scaleRow.setAttribute("aria-label", question.text);
 
-          const label = document.createElement("label");
-          label.className = "scale-option";
-          if (Number(selectedValue) === option.value) {
-            label.classList.add("selected");
-          }
+    SCALE_OPTIONS.forEach(function (option) {
+      const inputId = `${question.code}_${option.value}`;
 
-          label.innerHTML = `
-            <input
-              type="radio"
-              name="${question.code}"
-              id="${inputId}"
-              value="${option.value}"
-              ${Number(selectedValue) === option.value ? "checked" : ""}
-            />
-            <span class="scale-value">${option.value}</span>
-            <span class="scale-label">${option.label}</span>
-          `;
+      const label = document.createElement("label");
+      label.className = "scale-option";
 
-          scaleRow.appendChild(label);
-        });
+      if (Number(selectedValue) === option.value) {
+        label.classList.add("selected");
+      }
 
-        questionCard.appendChild(questionHeader);
-        questionCard.appendChild(questionText);
-        questionCard.appendChild(scaleRow);
+      label.innerHTML = `
+        <input
+          type="radio"
+          name="${question.code}"
+          id="${inputId}"
+          value="${option.value}"
+          ${Number(selectedValue) === option.value ? "checked" : ""}
+        />
+        <span class="scale-value">${option.value}</span>
+        <span class="scale-label">${option.label}</span>
+      `;
 
-        questionList.appendChild(questionCard);
-      });
-    }
+      scaleRow.appendChild(label);
+    });
+
+    questionCard.appendChild(questionHeader);
+    questionCard.appendChild(questionText);
+    questionCard.appendChild(scaleRow);
+
+    questionList.appendChild(questionCard);
+  });
+
+  bindQuestionEvents();
+  updatePageButtons();
+}
 
     function bindQuestionEvents() {
       const radioInputs = document.querySelectorAll("input[type='radio']");
@@ -889,13 +917,37 @@ const QUESTIONS = [
       localStorage.setItem(STORAGE_KEYS.currentStep, "leadership");
 
       renderQuestions();
-      bindQuestionEvents();
       updateProgress();
 
       if (savedPayload && savedPayload.updated_at) {
         saveStatus.textContent = "저장된 리더십 진단 응답을 불러왔습니다.";
       }
     }
+
+    prevPageButton.addEventListener("click", function () {
+  saveLeadershipAnswers();
+  goToPage(currentPage - 1);
+});
+
+nextPageButton.addEventListener("click", function () {
+  clearError();
+
+  const missingQuestions = getMissingQuestionsInCurrentPage();
+
+  if (missingQuestions.length > 0) {
+    markMissingQuestions(missingQuestions);
+
+    showError(
+      `현재 페이지에 미응답 문항이 ${missingQuestions.length}개 있습니다. 표시된 문항에 응답해 주세요.`
+    );
+
+    scrollToFirstMissingQuestion(missingQuestions);
+    return;
+  }
+
+  saveLeadershipAnswers();
+  goToPage(currentPage + 1);
+});
 
     leadershipForm.addEventListener("submit", function (event) {
       event.preventDefault();
