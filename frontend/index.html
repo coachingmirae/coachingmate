@@ -309,6 +309,9 @@
 
         localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
       }
+      if (state.status === "leadership_submitted") {
+  localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
+}
     }
 
     async function fetchParticipantState(participantCode) {

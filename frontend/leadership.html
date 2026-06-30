@@ -1025,8 +1025,11 @@ async function submitLeadershipToDb() {
     }
 
     function goToNeeds() {
+      const participantCode = getParticipantCode();
+
       localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
-      window.location.href = PAGE_PATHS.needs;
+
+      window.location.href = `${PAGE_PATHS.needs}?id=${encodeURIComponent(participantCode)}`;
     }
 
     function initializeRespondentInfo() {
@@ -1156,24 +1159,27 @@ async function submitLeadershipToDb() {
 
       saveLeadershipAnswers();
 
-      submitButton.disabled = true;
-      submitButton.textContent = "저장 중...";
+submitButton.disabled = true;
+submitButton.textContent = "제출 중...";
 
-      saveLeadershipDraftToDb()
-        .then(function () {
-          goToNeeds();
-        })
-        .catch(function (error) {
-          console.error("리더십 최종 draft DB 저장 오류:", error);
+submitLeadershipToDb()
+  .then(function () {
+    goToNeeds();
+  })
+  .catch(function (error) {
+    console.error("리더십 진단 제출 오류:", error);
 
-          showError(
-            "서버 임시저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
-          );
-        })
-        .finally(function () {
-          submitButton.disabled = false;
-          submitButton.textContent = "다음: 코칭 니즈조사";
-        });
+    const errorMessageText =
+      error && error.message
+        ? error.message
+        : "서버 제출 중 오류가 발생했습니다.";
+
+    showError(`리더십 진단 제출 중 오류가 발생했습니다: ${errorMessageText}`);
+  })
+  .finally(function () {
+    submitButton.disabled = false;
+    submitButton.textContent = "리더십 진단 제출하기";
+  });
     });
 
     backButton.addEventListener("click", function () {

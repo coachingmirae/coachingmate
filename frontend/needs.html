@@ -15,7 +15,15 @@
     <section class="progress-steps compact"><div class="step-item done"><span class="step-dot">✓</span><span>기본정보</span></div><div class="step-line active"></div><div class="step-item done"><span class="step-dot">✓</span><span>리더십 진단</span></div><div class="step-line active"></div><div class="step-item active"><span class="step-dot">3</span><span>코칭 니즈</span></div><div class="step-line"></div><div class="step-item"><span class="step-dot">4</span><span>완료</span></div></section>
     <section id="validView" class="content-section hidden">
       <div class="page-title-box"><p class="eyebrow">STEP 3</p><h2>코칭 니즈조사</h2><p>아래 문항은 향후 코칭 목표와 방향을 설정하기 위한 사전 질문입니다. 각 문항에 자유롭게 작성해 주세요.</p></div>
-      <form id="needsForm" novalidate><div id="needsList"></div><div id="errorMessage" class="error-message hidden"></div><div class="form-actions"><button type="button" id="backButton" class="secondary-button">이전: 리더십 진단</button><div class="button-row-inline"><button type="button" id="tempSaveButton" class="secondary-button">임시저장</button><button type="submit" class="primary-button">제출하기</button></div></div><p id="saveStatus" class="save-status">자동 저장 대기 중</p></form>
+      <form id="needsForm" novalidate><div id="needsList"></div><div id="errorMessage" class="error-message hidden"></div>
+        <!--
+리더십 진단 제출 후에는 수정 방지를 위해 이전 버튼을 숨김 처리합니다.
+
+<button type="button" id="backButton" class="secondary-button">
+  이전: 리더십 진단
+</button>
+-->
+            <div class="button-row-inline"><button type="button" id="tempSaveButton" class="secondary-button">임시저장</button><button type="submit" class="primary-button">제출하기</button></div></div><p id="saveStatus" class="save-status">자동 저장 대기 중</p></form>
     </section>
     <section id="invalidView" class="content-section hidden"><div class="error-card"><h2>참여코드를 확인할 수 없습니다.</h2><p>올바른 참여 링크로 다시 접속해 주세요.</p></div></section>
     <footer class="page-footer"><p>© CoachingMate. All rights reserved.</p></footer>
@@ -38,7 +46,7 @@
       ["need11","코칭 전에 코치가 꼭 알고 있었으면 하는 추가 정보나 요청하고 싶은 말이 있다면 자유롭게 적어 주세요."]
     ];
     const supabaseClient=cmGetSupabaseClient();
-    const participantCodeText=document.getElementById("participantCodeText"), validView=document.getElementById("validView"), invalidView=document.getElementById("invalidView"), needsForm=document.getElementById("needsForm"), needsList=document.getElementById("needsList"), errorMessage=document.getElementById("errorMessage"), saveStatus=document.getElementById("saveStatus"), backButton=document.getElementById("backButton"), tempSaveButton=document.getElementById("tempSaveButton");
+    const participantCodeText=document.getElementById("participantCodeText"), validView=document.getElementById("validView"), invalidView=document.getElementById("invalidView"), needsForm=document.getElementById("needsForm"), needsList=document.getElementById("needsList"), errorMessage=document.getElementById("errorMessage"), saveStatus=document.getElementById("saveStatus"), tempSaveButton=document.getElementById("tempSaveButton");
     let autoSaveTimer=null;
     function formatDateTime(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;}
     function loadBasicInfo(){try{return JSON.parse(localStorage.getItem(STORAGE_KEYS.basicInfo)||"{}");}catch(e){return {};}}
@@ -58,7 +66,8 @@
     function initializePage(){const code=cmGetParticipantCode(); if(!code){invalidView.classList.remove("hidden"); return;} participantCodeText.textContent=code; validView.classList.remove("hidden"); renderNeeds(); loadSaved(); QUESTIONS.forEach(q=>document.getElementById(q[0]).addEventListener("input",scheduleAutoSave)); localStorage.setItem(STORAGE_KEYS.currentStep,"needs");}
     tempSaveButton.addEventListener("click",function(){clearError(); saveNeedsAnswers(); saveNeedsDraftToDb().then(()=>alert("임시저장되었습니다. 같은 링크로 다시 접속하면 이어서 작성할 수 있습니다.")).catch(function(error){console.error(error); alert("서버 임시저장 중 오류가 발생했습니다.");});});
     needsForm.addEventListener("submit",function(e){e.preventDefault(); clearError(); const missing=validate(); if(missing.length){showError(`미응답 문항이 ${missing.length}개 있습니다. ‘해당 없음’ 또는 ‘코칭시 답변 예정’으로도 입력할 수 있습니다.`); document.getElementById(missing[0][0]).focus(); return;} const payload=saveFinalSubmission(); submitToSupabase(payload).then(()=>submitToGoogleSheet(payload).catch(err=>console.warn("Google Sheet 백업 오류",err))).then(()=>{window.location.href="./complete.html";}).catch(function(error){console.error(error); alert("서버 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");});});
-    backButton.addEventListener("click",function(){saveNeedsAnswers(); window.location.href="./leadership.html";});
+    
+    /*backButton.addEventListener("click",function(){saveNeedsAnswers(); window.location.href="./leadership.html";});*/
     initializePage();
   </script>
 </body>
