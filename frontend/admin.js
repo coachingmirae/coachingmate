@@ -105,12 +105,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
   function bindEvents() {
     const refreshBtn = document.getElementById("refreshBtn");
+    const csvBtn = document.getElementById("csvBtn");
     const sheetBtn = document.getElementById("sheetBtn");
     const modalCloseBtn = document.getElementById("modalCloseBtn");
     const modalBackdrop = document.getElementById("detailModalBackdrop");
 
     if (refreshBtn) {
       refreshBtn.addEventListener("click", loadSubmissions);
+    }
+
+    if (csvBtn) {
+     csvBtn.addEventListener("click", downloadSubmissionsCsv);
     }
 
     if (sheetBtn) {
@@ -499,6 +504,91 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
     return String(error);
   }
+
+function downloadSubmissionsCsv() {
+  if (!submissions || submissions.length === 0) {
+    alert("다운로드할 제출 목록이 없습니다.");
+    return;
+  }
+
+  const headers = [
+    "제출일시",
+    "참여코드",
+    "회사",
+    "성명",
+    "부서",
+    "직책",
+    "이메일",
+    "휴대폰",
+    "리더십응답수",
+    "니즈응답수",
+    "상태",
+  ];
+
+  const rows = submissions.map(function (row) {
+    return [
+      formatDateTime(row.submitted_at),
+      row.participant_code || "",
+      row.company || "",
+      row.name || "",
+      row.department || "",
+      row.position_title || "",
+      row.email || "",
+      row.phone || "",
+      String(row.leadership_answer_count || 0) + " / 32",
+      String(row.needs_answer_count || 0) + " / 12",
+      row.status || "",
+    ];
+  });
+
+  const csv = [
+    headers,
+    ...rows,
+  ]
+    .map(function (line) {
+      return line.map(csvEscape).join(",");
+    })
+    .join("\r\n");
+
+  // Excel 한글 깨짐 방지를 위한 BOM
+  const blob = new Blob(["\ufeff" + csv], {
+    type: "text/csv;charset=utf-8;",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+
+  link.href = url;
+  link.download = "coachingmate_submissions_" + y + m + d + "_" + hh + mm + ".csv";
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
+
+function csvEscape(value) {
+  const text = String(value == null ? "" : value);
+
+  if (
+    text.includes(",") ||
+    text.includes('"') ||
+    text.includes("\n") ||
+    text.includes("\r")
+  ) {
+    return '"' + text.replace(/"/g, '""') + '"';
+  }
+
+  return text;
+}
 
   function escapeHtml(value) {
     return String(value == null ? "" : value)
