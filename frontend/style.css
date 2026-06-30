@@ -430,7 +430,7 @@ input {
 }
 
 textarea {
-  min-height: 140px;
+  min-height: 70px;
   padding: 15px;
   resize: vertical;
 }
