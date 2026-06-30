@@ -1342,7 +1342,7 @@ submitLeadershipToDb()
     });
 
     goHomeButton.addEventListener("click", function () {
-      window.location.href = PAGE_PATHS.index;
+      window.location.href = `${PAGE_PATHS.index}?id=${encodeURIComponent(participantCode)}`;
     });
 
     initializePage();
