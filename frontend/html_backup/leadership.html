@@ -12,9 +12,6 @@
   />
 
   <link rel="stylesheet" href="./style.css" />
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./config.js"></script>
 </head>
 
 <body>
@@ -159,7 +156,7 @@
      * 2. 8문항씩 페이지 분할
      * 3. 5점 척도 응답 저장
      * 4. localStorage 자동저장
-     * 5. 다음 페이지 이동 시 Supabase draft 저장
+     * 5. 현재 페이지 미응답 문항 체크
      * 6. 전체 응답 완료 후 needs.html 이동
      */
 
@@ -176,14 +173,6 @@
       basicInfo: "./basic-info.html",
       needs: "./needs.html"
     };
-
-    const SUPABASE_URL = window.CM_CONFIG && window.CM_CONFIG.SUPABASE_URL;
-    const SUPABASE_ANON_KEY = window.CM_CONFIG && window.CM_CONFIG.SUPABASE_ANON_KEY;
-
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
 
     const SCALE_OPTIONS = [
       { value: 1, label: "전혀 그렇지 않다" },
@@ -708,32 +697,6 @@
       saveStatus.textContent = `자동 저장됨 · ${formatDateTime(now)}`;
     }
 
-    async function saveLeadershipDraftToDb() {
-      const participantCode = getParticipantCode();
-      const basicInfo = loadBasicInfo() || {};
-
-      if (!participantCode) {
-        throw new Error("참여코드를 확인할 수 없습니다.");
-      }
-
-      const { data, error } = await supabaseClient.rpc("save_leadership_draft", {
-        p_participant_code: participantCode,
-        p_basic_info: basicInfo,
-        p_answers: answers
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data && data.ok === false && data.status === "submitted") {
-        throw new Error("이미 제출 완료된 응답입니다.");
-      }
-
-      console.log("리더십 draft DB 저장 성공:", data);
-      return data;
-    }
-
     function scheduleAutoSave() {
       saveStatus.textContent = "입력 중...";
 
@@ -827,9 +790,7 @@
         questionHeader.innerHTML = `
           <div>
             <span class="question-number">${globalIndex + 1}</span>
-            <span class="question-group">${question.groupShort} · ${question.subShort}</span>
           </div>
-          <strong class="question-code">${question.code}</strong>
         `;
 
         const questionText = document.createElement("h3");
@@ -1061,25 +1022,7 @@
       }
 
       saveLeadershipAnswers();
-
-      nextPageButton.disabled = true;
-      nextPageButton.textContent = "저장 중...";
-
-      saveLeadershipDraftToDb()
-        .then(function () {
-          goToPage(currentPage + 1);
-        })
-        .catch(function (error) {
-          console.error("리더십 draft DB 저장 오류:", error);
-
-          showError(
-            "서버 임시저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
-          );
-        })
-        .finally(function () {
-          nextPageButton.disabled = false;
-          nextPageButton.textContent = "다음 문항";
-        });
+      goToPage(currentPage + 1);
     });
 
     leadershipForm.addEventListener("submit", function (event) {
@@ -1111,25 +1054,7 @@
       }
 
       saveLeadershipAnswers();
-
-      submitButton.disabled = true;
-      submitButton.textContent = "저장 중...";
-
-      saveLeadershipDraftToDb()
-        .then(function () {
-          goToNeeds();
-        })
-        .catch(function (error) {
-          console.error("리더십 최종 draft DB 저장 오류:", error);
-
-          showError(
-            "서버 임시저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
-          );
-        })
-        .finally(function () {
-          submitButton.disabled = false;
-          submitButton.textContent = "다음: 코칭 니즈조사";
-        });
+      goToNeeds();
     });
 
     backButton.addEventListener("click", function () {

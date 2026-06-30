@@ -8,10 +8,13 @@
 
   <meta
     name="description"
-    content="CoachingMate 리더십 진단 및 코칭 니즈조사 참여 페이지입니다."
+    content="CoachingMate 리더십 코칭 진단 플랫폼입니다."
   />
 
   <link rel="stylesheet" href="./style.css" />
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./config.js"></script>
 </head>
 
 <body>
@@ -22,32 +25,32 @@
           <span class="logo-text">CM</span>
         </div>
 
-        <div class="brand-text">
+        <div>
           <h1>CoachingMate</h1>
           <p>Leadership Coaching Platform</p>
         </div>
       </header>
 
+      <section id="loadingView" class="content-section">
+        <div class="notice-box">
+          <strong>참여 링크 확인 중</strong>
+          <p>잠시만 기다려 주세요. 참여코드와 응답 상태를 확인하고 있습니다.</p>
+        </div>
+      </section>
+
       <section id="validParticipantView" class="content-section hidden">
-        <div class="welcome-box">
-          <p class="eyebrow">리더십 코칭 프로그램</p>
-          <h2>리더십 진단과<br />코칭 니즈조사를 시작합니다.</h2>
-          <p class="description">
-            본 과정은 리더십 역량을 점검하고, 향후 코칭 방향을 설정하기 위한 사전 진단입니다.
-            응답 내용은 안전하게 저장되며, 작성 중 언제든 이어서 진행할 수 있습니다.
+        <div class="page-title-box">
+          <p class="eyebrow">WELCOME</p>
+          <h2>리더십 코칭 진단을 시작합니다.</h2>
+          <p>
+            본 진단은 리더십 특성과 코칭 니즈를 파악하여 향후 코칭 방향을 설정하기 위한 과정입니다.
+            응답 내용은 코칭 목적에 맞게 활용됩니다.
           </p>
         </div>
 
-        <div class="info-grid">
-          <div class="info-card">
-            <span class="info-label">예상 소요시간</span>
-            <strong>약 20분</strong>
-          </div>
-
-          <div class="info-card">
-            <span class="info-label">참여코드</span>
-            <strong id="participantCodeText">-</strong>
-          </div>
+        <div class="participant-box">
+          <span class="info-label">참여코드</span>
+          <strong id="participantCodeText">-</strong>
         </div>
 
         <div class="progress-steps" aria-label="진행 단계">
@@ -78,32 +81,55 @@
           </div>
         </div>
 
+        <div id="startBox" class="button-panel">
+          <button type="button" id="startButton" class="primary-button full-width">
+            시작하기
+          </button>
+        </div>
+
         <div id="resumeBox" class="resume-box hidden">
-          <h3>이전에 작성하던 내용이 있습니다.</h3>
+          <h3>이전에 작성 중인 응답이 있습니다.</h3>
           <p>
-            저장된 응답을 불러와 이어서 작성할 수 있습니다.
-            처음부터 다시 작성하면 기존 임시저장 내용이 초기화됩니다.
+            같은 참여코드로 저장된 응답이 있습니다.
+            이어서 작성하거나 처음부터 다시 시작할 수 있습니다.
           </p>
 
           <div class="button-row">
             <button type="button" id="resumeButton" class="primary-button">
               이어서 작성하기
             </button>
-            <button type="button" id="restartButton" class="secondary-button">
-              처음부터 작성하기
+
+            <button type="button" id="resetButton" class="secondary-button">
+              처음부터 다시 작성
             </button>
           </div>
         </div>
+      </section>
 
-        <div id="startBox" class="start-box">
-          <button type="button" id="startButton" class="primary-button full-width">
-            시작하기
-          </button>
+      <section id="submittedView" class="content-section hidden">
+        <div class="complete-card">
+          <div class="complete-icon">✓</div>
+
+          <p class="eyebrow">ALREADY SUBMITTED</p>
+
+          <h2>이미 제출 완료되었습니다.</h2>
+
+          <p class="description">
+            이 참여 링크로 이미 리더십 진단과 코칭 니즈조사가 제출되었습니다.
+            다시 응답하려면 기존 제출 내용을 삭제한 후 재응답을 시작할 수 있습니다.
+          </p>
+
+          <div class="participant-box">
+            <span class="info-label">참여코드</span>
+            <strong id="submittedParticipantCodeText">-</strong>
+          </div>
+
+          <div class="button-row complete-button-row">
+            <button type="button" id="resetResponseButton" class="secondary-button">
+              제출 내용 삭제 후 재응답하기
+            </button>
+          </div>
         </div>
-
-        <p class="save-notice">
-          작성 내용은 자동 저장됩니다. 브라우저를 닫아도 같은 링크로 다시 접속하면 이어서 작성할 수 있습니다.
-        </p>
       </section>
 
       <section id="invalidParticipantView" class="content-section hidden">
@@ -111,11 +137,14 @@
           <h2>참여코드를 확인할 수 없습니다.</h2>
           <p>
             올바른 참여 링크로 접속해 주세요.
-            문자 또는 이메일로 받은 링크를 다시 확인하거나 담당 코치에게 문의해 주세요.
+            문자 또는 이메일로 받은 링크를 다시 확인해 주세요.
           </p>
 
-          <div class="example-url">
-            예시: https://coachingmate.co.kr/?id=swon.cho7
+          <div class="notice-box">
+            <strong>참여 링크 예시</strong>
+            <p>
+              https://coachingmate.co.kr/?id=swon.cho7
+            </p>
           </div>
         </div>
       </section>
@@ -130,19 +159,23 @@
     /**
      * CoachingMate index.html
      * 역할:
-     * 1. URL의 ?id= 참여코드 확인
-     * 2. 참여코드를 localStorage에 저장
-     * 3. 기존 임시저장 데이터가 있으면 이어쓰기/처음부터 작성 선택
-     * 4. basic-info.html로 이동
+     * 1. URL의 참여코드 확인
+     * 2. Supabase DB에서 제출 상태 조회
+     * 3. submitted 상태이면 제출 완료 화면 표시
+     * 4. draft 상태이면 localStorage 복원 후 이어서 작성 가능
+     * 5. 제출 내용 삭제 후 재응답 처리
      */
 
+     
     const STORAGE_KEYS = {
       participantCode: "cm_participant_code",
       basicInfo: "cm_basic_info",
       leadershipAnswers: "cm_leadership_answers",
       needsAnswers: "cm_needs_answers",
       currentStep: "cm_current_step",
-      lastSavedAt: "cm_last_saved_at"
+      lastSavedAt: "cm_last_saved_at",
+      submittedAt: "cm_submitted_at",
+      finalSubmission: "cm_final_submission"
     };
 
     const PAGE_PATHS = {
@@ -152,108 +185,253 @@
       complete: "./complete.html"
     };
 
+    const SUPABASE_URL = window.CM_CONFIG && window.CM_CONFIG.SUPABASE_URL;
+    const SUPABASE_ANON_KEY = window.CM_CONFIG && window.CM_CONFIG.SUPABASE_ANON_KEY;
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    const loadingView = document.getElementById("loadingView");
     const validParticipantView = document.getElementById("validParticipantView");
     const invalidParticipantView = document.getElementById("invalidParticipantView");
-    const participantCodeText = document.getElementById("participantCodeText");
+    const submittedView = document.getElementById("submittedView");
 
-    const resumeBox = document.getElementById("resumeBox");
+    const participantCodeText = document.getElementById("participantCodeText");
+    const submittedParticipantCodeText = document.getElementById("submittedParticipantCodeText");
+
     const startBox = document.getElementById("startBox");
+    const resumeBox = document.getElementById("resumeBox");
 
     const startButton = document.getElementById("startButton");
     const resumeButton = document.getElementById("resumeButton");
-    const restartButton = document.getElementById("restartButton");
+    const resetButton = document.getElementById("resetButton");
+    const resetResponseButton = document.getElementById("resetResponseButton");
 
     function getParticipantCodeFromUrl() {
       const params = new URLSearchParams(window.location.search);
       const code = params.get("id");
 
-      if (!code) return "";
+      return code ? code.trim() : "";
+    }
 
-      return code.trim();
+    function showOnly(viewElement) {
+      loadingView.classList.add("hidden");
+      validParticipantView.classList.add("hidden");
+      invalidParticipantView.classList.add("hidden");
+      submittedView.classList.add("hidden");
+
+      viewElement.classList.remove("hidden");
     }
 
     function hasSavedProgress() {
-      const basicInfo = localStorage.getItem(STORAGE_KEYS.basicInfo);
-      const leadershipAnswers = localStorage.getItem(STORAGE_KEYS.leadershipAnswers);
-      const needsAnswers = localStorage.getItem(STORAGE_KEYS.needsAnswers);
-      const currentStep = localStorage.getItem(STORAGE_KEYS.currentStep);
-
-      return Boolean(basicInfo || leadershipAnswers || needsAnswers || currentStep);
+      return Boolean(
+        localStorage.getItem(STORAGE_KEYS.basicInfo) ||
+        localStorage.getItem(STORAGE_KEYS.leadershipAnswers) ||
+        localStorage.getItem(STORAGE_KEYS.needsAnswers)
+      );
     }
 
-    function getResumeTargetPage() {
-      const currentStep = localStorage.getItem(STORAGE_KEYS.currentStep);
+    function getCurrentStep() {
+      return localStorage.getItem(STORAGE_KEYS.currentStep) || "basicInfo";
+    }
 
-      if (currentStep === "complete") {
-        return PAGE_PATHS.complete;
+    function getResumePath() {
+      const currentStep = getCurrentStep();
+
+      if (currentStep === "leadership") {
+        return PAGE_PATHS.leadership;
       }
 
       if (currentStep === "needs") {
         return PAGE_PATHS.needs;
       }
 
-      if (currentStep === "leadership") {
-        return PAGE_PATHS.leadership;
+      if (currentStep === "complete") {
+        return PAGE_PATHS.complete;
       }
 
       return PAGE_PATHS.basicInfo;
     }
 
-    function clearDraftData() {
+    function clearLocalResponseData(keepParticipantCode) {
+      const participantCode = localStorage.getItem(STORAGE_KEYS.participantCode);
+
       localStorage.removeItem(STORAGE_KEYS.basicInfo);
       localStorage.removeItem(STORAGE_KEYS.leadershipAnswers);
       localStorage.removeItem(STORAGE_KEYS.needsAnswers);
       localStorage.removeItem(STORAGE_KEYS.currentStep);
       localStorage.removeItem(STORAGE_KEYS.lastSavedAt);
+      localStorage.removeItem(STORAGE_KEYS.submittedAt);
+      localStorage.removeItem(STORAGE_KEYS.finalSubmission);
+
+      if (!keepParticipantCode) {
+        localStorage.removeItem(STORAGE_KEYS.participantCode);
+      } else if (participantCode) {
+        localStorage.setItem(STORAGE_KEYS.participantCode, participantCode);
+      }
     }
 
-    function goToBasicInfo() {
-      localStorage.setItem(STORAGE_KEYS.currentStep, "basic-info");
-      window.location.href = PAGE_PATHS.basicInfo;
+    function restoreStateToLocalStorage(state) {
+      if (!state || !state.exists) return;
+
+      localStorage.setItem(STORAGE_KEYS.participantCode, state.participant_code);
+
+      if (state.basic_info) {
+        localStorage.setItem(STORAGE_KEYS.basicInfo, JSON.stringify({
+          company: state.basic_info.company || "",
+          name: state.basic_info.name || "",
+          position: state.basic_info.position || "",
+          department: state.basic_info.department || "",
+          email: state.basic_info.email || "",
+          phone: state.basic_info.phone || "",
+          participant_code: state.participant_code
+        }));
+      }
+
+      if (state.leadership_answers && state.leadership_answers.answers) {
+        localStorage.setItem(STORAGE_KEYS.leadershipAnswers, JSON.stringify({
+          participant_code: state.participant_code,
+          answers: state.leadership_answers.answers || {},
+          updated_at: state.leadership_answers.updated_at || new Date().toISOString()
+        }));
+
+        localStorage.setItem(STORAGE_KEYS.currentStep, "leadership");
+      }
+
+      if (state.needs_answers && state.needs_answers.answers) {
+        localStorage.setItem(STORAGE_KEYS.needsAnswers, JSON.stringify({
+          participant_code: state.participant_code,
+          answers: state.needs_answers.answers || {},
+          updated_at: state.needs_answers.updated_at || new Date().toISOString()
+        }));
+
+        localStorage.setItem(STORAGE_KEYS.currentStep, "needs");
+      }
     }
 
-    function initializePage() {
+    async function fetchParticipantState(participantCode) {
+      const { data, error } = await supabaseClient.rpc("get_participant_state", {
+        p_participant_code: participantCode
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    }
+
+    async function resetParticipantResponse(participantCode) {
+      const { data, error } = await supabaseClient.rpc("reset_participant_response", {
+        p_participant_code: participantCode
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    }
+
+    async function initializePage() {
       const participantCode = getParticipantCodeFromUrl();
 
       if (!participantCode) {
-        invalidParticipantView.classList.remove("hidden");
-        validParticipantView.classList.add("hidden");
+        showOnly(invalidParticipantView);
         return;
       }
 
       localStorage.setItem(STORAGE_KEYS.participantCode, participantCode);
+
       participantCodeText.textContent = participantCode;
+      submittedParticipantCodeText.textContent = participantCode;
 
-      validParticipantView.classList.remove("hidden");
-      invalidParticipantView.classList.add("hidden");
+      try {
+        const state = await fetchParticipantState(participantCode);
 
-      if (hasSavedProgress()) {
-        resumeBox.classList.remove("hidden");
-        startBox.classList.add("hidden");
-      } else {
-        resumeBox.classList.add("hidden");
-        startBox.classList.remove("hidden");
+        if (state && state.status === "submitted") {
+          showOnly(submittedView);
+          return;
+        }
+
+        if (state && state.exists) {
+          restoreStateToLocalStorage(state);
+        }
+
+        showOnly(validParticipantView);
+
+        if (hasSavedProgress()) {
+          startBox.classList.add("hidden");
+          resumeBox.classList.remove("hidden");
+        } else {
+          startBox.classList.remove("hidden");
+          resumeBox.classList.add("hidden");
+        }
+
+      } catch (error) {
+        console.error("참여 상태 조회 오류:", error);
+
+        showOnly(validParticipantView);
+
+        if (hasSavedProgress()) {
+          startBox.classList.add("hidden");
+          resumeBox.classList.remove("hidden");
+        } else {
+          startBox.classList.remove("hidden");
+          resumeBox.classList.add("hidden");
+        }
+
+        alert(
+          "서버 상태 조회 중 오류가 발생했습니다. 현재 브라우저에 저장된 내용으로 계속 진행합니다."
+        );
       }
     }
 
     startButton.addEventListener("click", function () {
-      goToBasicInfo();
+      localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
+      window.location.href = PAGE_PATHS.basicInfo;
     });
 
     resumeButton.addEventListener("click", function () {
-      const targetPage = getResumeTargetPage();
-      window.location.href = targetPage;
+      window.location.href = getResumePath();
     });
 
-    restartButton.addEventListener("click", function () {
+    resetButton.addEventListener("click", function () {
       const confirmed = window.confirm(
-        "기존 임시저장 내용을 삭제하고 처음부터 다시 작성하시겠습니까?"
+        "현재 브라우저에 저장된 작성 내용을 삭제하고 처음부터 다시 작성하시겠습니까?"
       );
 
       if (!confirmed) return;
 
-      clearDraftData();
-      goToBasicInfo();
+      clearLocalResponseData(true);
+      localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
+
+      window.location.href = PAGE_PATHS.basicInfo;
+    });
+
+    resetResponseButton.addEventListener("click", async function () {
+      const participantCode = getParticipantCodeFromUrl();
+
+      const confirmed = window.confirm(
+        "기존 제출 내용을 삭제하고 다시 응답하시겠습니까?\n\n삭제 후에는 기존 제출 데이터가 초기화됩니다."
+      );
+
+      if (!confirmed) return;
+
+      try {
+        await resetParticipantResponse(participantCode);
+
+        clearLocalResponseData(true);
+        localStorage.setItem(STORAGE_KEYS.currentStep, "basicInfo");
+
+        window.location.href = PAGE_PATHS.basicInfo;
+
+      } catch (error) {
+        console.error("재응답 초기화 오류:", error);
+        alert("재응답 초기화 중 오류가 발생했습니다. 담당자에게 문의해 주세요.");
+      }
     });
 
     initializePage();

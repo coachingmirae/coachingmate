@@ -1,0 +1,1 @@
+const p=new URLSearchParams(location.search);const id=p.get('id')||localStorage.getItem('participant_id')||'미지정';localStorage.setItem('participant_id',id);document.getElementById('pid').innerHTML='<b>참여코드</b><br>'+id;

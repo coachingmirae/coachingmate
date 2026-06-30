@@ -1,0 +1,28 @@
+# local secrets
+.env
+.env.*
+*.local
+config.js
+secrets/
+__pycache__/
+
+# google credentials
+service_account.json
+oauth_credentials.json
+token.json
+credentials.json
+
+# logs
+*.log
+
+# zip
+*.zip
+
+# texts
+*.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+

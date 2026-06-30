@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>CoachingMate | Leadership Coaching Platform</title>
+
+  <meta
+    name="description"
+    content="CoachingMate 리더십 진단 및 코칭 니즈조사 참여 페이지입니다."
+  />
+
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <main class="app-shell">
+    <section class="intro-card">
+      <header class="brand-header">
+        <div class="logo-box">
+          <span class="logo-text">CM</span>
+        </div>
+
+        <div class="brand-text">
+          <h1>CoachingMate</h1>
+          <p>Leadership Coaching Platform</p>
+        </div>
+      </header>
+
+      <section id="validParticipantView" class="content-section hidden">
+        <div class="welcome-box">
+          <p class="eyebrow">리더십 코칭 프로그램</p>
+          <h2>리더십 진단과<br />코칭 니즈조사를 시작합니다.</h2>
+          <p class="description">
+            본 과정은 리더십 역량을 점검하고, 향후 코칭 방향을 설정하기 위한 사전 진단입니다.
+            응답 내용은 안전하게 저장되며, 작성 중 언제든 이어서 진행할 수 있습니다.
+          </p>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-card">
+            <span class="info-label">예상 소요시간</span>
+            <strong>약 20분</strong>
+          </div>
+
+          <div class="info-card">
+            <span class="info-label">참여코드</span>
+            <strong id="participantCodeText">-</strong>
+          </div>
+        </div>
+
+        <div class="progress-steps" aria-label="진행 단계">
+          <div class="step-item active">
+            <span class="step-dot">1</span>
+            <span>기본정보</span>
+          </div>
+
+          <div class="step-line"></div>
+
+          <div class="step-item">
+            <span class="step-dot">2</span>
+            <span>리더십 진단</span>
+          </div>
+
+          <div class="step-line"></div>
+
+          <div class="step-item">
+            <span class="step-dot">3</span>
+            <span>코칭 니즈</span>
+          </div>
+
+          <div class="step-line"></div>
+
+          <div class="step-item">
+            <span class="step-dot">4</span>
+            <span>완료</span>
+          </div>
+        </div>
+
+        <div id="resumeBox" class="resume-box hidden">
+          <h3>이전에 작성하던 내용이 있습니다.</h3>
+          <p>
+            저장된 응답을 불러와 이어서 작성할 수 있습니다.
+            처음부터 다시 작성하면 기존 임시저장 내용이 초기화됩니다.
+          </p>
+
+          <div class="button-row">
+            <button type="button" id="resumeButton" class="primary-button">
+              이어서 작성하기
+            </button>
+            <button type="button" id="restartButton" class="secondary-button">
+              처음부터 작성하기
+            </button>
+          </div>
+        </div>
+
+        <div id="startBox" class="start-box">
+          <button type="button" id="startButton" class="primary-button full-width">
+            시작하기
+          </button>
+        </div>
+
+        <p class="save-notice">
+          작성 내용은 자동 저장됩니다. 브라우저를 닫아도 같은 링크로 다시 접속하면 이어서 작성할 수 있습니다.
+        </p>
+      </section>
+
+      <section id="invalidParticipantView" class="content-section hidden">
+        <div class="error-card">
+          <h2>참여코드를 확인할 수 없습니다.</h2>
+          <p>
+            올바른 참여 링크로 접속해 주세요.
+            문자 또는 이메일로 받은 링크를 다시 확인하거나 담당 코치에게 문의해 주세요.
+          </p>
+
+          <div class="example-url">
+            예시: https://coachingmate.co.kr/?id=swon.cho7
+          </div>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <p>© CoachingMate. All rights reserved.</p>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    /**
+     * CoachingMate index.html
+     * 역할:
+     * 1. URL의 ?id= 참여코드 확인
+     * 2. 참여코드를 localStorage에 저장
+     * 3. 기존 임시저장 데이터가 있으면 이어쓰기/처음부터 작성 선택
+     * 4. basic-info.html로 이동
+     */
+
+    const STORAGE_KEYS = {
+      participantCode: "cm_participant_code",
+      basicInfo: "cm_basic_info",
+      leadershipAnswers: "cm_leadership_answers",
+      needsAnswers: "cm_needs_answers",
+      currentStep: "cm_current_step",
+      lastSavedAt: "cm_last_saved_at"
+    };
+
+    const PAGE_PATHS = {
+      basicInfo: "./basic-info.html",
+      leadership: "./leadership.html",
+      needs: "./needs.html",
+      complete: "./complete.html"
+    };
+
+    const validParticipantView = document.getElementById("validParticipantView");
+    const invalidParticipantView = document.getElementById("invalidParticipantView");
+    const participantCodeText = document.getElementById("participantCodeText");
+
+    const resumeBox = document.getElementById("resumeBox");
+    const startBox = document.getElementById("startBox");
+
+    const startButton = document.getElementById("startButton");
+    const resumeButton = document.getElementById("resumeButton");
+    const restartButton = document.getElementById("restartButton");
+
+    function getParticipantCodeFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("id");
+
+      if (!code) return "";
+
+      return code.trim();
+    }
+
+    function hasSavedProgress() {
+      const basicInfo = localStorage.getItem(STORAGE_KEYS.basicInfo);
+      const leadershipAnswers = localStorage.getItem(STORAGE_KEYS.leadershipAnswers);
+      const needsAnswers = localStorage.getItem(STORAGE_KEYS.needsAnswers);
+      const currentStep = localStorage.getItem(STORAGE_KEYS.currentStep);
+
+      return Boolean(basicInfo || leadershipAnswers || needsAnswers || currentStep);
+    }
+
+    function getResumeTargetPage() {
+      const currentStep = localStorage.getItem(STORAGE_KEYS.currentStep);
+
+      if (currentStep === "complete") {
+        return PAGE_PATHS.complete;
+      }
+
+      if (currentStep === "needs") {
+        return PAGE_PATHS.needs;
+      }
+
+      if (currentStep === "leadership") {
+        return PAGE_PATHS.leadership;
+      }
+
+      return PAGE_PATHS.basicInfo;
+    }
+
+    function clearDraftData() {
+      localStorage.removeItem(STORAGE_KEYS.basicInfo);
+      localStorage.removeItem(STORAGE_KEYS.leadershipAnswers);
+      localStorage.removeItem(STORAGE_KEYS.needsAnswers);
+      localStorage.removeItem(STORAGE_KEYS.currentStep);
+      localStorage.removeItem(STORAGE_KEYS.lastSavedAt);
+    }
+
+    function goToBasicInfo() {
+      localStorage.setItem(STORAGE_KEYS.currentStep, "basic-info");
+      window.location.href = PAGE_PATHS.basicInfo;
+    }
+
+    function initializePage() {
+      const participantCode = getParticipantCodeFromUrl();
+
+      if (!participantCode) {
+        invalidParticipantView.classList.remove("hidden");
+        validParticipantView.classList.add("hidden");
+        return;
+      }
+
+      localStorage.setItem(STORAGE_KEYS.participantCode, participantCode);
+      participantCodeText.textContent = participantCode;
+
+      validParticipantView.classList.remove("hidden");
+      invalidParticipantView.classList.add("hidden");
+
+      if (hasSavedProgress()) {
+        resumeBox.classList.remove("hidden");
+        startBox.classList.add("hidden");
+      } else {
+        resumeBox.classList.add("hidden");
+        startBox.classList.remove("hidden");
+      }
+    }
+
+    startButton.addEventListener("click", function () {
+      goToBasicInfo();
+    });
+
+    resumeButton.addEventListener("click", function () {
+      const targetPage = getResumeTargetPage();
+      window.location.href = targetPage;
+    });
+
+    restartButton.addEventListener("click", function () {
+      const confirmed = window.confirm(
+        "기존 임시저장 내용을 삭제하고 처음부터 다시 작성하시겠습니까?"
+      );
+
+      if (!confirmed) return;
+
+      clearDraftData();
+      goToBasicInfo();
+    });
+
+    initializePage();
+  </script>
+</body>
+</html>

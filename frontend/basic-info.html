@@ -3,431 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>기본정보 | CoachingMate</title>
-
-  <meta
-    name="description"
-    content="CoachingMate 리더십 코칭 프로그램 기본정보 입력 페이지입니다."
-  />
-
   <link rel="stylesheet" href="./style.css" />
+  <script src="./script.js"></script>
 </head>
-
 <body>
   <main class="app-shell">
     <section class="survey-card">
       <header class="survey-header">
-        <div class="brand-mini">
-          <div class="logo-box small">
-            <span class="logo-text">CM</span>
-          </div>
-
-          <div>
-            <h1>CoachingMate</h1>
-            <p>Leadership Coaching Platform</p>
-          </div>
-        </div>
-
-        <div class="participant-badge">
-          참여코드 <strong id="participantCodeText">-</strong>
-        </div>
+        <div class="brand-mini"><div class="logo-box small">CM</div><div><h1>CoachingMate</h1><p>Leadership Coaching Platform</p></div></div>
+        <div class="participant-badge">참여코드 <strong id="participantCodeText">-</strong></div>
       </header>
 
-      <section class="progress-steps compact" aria-label="진행 단계">
-        <div class="step-item active">
-          <span class="step-dot">1</span>
-          <span>기본정보</span>
-        </div>
-
-        <div class="step-line"></div>
-
-        <div class="step-item">
-          <span class="step-dot">2</span>
-          <span>리더십 진단</span>
-        </div>
-
-        <div class="step-line"></div>
-
-        <div class="step-item">
-          <span class="step-dot">3</span>
-          <span>코칭 니즈</span>
-        </div>
-
-        <div class="step-line"></div>
-
-        <div class="step-item">
-          <span class="step-dot">4</span>
-          <span>완료</span>
-        </div>
+      <section class="progress-steps compact">
+        <div class="step-item active"><span class="step-dot">1</span><span>기본정보</span></div><div class="step-line"></div>
+        <div class="step-item"><span class="step-dot">2</span><span>리더십 진단</span></div><div class="step-line"></div>
+        <div class="step-item"><span class="step-dot">3</span><span>코칭 니즈</span></div><div class="step-line"></div>
+        <div class="step-item"><span class="step-dot">4</span><span>완료</span></div>
       </section>
 
       <section id="validView" class="content-section hidden">
-        <div class="page-title-box">
-          <p class="eyebrow">STEP 1</p>
-          <h2>기본정보를 입력해 주세요.</h2>
-          <p>
-            입력하신 정보는 리더십 진단 결과와 코칭 진행을 위해 사용됩니다.
-            작성 내용은 자동 저장됩니다.
-          </p>
-        </div>
-
-        <form id="basicInfoForm" class="form-section" novalidate>
+        <div class="page-title-box"><p class="eyebrow">STEP 1</p><h2>기본정보</h2><p>코칭 준비를 위해 필요한 기본정보를 입력해 주세요.</p></div>
+        <form id="basicInfoForm" novalidate>
           <div class="form-grid">
-            <div class="form-field">
-              <label for="company">회사명 <span class="required">*필수</span></label>
-              <input
-                type="text"
-                id="company"
-                name="company"
-                placeholder="예: 미래교육"
-                autocomplete="organization"
-                required
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="name">성명 <span class="required">*필수</span></label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                placeholder="예: 홍길동"
-                autocomplete="name"
-                required
-              />
-            </div>
-            
-            <div class="form-field">
-              <label for="position">직책/직급 <span class="required">*필수</span></label>
-              <input
-                type="text"
-                id="position"
-                name="position"
-                placeholder="예: 대표이사, 경영지원총괄 "
-                autocomplete="organization-title"
-                required
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="department">부서</label>
-              <input
-                type="text"
-                id="department"
-                name="department"
-                placeholder="예: 영업팀"
-                autocomplete="organization"
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="email">이메일</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="예: name@example.com"
-                autocomplete="email"
-              />
-            </div>
-
+            <div class="form-field"><label for="company">회사명</label><input id="company" name="company" type="text" required /></div>
+            <div class="form-field"><label for="name">성명</label><input id="name" name="name" type="text" required /></div>
+            <div class="form-field"><label for="department">부서</label><input id="department" name="department" type="text" required /></div>
+            <div class="form-field"><label for="position">직책/직위</label><input id="position" name="position" type="text" required /></div>
+            <div class="form-field full"><label for="email">이메일</label><input id="email" name="email" type="email" required /></div>
             <!--
-            <div class="form-field">
-              <label for="phone">연락처</label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                placeholder="예: 010-0000-0000"
-                autocomplete="tel"
-              />
-            </div>
+            <div class="form-field full"><label for="phone">연락처</label><input id="phone" name="phone" type="tel" /></div>
             -->
-
           </div>
-
-          <div class="notice-box">
-            <strong>안내</strong>
-            <p>
-              기본정보 입력 후 리더십 진단 32문항으로 이동합니다.
-              중간에 브라우저를 닫아도 같은 링크로 다시 접속하면 이어서 작성할 수 있습니다.
-            </p>
-          </div>
-
           <div id="errorMessage" class="error-message hidden"></div>
-
           <div class="form-actions">
-            <button type="button" id="backButton" class="secondary-button">
-              처음 화면으로
-            </button>
-
-            <button type="submit" class="primary-button">
-              다음: 리더십 진단
-            </button>
+            <button type="button" id="backButton" class="secondary-button">처음 화면</button>
+            <button type="submit" class="primary-button">다음: 리더십 진단</button>
           </div>
-
-          <p id="saveStatus" class="save-status">
-            자동 저장 대기 중
-          </p>
+          <p id="saveStatus" class="save-status">자동 저장 대기 중</p>
         </form>
       </section>
 
-      <section id="invalidView" class="content-section hidden">
-        <div class="error-card">
-          <h2>참여코드를 확인할 수 없습니다.</h2>
-          <p>
-            올바른 참여 링크로 다시 접속해 주세요.
-            문자 또는 이메일로 받은 링크를 확인하거나 담당 코치에게 문의해 주세요.
-          </p>
-
-          <button type="button" id="goHomeButton" class="primary-button full-width">
-            처음 화면으로 이동
-          </button>
-        </div>
-      </section>
-
-      <footer class="page-footer">
-        <p>© CoachingMate. All rights reserved.</p>
-      </footer>
+      <section id="invalidView" class="content-section hidden"><div class="error-card"><h2>참여코드를 확인할 수 없습니다.</h2><p>올바른 참여 링크로 다시 접속해 주세요.</p></div></section>
+      <footer class="page-footer"><p>© CoachingMate. All rights reserved.</p></footer>
     </section>
   </main>
 
   <script>
-    /**
-     * CoachingMate basic-info.html
-     * 역할:
-     * 1. 참여코드 확인
-     * 2. 기본정보 입력값 localStorage 자동저장
-     * 3. 필수값 검증
-     * 4. leadership.html 이동
-     */
-
-    const STORAGE_KEYS = {
-      participantCode: "cm_participant_code",
-      basicInfo: "cm_basic_info",
-      currentStep: "cm_current_step",
-      lastSavedAt: "cm_last_saved_at"
-    };
-
-    const PAGE_PATHS = {
-      index: "./index.html",
-      leadership: "./leadership.html"
-    };
-
+    const STORAGE_KEYS = { participantCode:"cm_participant_code", basicInfo:"cm_basic_info", currentStep:"cm_current_step", lastSavedAt:"cm_last_saved_at" };
     const participantCodeText = document.getElementById("participantCodeText");
     const validView = document.getElementById("validView");
     const invalidView = document.getElementById("invalidView");
-
-    const basicInfoForm = document.getElementById("basicInfoForm");
+    const form = document.getElementById("basicInfoForm");
     const errorMessage = document.getElementById("errorMessage");
     const saveStatus = document.getElementById("saveStatus");
-
     const backButton = document.getElementById("backButton");
-    const goHomeButton = document.getElementById("goHomeButton");
-
-    const formFields = [
-      "company",
-      "name",
-      "position",
-      "department",
-      "email",
-      //"phone"
-    ];
-
+    const formFields = ["company", "name", "position", "department", "email"];
     let autoSaveTimer = null;
 
-    function getParticipantCode() {
-      const params = new URLSearchParams(window.location.search);
-      const codeFromUrl = params.get("id");
-
-      if (codeFromUrl && codeFromUrl.trim()) {
-        const cleanCode = codeFromUrl.trim();
-        localStorage.setItem(STORAGE_KEYS.participantCode, cleanCode);
-        return cleanCode;
-      }
-
-      const savedCode = localStorage.getItem(STORAGE_KEYS.participantCode);
-      return savedCode ? savedCode.trim() : "";
+    function formatDateTime(date) {
+      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")} ${String(date.getHours()).padStart(2,"0")}:${String(date.getMinutes()).padStart(2,"0")}`;
     }
-
     function getBasicInfoFromForm() {
-      const data = {};
-
-      formFields.forEach(function (fieldName) {
-        const field = document.getElementById(fieldName);
-        data[fieldName] = field ? field.value.trim() : "";
-      });
-
+      const data = { participant_code: cmGetParticipantCode() };
+      formFields.forEach(function (field) { data[field] = document.getElementById(field).value.trim(); });
       return data;
     }
-
-    function setBasicInfoToForm(data) {
-      if (!data) return;
-
-      formFields.forEach(function (fieldName) {
-        const field = document.getElementById(fieldName);
-        if (field && data[fieldName]) {
-          field.value = data[fieldName];
-        }
-      });
-    }
-
-    function loadSavedBasicInfo() {
-      const saved = localStorage.getItem(STORAGE_KEYS.basicInfo);
-
-      if (!saved) return null;
-
-      try {
-        return JSON.parse(saved);
-      } catch (error) {
-        console.warn("기본정보 저장 데이터를 불러오지 못했습니다.", error);
-        return null;
-      }
-    }
-
-    function formatDateTime(date) {
-      const yyyy = date.getFullYear();
-      const mm = String(date.getMonth() + 1).padStart(2, "0");
-      const dd = String(date.getDate()).padStart(2, "0");
-      const hh = String(date.getHours()).padStart(2, "0");
-      const mi = String(date.getMinutes()).padStart(2, "0");
-
-      return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
-    }
-
     function saveBasicInfo() {
-      const data = getBasicInfoFromForm();
       const now = new Date();
-
-      const payload = {
-        ...data,
-        participant_code: getParticipantCode(),
-        updated_at: now.toISOString()
-      };
-
-      localStorage.setItem(STORAGE_KEYS.basicInfo, JSON.stringify(payload));
+      localStorage.setItem(STORAGE_KEYS.basicInfo, JSON.stringify(getBasicInfoFromForm()));
       localStorage.setItem(STORAGE_KEYS.currentStep, "basic-info");
       localStorage.setItem(STORAGE_KEYS.lastSavedAt, now.toISOString());
-
       saveStatus.textContent = `자동 저장됨 · ${formatDateTime(now)}`;
     }
-
     function scheduleAutoSave() {
       saveStatus.textContent = "입력 중...";
-
-      if (autoSaveTimer) {
-        clearTimeout(autoSaveTimer);
-      }
-
-      autoSaveTimer = setTimeout(function () {
-        saveBasicInfo();
-      }, 800);
+      if (autoSaveTimer) clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(saveBasicInfo, 500);
     }
-
-    function showError(message) {
-      errorMessage.textContent = message;
-      errorMessage.classList.remove("hidden");
+    function loadSaved() {
+      const saved = localStorage.getItem(STORAGE_KEYS.basicInfo);
+      if (!saved) return;
+      try {
+        const data = JSON.parse(saved);
+        formFields.forEach(function(field){ if (data[field]) document.getElementById(field).value = data[field]; });
+      } catch (e) { console.warn(e); }
     }
-
-    function clearError() {
-      errorMessage.textContent = "";
-      errorMessage.classList.add("hidden");
-    }
-
-    function validateBasicInfo(data) {
-      if (!data.company) {
-        return "회사명을 입력해 주세요.";
-      }
-
-      if (!data.name) {
-        return "성명을 입력해 주세요.";
-      }
-
-      if (!data.position) {
-        return "직책/직급을 입력해 주세요.";
-      }
-
-      if (data.email && !isValidEmail(data.email)) {
-        return "이메일 형식이 올바르지 않습니다.";
-      }
-
-      return "";
-    }
-
-    function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function goToLeadership() {
-      localStorage.setItem(STORAGE_KEYS.currentStep, "leadership");
-      window.location.href = PAGE_PATHS.leadership;
-    }
+    function showError(message) { errorMessage.textContent = message; errorMessage.classList.remove("hidden"); }
+    function clearError() { errorMessage.textContent = ""; errorMessage.classList.add("hidden"); }
 
     function initializePage() {
-      const participantCode = getParticipantCode();
-
-      if (!participantCode) {
-        validView.classList.add("hidden");
-        invalidView.classList.remove("hidden");
-        return;
-      }
-
-      participantCodeText.textContent = participantCode;
-
+      const code = cmGetParticipantCode();
+      if (!code) { invalidView.classList.remove("hidden"); return; }
+      participantCodeText.textContent = code;
       validView.classList.remove("hidden");
-      invalidView.classList.add("hidden");
-
-      const savedBasicInfo = loadSavedBasicInfo();
-      setBasicInfoToForm(savedBasicInfo);
-
-      localStorage.setItem(STORAGE_KEYS.currentStep, "basic-info");
-
-      if (savedBasicInfo && savedBasicInfo.updated_at) {
-        saveStatus.textContent = `저장된 기본정보를 불러왔습니다.`;
-      }
+      loadSaved();
     }
-
-    formFields.forEach(function (fieldName) {
-      const field = document.getElementById(fieldName);
-
-      if (!field) return;
-
-      field.addEventListener("input", function () {
-        clearError();
-        scheduleAutoSave();
-      });
-
-      field.addEventListener("blur", function () {
-        saveBasicInfo();
-      });
-    });
-
-    basicInfoForm.addEventListener("submit", function (event) {
-      event.preventDefault();
-
-      clearError();
-
-      const data = getBasicInfoFromForm();
-      const validationMessage = validateBasicInfo(data);
-
-      if (validationMessage) {
-        showError(validationMessage);
-        return;
-      }
-
+    formFields.forEach(function(field){ document.getElementById(field).addEventListener("input", scheduleAutoSave); });
+    form.addEventListener("submit", function(event){
+      event.preventDefault(); clearError();
+      const missing = formFields.filter(function(field){ return !document.getElementById(field).value.trim(); });
+      if (missing.length) { showError("필수 입력 항목을 모두 입력해 주세요."); return; }
       saveBasicInfo();
-      goToLeadership();
+      localStorage.setItem(STORAGE_KEYS.currentStep, "leadership");
+      window.location.href = "./leadership.html";
     });
-
-    backButton.addEventListener("click", function () {
-      window.location.href = PAGE_PATHS.index;
-    });
-
-    goHomeButton.addEventListener("click", function () {
-      window.location.href = PAGE_PATHS.index;
-    });
-
+    backButton.addEventListener("click", function(){ window.location.href = "./index.html?id=" + encodeURIComponent(cmGetParticipantCode()); });
     initializePage();
   </script>
 </body>
