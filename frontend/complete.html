@@ -2,62 +2,215 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>제출 완료 | CoachingMate</title>
+
+  <meta
+    name="description"
+    content="CoachingMate 리더십 코칭 진단 제출 완료 페이지입니다."
+  />
+
   <link rel="stylesheet" href="./style.css" />
-  <script src="./script.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./config.js"></script>
 </head>
+
 <body>
-  <main class="app-shell"><section class="survey-card">
-    <section class="complete-card">
-      <div class="complete-icon">✓</div>
-      <p class="eyebrow">SUBMITTED</p>
-      <h2>제출이 완료되었습니다.</h2>
-      <p class="description">리더십 진단과 코칭 니즈조사에 참여해 주셔서 감사합니다. 입력하신 내용은 담당 코치가 코칭 준비 및 방향 설정을 위해 확인합니다.</p>
-      <div class="complete-summary" id="summaryBox"><div><span class="info-label">응답자</span><strong id="nameText">-</strong></div><div><span class="info-label">회사/직책</span><strong id="metaText">-</strong></div><div><span class="info-label">제출일시</span><strong id="submittedAtText">-</strong></div></div>
-      <div class="notice-box"><strong>안내</strong><p>응답이 정상 제출되었습니다. 이제 브라우저 창을 닫아 주세요.</p><p>동일 링크로 다시 접속하면 제출 완료 상태를 확인할 수 있습니다.</p></div>
-      <!-- 완료 화면 버튼은 운영 MVP에서 숨김 처리합니다.
-      <div class="button-row"><button type="button" id="summaryButton" class="secondary-button">저장된 응답 요약 보기</button><button type="button" id="homeButton" class="primary-button">처음 화면으로</button></div>
-      -->
+  <main class="app-shell">
+    <section class="survey-card">
+      <section id="validView" class="content-section hidden">
+        <div class="complete-card">
+          <div class="complete-icon">✓</div>
+
+          <p class="eyebrow">SUBMITTED</p>
+
+          <h1>제출이 완료되었습니다.</h1>
+
+          <p class="description">
+            리더십 진단과 코칭 니즈조사에 참여해 주셔서 감사합니다.
+            입력하신 내용은 담당 코치가 코칭 준비 및 코칭 방향 설정을 위해 확인합니다.
+          </p>
+
+          <div class="complete-summary">
+            <div class="summary-row">
+              <span>응답자</span>
+              <strong id="nameText">-</strong>
+            </div>
+
+            <div class="summary-row">
+              <span>회사/직책</span>
+              <strong id="metaText">-</strong>
+            </div>
+
+            <div class="summary-row">
+              <span>제출일시</span>
+              <strong id="submittedAtText">-</strong>
+            </div>
+          </div>
+
+          <div class="notice-box">
+            <strong>안내</strong>
+            <p>
+              응답이 정상 제출되었습니다. 이제 브라우저 창을 닫아 주세요.
+            </p>
+            <p>
+              동일 링크로 다시 접속하면 제출 완료 상태를 확인할 수 있습니다.
+            </p>
+          </div>
+
+          <!--
+          아래 버튼들은 나중에 다시 사용할 수 있도록 임시 보관합니다.
+
+          <div class="button-row complete-button-row">
+            <button type="button" id="summaryButton" class="secondary-button">
+              저장된 응답 요약 보기
+            </button>
+
+            <button type="button" id="homeButton" class="primary-button">
+              처음 화면으로
+            </button>
+
+            <button type="button" id="closeButton" class="primary-button">
+              창 닫기
+            </button>
+          </div>
+          -->
+        </div>
+      </section>
+
+      <section id="invalidView" class="content-section hidden">
+        <div class="error-card">
+          <h2>제출 정보를 확인할 수 없습니다.</h2>
+          <p>
+            제출 완료 정보가 현재 브라우저에 남아 있지 않습니다.
+            문자 또는 이메일로 받은 참여 링크로 다시 접속해 주세요.
+          </p>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <p>© CoachingMate. All rights reserved.</p>
+      </footer>
     </section>
-    <footer class="page-footer"><p>© CoachingMate. All rights reserved.</p></footer>
-  </section></main>
+  </main>
+
   <script>
-    function formatDateTime(iso){if(!iso)return "-"; const d=new Date(iso); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;}
-    try{const payload=JSON.parse(localStorage.getItem("cm_final_submission")||"{}"); const basic=payload.basic_info||{}; document.getElementById("nameText").textContent=basic.name||"-"; document.getElementById("metaText").textContent=[basic.company,basic.department,basic.position].filter(Boolean).join(" / ")||"-"; document.getElementById("submittedAtText").textContent=formatDateTime(payload.submitted_at||localStorage.getItem("cm_submitted_at"));}catch(e){console.warn(e);}
-  </script>
-</body>
-</html>
-ck", function () {
-  window.close();
+    /**
+     * CoachingMate complete.html
+     * 역할:
+     * 1. localStorage의 최종 제출 데이터 표시
+     * 2. 제출 완료 안내
+     * 3. 버튼 없이 브라우저 종료 안내만 표시
+     */
 
-  // 브라우저 정책상 사용자가 직접 연 창이 아니면 window.close()가 동작하지 않을 수 있습니다.
-  // 그 경우 안내 문구만 표시합니다.
-  setTimeout(function () {
-    alert("창이 자동으로 닫히지 않으면 브라우저의 닫기 버튼을 눌러 종료해 주세요.");
-  }, 300);
-});
+    const STORAGE_KEYS = {
+      participantCode: "cm_participant_code",
+      basicInfo: "cm_basic_info",
+      leadershipAnswers: "cm_leadership_answers",
+      needsAnswers: "cm_needs_answers",
+      currentStep: "cm_current_step",
+      lastSavedAt: "cm_last_saved_at",
+      submittedAt: "cm_submitted_at",
+      finalSubmission: "cm_final_submission"
+    };
 
-    goHomeButton.addEventListener("click", function () {
-      goHome();
-    });
+    const validView = document.getElementById("validView");
+    const invalidView = document.getElementById("invalidView");
 
-    initializePage();
-  </script>
-</body>
-</html>function () {
-  window.close();
+    const nameText = document.getElementById("nameText");
+    const metaText = document.getElementById("metaText");
+    const submittedAtText = document.getElementById("submittedAtText");
 
-  // 브라우저 정책상 사용자가 직접 연 창이 아니면 window.close()가 동작하지 않을 수 있습니다.
-  // 그 경우 안내 문구만 표시합니다.
-  setTimeout(function () {
-    alert("창이 자동으로 닫히지 않으면 브라우저의 닫기 버튼을 눌러 종료해 주세요.");
-  }, 300);
-});
+    function loadFinalSubmission() {
+      const saved = localStorage.getItem(STORAGE_KEYS.finalSubmission);
 
-    goHomeButton.addEventListener("click", function () {
-      goHome();
-    });
+      if (!saved) return null;
+
+      try {
+        return JSON.parse(saved);
+      } catch (error) {
+        console.warn("최종 제출 정보를 불러오지 못했습니다.", error);
+        return null;
+      }
+    }
+
+    function loadBasicInfo() {
+      const saved = localStorage.getItem(STORAGE_KEYS.basicInfo);
+
+      if (!saved) return null;
+
+      try {
+        return JSON.parse(saved);
+      } catch (error) {
+        console.warn("기본정보를 불러오지 못했습니다.", error);
+        return null;
+      }
+    }
+
+    function formatDateTimeFromIso(isoString) {
+      if (!isoString) return "-";
+
+      const date = new Date(isoString);
+
+      if (Number.isNaN(date.getTime())) {
+        return isoString;
+      }
+
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, "0");
+      const dd = String(date.getDate()).padStart(2, "0");
+      const hh = String(date.getHours()).padStart(2, "0");
+      const mi = String(date.getMinutes()).padStart(2, "0");
+
+      return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+    }
+
+    function initializePage() {
+      const finalSubmission = loadFinalSubmission();
+      const basicInfo = finalSubmission && finalSubmission.basic_info
+        ? finalSubmission.basic_info
+        : loadBasicInfo();
+
+      if (!finalSubmission && !basicInfo) {
+        validView.classList.add("hidden");
+        invalidView.classList.remove("hidden");
+        return;
+      }
+
+      validView.classList.remove("hidden");
+      invalidView.classList.add("hidden");
+
+      nameText.textContent = basicInfo && basicInfo.name
+        ? basicInfo.name
+        : "-";
+
+      const metaParts = [];
+
+      if (basicInfo && basicInfo.company) {
+        metaParts.push(basicInfo.company);
+      }
+
+      if (basicInfo && basicInfo.department) {
+        metaParts.push(basicInfo.department);
+      }
+
+      if (basicInfo && basicInfo.position) {
+        metaParts.push(basicInfo.position);
+      }
+
+      metaText.textContent = metaParts.length ? metaParts.join(" / ") : "-";
+
+      const submittedAt =
+        finalSubmission && finalSubmission.submitted_at
+          ? finalSubmission.submitted_at
+          : localStorage.getItem(STORAGE_KEYS.submittedAt);
+
+      submittedAtText.textContent = formatDateTimeFromIso(submittedAt);
+
+      localStorage.setItem(STORAGE_KEYS.currentStep, "complete");
+    }
 
     initializePage();
   </script>
