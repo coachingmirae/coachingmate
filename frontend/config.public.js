@@ -1,0 +1,4 @@
+window.CM_CONFIG = {
+  SUPABASE_URL: "https://kvmhibfxysqnrfekiatf.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2bWhpYmZ4eXNxbnJmZWtpYXRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk5OTEsImV4cCI6MjA5NzkzNTk5MX0.lig9PP0rJy0O4dVUWllwDZEUN739c0bwvm9kBybfGtI"
+};
