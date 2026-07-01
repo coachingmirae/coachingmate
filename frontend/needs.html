@@ -83,7 +83,7 @@
             당장 답변이 어려운 문항은 “해당 없음” 또는 “코칭시 답변 예정”으로 입력할 수 있습니다.
           </p>
           <p>
-            다른 기기에서 이어서 작성하려면 문항 작성 후 <strong>이 문항까지 임시저장</strong> 버튼을 눌러 주세요.
+            다른 기기에서 이어서 작성하려면 문항 작성 후 <strong>임시저장</strong> 버튼을 눌러 주세요.
           </p>
         </div>
 
@@ -139,7 +139,7 @@
      * 역할:
      * 1. 코칭 니즈조사 렌더링
      * 2. 입력 중 localStorage 자동저장
-     * 3. 문항별 "이 문항까지 임시저장" 버튼 클릭 시 Supabase draft 저장
+     * 3. 문항별 "임시저장" 버튼 클릭 시 Supabase draft 저장
      * 4. 전체 임시저장 버튼 클릭 시 Supabase draft 저장
      * 5. 다른 기기 접속 시 Supabase needs_answers를 localStorage로 복원
      * 6. 제출하기 클릭 시 Supabase 최종 제출
@@ -365,7 +365,7 @@
               class="secondary-button needs-single-save-button"
               data-field-name="${fieldName}"
             >
-              이 문항까지 임시저장
+              임시저장
             </button>
           </div>
         `;
