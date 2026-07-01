@@ -1,0 +1,14 @@
+# CoachingMate
+
+> 리더의 실전 코칭을 통해 개인의 성장과 조직의 성과를 연결하는 Leadership Coaching Platform입니다.
+
+## 핵심 콘텐츠
+
+- [사전조사 응답하기](https://coachingmate.co.kr/#survey): 참여코드 입력 후 리더십 진단과 코칭 니즈 조사를 진행합니다.
+- [코칭 소개](https://coachingmate.co.kr/#intro): CoachingMate 코칭 철학과 운영 방식, 듀얼 성장 관점.
+- [코칭 프로그램](https://coachingmate.co.kr/#program): 리더 코칭 커리큘럼과 진행 프로세스 안내.
+
+## Optional
+
+- [블로그](https://coachingmate.co.kr/blog): 리더십, 조직문화, 코칭 관련 인사이트.
+- [문의하기](https://coachingmate.co.kr/#contact): 코칭 프로그램 및 HR 진단에 대한 문의.
