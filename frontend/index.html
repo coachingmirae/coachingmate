@@ -157,6 +157,50 @@
       padding: 72px 0 48px;
     }
 
+.hero-title {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR",
+    "Apple SD Gothic Neo", sans-serif;
+  font-size: clamp(32px, 4.2vw, 48px); /* 데스크톱에서 1.5~2줄 느낌 */
+  line-height: 1.15;
+  letter-spacing: -0.06em;
+  color: #111827; /* 기본 네이비 */
+}
+
+.hero-line {
+  display: block;
+}
+
+.hero-kicker {
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.hero-title .hero-line:nth-child(2) {
+  font-weight: 700;
+}
+
+.hero-accent {
+  font-weight: 800;
+  background: linear-gradient(135deg, #2563eb, #111827);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; /* 그라디언트 텍스트 */
+  text-shadow: 0 12px 30px rgba(37, 99, 235, 0.18); /* 살짝 입체감 */
+}
+
+/* 모바일에서는 너무 튀지 않게 사이즈·줄바꿈 조정 */
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: clamp(24px, 6vw, 32px);
+    line-height: 1.25;
+  }
+
+  .hero-line {
+    margin-bottom: 4px;
+  }
+}
+
     .hero-grid {
       display: grid;
       grid-template-columns: 1.18fr 0.82fr;
@@ -717,10 +761,10 @@
 
   <div class="eyebrow">Dual Growth · Real Coaching</div>
 
-            <h1>
-             실전 코칭으로<br />
-             리더의 성장을<br />
-              <span>조직의 성과</span>로 연결합니다.
+            <h1 class="hero-title">
+            <span class="hero-line hero-kicker">실전 코칭으로</span>
+            <span class="hero-line">리더의 성장을</span>
+            <span class="hero-line hero-accent">조직의 성과로 연결합니다.</span>
             </h1>
 
             <p class="hero-copy">
