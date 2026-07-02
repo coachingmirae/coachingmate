@@ -8,6 +8,7 @@
 secrets/
 frontend/html_backup/
 frontend/txt/
+ops_python/
 __pycache__/
 
 # google credentials
