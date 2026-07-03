@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CoachingMate Login / whoami Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 920px; margin: 40px auto; padding: 0 20px; background: #f7f7f8; color: #1f2937; }
+    h1 { font-size: 24px; }
+    section { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; }
+    label { display: block; font-weight: 700; margin-top: 12px; }
+    input, textarea { width: 100%; box-sizing: border-box; padding: 10px; margin-top: 6px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+    button { margin-top: 14px; padding: 10px 14px; border: 0; border-radius: 8px; background: #2563eb; color: white; cursor: pointer; font-weight: 700; }
+    button.secondary { background: #4b5563; }
+    button.danger { background: #dc2626; }
+    pre { background: #111827; color: #d1fae5; padding: 14px; border-radius: 10px; overflow: auto; min-height: 80px; }
+    .hint { color: #6b7280; font-size: 13px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <h1>CoachingMate Login / whoami Test</h1>
+  <p class="hint">
+    이 파일은 Supabase Auth 로그인 → access_token 확인 → whoami Edge Function 호출을 한 번에 테스트하기 위한 페이지입니다.<br />
+    아래 SUPABASE_URL, SUPABASE_ANON_KEY만 실제 값으로 바꾸어 사용하세요.
+  </p>
+
+  <section>
+    <h2>1. Supabase 설정</h2>
+    <label>SUPABASE_URL</label>
+    <input id="supabaseUrl" value="https://YOUR_PROJECT_REF.supabase.co" />
+
+    <label>SUPABASE_ANON_KEY</label>
+    <textarea id="supabaseAnonKey" rows="3">YOUR_SUPABASE_ANON_KEY</textarea>
+
+    <button id="initBtn">Supabase Client 초기화</button>
+  </section>
+
+  <section>
+    <h2>2. 로그인</h2>
+    <label>Email</label>
+    <input id="email" value="coachingmirae@gmail.com" />
+
+    <label>Password</label>
+    <input id="password" type="password" placeholder="Supabase Auth 사용자 비밀번호" />
+
+    <button id="loginBtn">로그인</button>
+    <button id="logoutBtn" class="danger">로그아웃</button>
+  </section>
+
+  <section>
+    <h2>3. 세션/access_token 확인</h2>
+    <button id="sessionBtn" class="secondary">현재 세션 확인</button>
+    <pre id="sessionOutput">아직 실행 전입니다.</pre>
+  </section>
+
+  <section>
+    <h2>4. whoami 호출</h2>
+    <button id="whoamiBtn">whoami 호출</button>
+    <pre id="whoamiOutput">아직 실행 전입니다.</pre>
+  </section>
+
+  <section>
+    <h2>5. create-client 테스트</h2>
+    <p class="hint">whoami 성공 후 테스트하세요. 이미 emro가 있으면 DUPLICATE_CLIENT_CODE가 정상입니다.</p>
+    <label>요청 JSON</label>
+    <textarea id="createClientBody" rows="8">{
+  "client_name": "주식회사 엠로",
+  "display_name": "엠로",
+  "client_code": "emro",
+  "business_number": null,
+  "memo": "MVP 테스트 고객사"
+}</textarea>
+    <button id="createClientBtn">create-client 호출</button>
+    <pre id="createClientOutput">아직 실행 전입니다.</pre>
+  </section>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    let supabase = null;
+
+    function show(id, value) {
+      document.getElementById(id).textContent =
+        typeof value === "string" ? value : JSON.stringify(value, null, 2);
+    }
+
+    function getConfig() {
+      const supabaseUrl = document.getElementById("supabaseUrl").value.trim();
+      const supabaseAnonKey = document.getElementById("supabaseAnonKey").value.trim();
+      return { supabaseUrl, supabaseAnonKey };
+    }
+
+    function requireClient() {
+      if (!supabase) {
+        throw new Error("먼저 Supabase Client 초기화 버튼을 누르세요.");
+      }
+      return supabase;
+    }
+
+    document.getElementById("initBtn").addEventListener("click", () => {
+      const { supabaseUrl, supabaseAnonKey } = getConfig();
+      supabase = createClient(supabaseUrl, supabaseAnonKey);
+      show("sessionOutput", "Supabase Client가 초기화되었습니다.");
+    });
+
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      try {
+        const client = requireClient();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const { data, error } = await client.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        show("sessionOutput", {
+          message: "로그인 성공",
+          user: data.user,
+          access_token_preview: data.session?.access_token?.slice(0, 40) + "...",
+        });
+      } catch (err) {
+        show("sessionOutput", { error: err.message });
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      try {
+        const client = requireClient();
+        await client.auth.signOut();
+        show("sessionOutput", "로그아웃되었습니다.");
+      } catch (err) {
+        show("sessionOutput", { error: err.message });
+      }
+    });
+
+    document.getElementById("sessionBtn").addEventListener("click", async () => {
+      try {
+        const client = requireClient();
+        const { data, error } = await client.auth.getSession();
+        if (error) throw error;
+        show("sessionOutput", {
+          has_session: !!data.session,
+          user_email: data.session?.user?.email ?? null,
+          access_token_preview: data.session?.access_token
+            ? data.session.access_token.slice(0, 40) + "..."
+            : null,
+          expires_at: data.session?.expires_at ?? null,
+        });
+      } catch (err) {
+        show("sessionOutput", { error: err.message });
+      }
+    });
+
+    async function callFunction(functionName, method = "GET", body = null) {
+      const client = requireClient();
+      const { supabaseUrl } = getConfig();
+      const { data: { session }, error } = await client.auth.getSession();
+      if (error) throw error;
+      if (!session) throw new Error("로그인 세션이 없습니다.");
+
+      const res = await fetch(`${supabaseUrl}/functions/v1/${functionName}`, {
+        method,
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json",
+        },
+        body: body ? JSON.stringify(body) : null,
+      });
+
+      const json = await res.json();
+      return { http_status: res.status, response: json };
+    }
+
+    document.getElementById("whoamiBtn").addEventListener("click", async () => {
+      try {
+        const result = await callFunction("whoami", "GET");
+        show("whoamiOutput", result);
+      } catch (err) {
+        show("whoamiOutput", { error: err.message });
+      }
+    });
+
+    document.getElementById("createClientBtn").addEventListener("click", async () => {
+      try {
+        const raw = document.getElementById("createClientBody").value;
+        const body = JSON.parse(raw);
+        const result = await callFunction("create-client", "POST", body);
+        show("createClientOutput", result);
+      } catch (err) {
+        show("createClientOutput", { error: err.message });
+      }
+    });
+  </script>
+</body>
+</html>
