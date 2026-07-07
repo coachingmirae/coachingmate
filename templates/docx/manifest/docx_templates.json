@@ -1,0 +1,43 @@
+{
+  "template_2": {
+    "template_no": 2,
+    "name": "코칭 사전 니즈 조사 내용",
+    "output_type": "coaching_needs_survey",
+    "version": "v3",
+    "status": "confirmed",
+    "template_path": "templates/docx/coaching_needs/template_2_coaching_needs_survey_current.docx",
+    "versioned_template_path": "templates/docx/coaching_needs/template_2_coaching_needs_survey_v3.docx",
+    "output_filename_pattern": "{coachee_name} {position}_2코칭 사전 니즈 조사 내용_{date}.docx",
+    "generation_method": "python_direct",
+    "requires_gpt": false,
+    "description": "피코치가 제출한 코칭 사전 니즈 조사 원문 응답을 공유용 문서로 생성한다."
+  },
+  "template_3": {
+    "template_no": 3,
+    "name": "코치용 코칭사전니즈 분석 및 심층질문 가이드",
+    "output_type": "doc3_needs_analysis_deep_question_guide",
+    "version": "v3",
+    "status": "confirmed",
+    "template_path": "templates/docx/coach_guides/template_3_coach_needs_analysis_deep_question_guide_current.docx",
+    "versioned_template_path": "templates/docx/coach_guides/template_3_coach_needs_analysis_deep_question_guide_v3.docx",
+    "output_filename_pattern": "{coachee_name} {position}_3코치용_코칭사전니즈 분석 및 심층질문 가이드_{date}.docx",
+    "generation_method": "gpt_json_then_docx",
+    "requires_gpt": true,
+    "prompt_type": "doc3_needs_analysis_deep_question_guide",
+    "description": "코칭 사전 니즈 응답을 바탕으로 질문별 응답 요약, 관점 전환 질문, 구체적 사례 질문, 미래상 질문, 코칭 대화 스크립트, 1회차 우선 탐색 의제를 생성한다."
+  },
+  "template_4": {
+    "template_no": 4,
+    "name": "코치용 리더십진단 및 코칭사전니즈 통합 가이드",
+    "output_type": "doc4_integrated_feedback_guide",
+    "version": "v3",
+    "status": "confirmed",
+    "template_path": "templates/docx/coach_guides/template_4_coach_integrated_feedback_guide_current.docx",
+    "versioned_template_path": "templates/docx/coach_guides/template_4_coach_integrated_feedback_guide_v3.docx",
+    "output_filename_pattern": "{coachee_name} {position}_4코치용_리더십진단 및 코칭사전니즈 통합 가이드_{date}.docx",
+    "generation_method": "gpt_json_then_docx",
+    "requires_gpt": true,
+    "prompt_type": "doc4_integrated_feedback_guide",
+    "description": "리더십 진단 결과와 코칭 사전 니즈 응답을 통합하여 프로파일링, 핵심 가설, 역량별 운영 방향, 8세션 커리큘럼, 1회차 운영가이드, Action Item, 코치 유의사항을 생성한다."
+  }
+}

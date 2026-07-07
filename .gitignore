@@ -17,6 +17,14 @@ oauth_credentials.json
 token.json
 credentials.json
 
+*.pptx
+*.docx
+*.py
+*.pdf
+*.toml
+*.sql
+*.ts
+
 # logs
 *.log
 
@@ -29,3 +37,4 @@ credentials.json
 # OS
 .DS_Store
 Thumbs.db
+supabase/functions/download-session-document/.npmrc

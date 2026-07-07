@@ -255,7 +255,7 @@ Deno.serve(async (req: Request) => {
     // ============================================================
     const { data: existingProject, error: existingProjectError } =
       await supabaseAdmin
-        .from("coaching_projects")
+        .from("projects")
         .select("id, project_name, status")
         .eq("client_id", clientId)
         .eq("project_name", projectName)
@@ -286,11 +286,11 @@ Deno.serve(async (req: Request) => {
     }
 
     // ============================================================
-    // 7. coaching_projects insert
+    // 7. projects insert
     // ============================================================
     const { data: insertedProject, error: insertError } =
       await supabaseAdmin
-        .from("coaching_projects")
+        .from("projects")
         .insert({
           client_id: clientId,
           project_name: projectName,

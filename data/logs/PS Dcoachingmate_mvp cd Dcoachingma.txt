@@ -1,0 +1,380 @@
+PS D:\coachingmate_mvp> cd D:\coachingmate_mvp
+>> 
+>> python scripts\docx_generation\run_session1_material_pipeline.py --participant-code emro002 --project-coachee-id e0503a22-ec82-4309-8859-9721e7c33c60
+================================================================================
+run_session1_material_pipeline.py
+1회차 코칭세션 제공자료 정식 생성 파이프라인
+================================================================================
+BASE_DIR: D:\coachingmate_mvp
+SCRIPT_DIR: D:\coachingmate_mvp\scripts\docx_generation
+REPORT_SCRIPT_DIR: D:\coachingmate_mvp\scripts\report_generation
+PYTHON: C:\Python314\python.exe
+PARTICIPANT_CODE: emro002
+PROJECT_COACHEE_ID: e0503a22-ec82-4309-8859-9721e7c33c60
+FORCE_FAIL: False
+STARTED_AT: 2026-07-06 20:29:20
+--------------------------------------------------------------------------------
+[현재 1차 정식 파이프라인 기준]
+1번 리더십 리포트 생성 단계를 파이프라인 첫 단계에 연결했습니다.
+2번 니즈 조사 DOCX 생성 후 3번/4번 가이드, 등록, ZIP, 상태 업데이트를 실행합니다.
+--------------------------------------------------------------------------------
+================================================================================
+[1/6] 1번 리더십 역량진단 결과 리포트 PPTX/PDF 생성
+script: D:\coachingmate_mvp\scripts\report_generation\run_doc1_leadership_report.py
+--------------------------------------------------------------------------------
+command:
+C:\Python314\python.exe D:\coachingmate_mvp\scripts\report_generation\run_doc1_leadership_report.py --participant-code emro002 --project-coachee-id e0503a22-ec82-4309-8859-9721e7c33c60
+--------------------------------------------------------------------------------
+================================================================================
+run_doc1_leadership_report.py
+1번 리더십 역량진단 결과 리포트 생성 래퍼
+================================================================================
+BASE_DIR: D:\coachingmate_mvp
+ENGINE_DIR: D:\coachingmate_mvp\ops_python\report_engine
+PARTICIPANT_CODE: emro002
+PROJECT_COACHEE_ID: e0503a22-ec82-4309-8859-9721e7c33c60
+OUTPUT_DATE: 20260706
+--------------------------------------------------------------------------------
+[현재 1차 연결 기준]
+report_engine은 SAMPLE_RESPONSE(swon.cho7)를 사용합니다.
+swon.cho7은 emro002 원본 실제 응답으로 간주하여 산출물을 emro002 폴더로 복사합니다.
+--------------------------------------------------------------------------------
+[0/5] Supabase 로그인 중...
+  - 로그인 성공: coachingmirae@gmail.com
+[1/5] project_coachee 메타 조회 중...
+  - project_coachee_id: e0503a22-ec82-4309-8859-9721e7c33c60
+  - participant_code: emro002
+[1.5/5] 출력 경로 준비
+  - final_participant_code: emro002
+  - name_position: 조상원 대표이사
+  - output_dir: D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706
+[2/5] 기존 report_engine 실행 중...
+  - ENGINE_DIR: D:\coachingmate_mvp\ops_python\report_engine
+  - ENGINE_MAIN: D:\coachingmate_mvp\ops_python\report_engine\main.py
+======================================================================
+CoachingMate Report Engine v8.7.3
+======================================================================
+환경변수 로딩 확인
+- GEMINI_API_KEY: loaded
+- OPENAI_API_KEY: loaded
+- ANTHROPIC_API_KEY: loaded
+- PERPLEXITY_API_KEY: loaded
+-
+PPTX_SANITIZE_FOR_POWERPOINT = False
+PPTX_FINALIZE_WITH_POWERPOINT = False
+PPTX_RENDER_MODE = powerpoint_com
+-
+분석 JSON 생성 완료: D:\coachingmate_mvp\ops_python\report_engine\output\json\swon.cho7_analysis_payload.json
+검증 CSV 생성 완료: D:\coachingmate_mvp\ops_python\report_engine\output\csv
+- Chart_Data.csv
+- Item_Data.csv
+- GAP_Data.csv
+- IPA_Data.csv
+- Group_Sub_Analysis.csv
+차트 SVG 생성 완료: D:\coachingmate_mvp\ops_python\report_engine\output\charts
+- G_Chart.svg
+- F_Chart.svg
+- IPA_Chart.svg
+HTML 리포트 생성 완료: D:\coachingmate_mvp\ops_python\report_engine\output\reports\swon.cho7_leadership_self_report.html
+LLM/GPT 생성 상태: completed_local_safe / 최종소스: local_safe_validated
+수동 웹 프롬프트 패키지 생성 완료:
+- manual_prompt_package: swon.cho7_manual_web_prompt_package.json
+- manual_primary_prompt: swon.cho7_manual_primary_prompt.txt
+- manual_secondary_review_prompt: swon.cho7_manual_secondary_review_prompt.txt
+- manual_full_report_prompt: swon.cho7_manual_full_report_prompt.txt
+- manual_full_report_double_check_prompt: swon.cho7_manual_full_report_double_check_prompt.txt
+- manual_local_draft_summary: swon.cho7_manual_local_draft_summary.json
+GPT/Report Content DB 생성 완료: D:\coachingmate_mvp\ops_python\report_engine\output\ai
+- final_summary: swon.cho7_gpt_summary_final.json
+- swon.cho7_report_content_db.txt
+- swon.cho7_report_content_db.csv
+- swon.cho7_report_content_db.json
+PPTX 리포트 생성 완료: D:\coachingmate_mvp\ops_python\report_engine\output\pptx\swon.cho7_leadership_self_report.pptx
+PPTX 안전화 상태: skipped PPTX sanitize disabled
+PowerPoint 최종저장 상태: skipped PowerPoint COM finalize disabled
+PDF 변환 상태: completed D:\coachingmate_mvp\ops_python\report_engine\output\pdf\swon.cho7_leadership_self_report.pdf
+PDF 변환 메시지: PDF 변환 완료 / soffice=C:\Program Files\LibreOffice\program\soffice.exe / overwritten
+-
+핵심 검증값
+overall.self_score = 4.13
+overall.norm_score = 3.86
+overall.gap_score  = 0.27
+IPA axis mode      = fixed_x_spread_y
+IPA x axis         = {'min': 2.0, 'max': 6.0, 'center': 4.0, 'ticks': [2, 3, 4, 5, 6]}
+IPA y axis         = {'min': 3.53, 'max': 4.12, 'center': 3.82, 'data_min': 3.59, 'data_max': 4.06}
+======================================================================
+
+  - report_engine 실행 완료: 98.83s
+[3/5] report_engine 산출물 탐색 중...
+  - latest_pptx: D:\coachingmate_mvp\ops_python\report_engine\output\pptx\swon.cho7_leadership_self_report.pptx
+  - latest_pdf:  D:\coachingmate_mvp\ops_python\report_engine\output\pdf\swon.cho7_leadership_self_report.pdf
+  - PPTX 복사 완료: D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706\조상원 대표이사_1리더십역량진단결과리포트_20260706.pptx
+  - PDF 복사 완료: D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706\조상원 대표이사_1리더십역량진단결과리포트_20260706.pdf
+[4/5] 생성 결과 요약
+--------------------------------------------------------------------------------
+PPTX: D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706\조상원 대표이사_1리더십역량진단결과리포트_20260706.pptx
+PDF:  D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706\조상원 대표이사_1리더십역량진단결과리포트_20260706.pdf
+--------------------------------------------------------------------------------
+[완료] 1번 리더십 역량진단 결과 리포트 생성/복사 완료
+================================================================================
+
+--------------------------------------------------------------------------------
+result: SUCCESS
+returncode: 0
+elapsed_seconds: 104.34
+================================================================================
+[2/6] 2번 코칭 사전 니즈 조사 내용 DOCX 생성
+script: D:\coachingmate_mvp\scripts\docx_generation\generate_doc2_needs_survey.py
+--------------------------------------------------------------------------------
+command:
+C:\Python314\python.exe D:\coachingmate_mvp\scripts\docx_generation\generate_doc2_needs_survey.py --participant-code emro002 --project-coachee-id e0503a22-ec82-4309-8859-9721e7c33c60
+--------------------------------------------------------------------------------
+================================================================================
+generate_doc2_needs_survey.py
+실제 get-leadership-report API 기반 코칭 사전 니즈 조사 DOCX 생성
+================================================================================
+[1/4] Supabase 로그인 중...
+  - 로그인 성공
+[2/4] get-leadership-report 조회 중...
+  - participant_code 조회: emro002
+[3/4] DOCX 치환 데이터 매핑 중...
+  - 대상자: 조상원
+  - 참여코드: emro002
+  - 제출일: 2026-07-01
+[4/4] DOCX 생성 중...
+[완료]
+생성 파일: D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260701\조상원 대표이사_2코칭 사전 니즈 조사 내용_20260701.docx
+
+--------------------------------------------------------------------------------
+result: SUCCESS
+returncode: 0
+elapsed_seconds: 3.94
+================================================================================
+[3/6] 3번/4번 코치용 가이드 DOCX 생성
+script: D:\coachingmate_mvp\scripts\docx_generation\generate_doc3_doc4_from_manual_gpt_outputs.py
+--------------------------------------------------------------------------------
+command:
+C:\Python314\python.exe D:\coachingmate_mvp\scripts\docx_generation\generate_doc3_doc4_from_manual_gpt_outputs.py
+--------------------------------------------------------------------------------
+================================================================================
+generate_doc3_doc4_from_manual_gpt_outputs.py
+3번/4번 DOCX 자동 생성
+================================================================================
+BASE_DIR: D:\coachingmate_mvp
+PARTICIPANT_CODE: emro002
+PROJECT_COACHEE_ID: e0503a22-ec82-4309-8859-9721e7c33c60
+--------------------------------------------------------------------------------
+[0/6] Supabase 로그인 중...
+  - 로그인 성공: coachingmirae@gmail.com
+[1/6] project_coachee 조회 중...
+  - project_coachee_id: e0503a22-ec82-4309-8859-9721e7c33c60
+  - participant_code: emro002
+[2/6] submission 조회 중...
+  - submission 없음
+[3/6] manual_gpt_outputs 최종 결과 조회 중: doc3_needs_analysis_deep_question_guide
+  - 선택: integrated_final 최종본 / id=2828b2e6-5549-4389-9ce4-08fef3479cd3 / generation_channel=web_manual / review_mode=single / gpt_slot=gpt1 / created_at=2026-07-05T21:17:43.166199+00:00
+  - json_key_count: 85
+[3/6] manual_gpt_outputs 최종 결과 조회 중: doc4_integrated_feedback_guide
+  - 선택: integrated_final 최종본 / id=0eb13756-53df-4759-912d-7fe07ec1e225 / generation_channel=web_manual / review_mode=single / gpt_slot=gpt1 / created_at=2026-07-05T21:17:43.166199+00:00
+  - json_key_count: 170
+[4/6] manifest 로딩 중...
+  - manifest: D:\coachingmate_mvp\templates\docx\manifest\docx_templates.json
+[5/6] 출력 폴더 준비
+  - output_date: 20260706
+  - output_dir: D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706
+[4/6] DOCX 생성 준비: 3코치용_코칭사전니즈 분석 및 심층질문 가이드
+  - template: D:\coachingmate_mvp\templates\docx\coach_guides\template_3_coach_needs_analysis_deep_question_guide_current.docx
+  - output:   D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706\조상원 대표이사_3코치용_코칭사전니즈 분석 및 심층질문 가이드_20260706.docx
+  - replacement keys: 85
+  - 저장 완료
+  - 미치환 placeholder 수: 0
+[4/6] DOCX 생성 준비: 4코치용_리더십진단 및 코칭사전니즈 통합가이드
+  - template: D:\coachingmate_mvp\templates\docx\coach_guides\template_4_coach_integrated_feedback_guide_current.docx
+  - output:   D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706\조상원 대표이사_4코치용_리더십진단 및 코칭사전니즈 통합가이드_20260706.docx
+  - replacement keys: 170
+  - 저장 완료
+  - 미치환 placeholder 수: 0
+[6/6] 생성 결과 요약
+--------------------------------------------------------------------------------
+3번 DOCX: D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706\조상원 대표이사_3코치용_코칭사전니즈 분석 및 심층질문 가이드_20260706.docx
+  - 미치환 placeholder 수: 0
+4번 DOCX: D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706\조상원 대표이사_4코치용_리더십진단 및 코칭사전니즈 통합가이드_20260706.docx
+  - 미치환 placeholder 수: 0
+--------------------------------------------------------------------------------
+[완료] 3번/4번 DOCX가 모두 정상 생성되었습니다.
+================================================================================
+
+--------------------------------------------------------------------------------
+result: SUCCESS
+returncode: 0
+elapsed_seconds: 4.44
+================================================================================
+[4/6] 1~4번 세션1 자료 DB 등록
+script: D:\coachingmate_mvp\scripts\docx_generation\register_session1_documents.py
+--------------------------------------------------------------------------------
+command:
+C:\Python314\python.exe D:\coachingmate_mvp\scripts\docx_generation\register_session1_documents.py
+--------------------------------------------------------------------------------
+================================================================================
+register_session1_documents.py
+1번째 세션 제공자료 4종 DB 등록
+================================================================================
+BASE_DIR: D:\coachingmate_mvp
+PARTICIPANT_CODE: emro002
+--------------------------------------------------------------------------------
+[0/4] Supabase 로그인 중...
+  - 로그인 성공: coachingmirae@gmail.com
+[1/4] project_coachee 조회 중...
+  - project_coachee_id: e0503a22-ec82-4309-8859-9721e7c33c60
+  - participant_code: emro002
+[2/4] 생성 파일 탐색 기준
+  - base_folder: D:\coachingmate_mvp\generated\coaching_reports\emro\emro002
+[3/4] 문서별 파일 탐색 및 DB 등록
+--------------------------------------------------------------------------------
+[1] 리더십 역량진단 결과 리포트
+  - status: generated
+  - file_exists: True
+  - file_name: 조상원 대표이사_1리더십역량진단결과리포트_20260706.pdf
+  - relative_url: /generated/coaching_reports/emro/emro002/20260706/조상원 대표이사_1리더십역량진단결과리포트_20260706.pdf
+--------------------------------------------------------------------------------
+[2] 코칭 사전 니즈 조사 내용
+  - status: generated
+  - file_exists: True
+  - file_name: 조상원 대표이사_2코칭 사전 니즈 조사 내용_20260701.docx
+  - relative_url: /generated/coaching_reports/emro/emro002/20260701/조상원 대표이사_2코칭 사전 니즈 조사 내용_20260701.docx
+--------------------------------------------------------------------------------
+[3] 코치용 코칭사전니즈 분석 및 심층질문 가이드
+  - status: generated
+  - file_exists: True
+  - file_name: 조상원 대표이사_3코치용_코칭사전니즈 분석 및 심층질문 가이드_20260706.docx
+  - relative_url: /generated/coaching_reports/emro/emro002/20260706/조상원 대표이사_3코치용_코칭사전니즈 분석 및 심층질문 가이드_20260706.docx
+--------------------------------------------------------------------------------
+[4] 코치용 리더십진단 및 코칭사전니즈 통합가이드
+  - status: generated
+  - file_exists: True
+  - file_name: 조상원 대표이사_4코치용_리더십진단 및 코칭사전니즈 통합가이드_20260706.docx
+  - relative_url: /generated/coaching_reports/emro/emro002/20260706/조상원 대표이사_4코치용_리더십진단 및 코칭사전니즈 통합가이드_20260706.docx
+[4/4] 등록 결과 요약
+--------------------------------------------------------------------------------
+OK | 1 | 리더십 역량진단 결과 리포트 | 조상원 대표이사_1리더십역량진단결과리포트_20260706.pdf
+OK | 2 | 코칭 사전 니즈 조사 내용 | 조상원 대표이사_2코칭 사전 니즈 조사 내용_20260701.docx
+OK | 3 | 코치용 코칭사전니즈 분석 및 심층질문 가이드 | 조상원 대표이사_3코치용_코칭사전니즈 분석 및 심층질문 가이드_20260706.docx
+OK | 4 | 코치용 리더십진단 및 코칭사전니즈 통합가이드 | 조상원 대표이사_4코치용_리더십진단 및 코칭사전니즈 통합가이드_20260706.docx
+================================================================================
+[완료] session_document_outputs 등록이 완료되었습니다.
+================================================================================
+
+--------------------------------------------------------------------------------
+result: SUCCESS
+returncode: 0
+elapsed_seconds: 3.51
+================================================================================
+[5/6] 세션1 ZIP 패키지 생성
+script: D:\coachingmate_mvp\scripts\docx_generation\create_session1_document_package.py
+--------------------------------------------------------------------------------
+command:
+C:\Python314\python.exe D:\coachingmate_mvp\scripts\docx_generation\create_session1_document_package.py
+--------------------------------------------------------------------------------
+================================================================================
+create_session1_document_package.py
+1번째 세션 제공자료 ZIP 패키지 생성
+================================================================================
+BASE_DIR: D:\coachingmate_mvp
+PARTICIPANT_CODE: emro002
+--------------------------------------------------------------------------------
+[0/5] Supabase 로그인 중...
+  - 로그인 성공: coachingmirae@gmail.com
+[1/5] project_coachee 조회 중...
+  - project_coachee_id: e0503a22-ec82-4309-8859-9721e7c33c60
+  - participant_code: emro002
+[2/5] 1~4번 세션 자료 조회 중...
+  - 조회 문서 수: 4
+[3/5] 파일 존재 검증 중...
+  - OK 1: 조상원 대표이사_1리더십역량진단결과리포트_20260706.pdf
+  - OK 2: 조상원 대표이사_2코칭 사전 니즈 조사 내용_20260701.docx
+  - OK 3: 조상원 대표이사_3코치용_코칭사전니즈 분석 및 심층질문 가이드_20260706.docx
+  - OK 4: 조상원 대표이사_4코치용_리더십진단 및 코칭사전니즈 통합가이드_20260706.docx
+[4/5] ZIP 패키지 생성 중...
+  - package: D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706\조상원 대표이사_1회차_코칭세션자료_20260706.zip
+  - 추가: 조상원 대표이사_1리더십역량진단결과리포트_20260706.pdf
+  - 추가: 조상원 대표이사_2코칭 사전 니즈 조사 내용_20260701.docx
+  - 추가: 조상원 대표이사_3코치용_코칭사전니즈 분석 및 심층질문 가이드_20260706.docx
+  - 추가: 조상원 대표이사_4코치용_리더십진단 및 코칭사전니즈 통합가이드_20260706.docx
+  - ZIP 저장 완료
+  - size: 547,170 bytes
+[5/5] ZIP 패키지 DB 등록 중...
+  - id: a6901296-88ff-4b0f-9677-c74a31f60d63
+  - file_name: 조상원 대표이사_1회차_코칭세션자료_20260706.zip
+  - relative_url: /generated/coaching_reports/emro/emro002/20260706/조상원 대표이사_1회차_코칭세션자료_20260706.zip
+  - status: generated
+================================================================================
+[완료] 1회차 코칭세션자료 ZIP 패키지 생성 및 DB 등록 완료
+================================================================================
+ZIP 파일: D:\coachingmate_mvp\generated\coaching_reports\emro\emro002\20260706\조상원 대표이사_1회차_코칭세션자료_20260706.zip
+다운로드 URL: http://localhost:5173/generated/coaching_reports/emro/emro002/20260706/조상원 대표이사_1회차_코칭세션자료_20260706.zip
+DB row id: a6901296-88ff-4b0f-9677-c74a31f60d63
+================================================================================
+
+--------------------------------------------------------------------------------
+result: SUCCESS
+returncode: 0
+elapsed_seconds: 3.26
+================================================================================
+[6/6] 세션1 자료 상태 업데이트
+script: D:\coachingmate_mvp\scripts\docx_generation\update_session1_document_status.py
+--------------------------------------------------------------------------------
+command:
+C:\Python314\python.exe D:\coachingmate_mvp\scripts\docx_generation\update_session1_document_status.py
+--------------------------------------------------------------------------------
+================================================================================
+update_session1_document_status.py
+1회차 자료 준비 상태 업데이트
+================================================================================
+[0/4] Supabase 로그인 중...
+  - 로그인 성공: coachingmirae@gmail.com
+[1/4] project_coachee 조회 중...
+  - project_coachee_id: e0503a22-ec82-4309-8859-9721e7c33c60
+  - participant_code: emro002
+  - 기존 report_status: session1_package_ready
+  - 기존 session1_documents_status: ready
+[2/4] session_document_outputs 조회 중...
+  - 1 | generated | True | 조상원 대표이사_1리더십역량진단결과리포트_20260706.pdf
+  - 2 | generated | True | 조상원 대표이사_2코칭 사전 니즈 조사 내용_20260701.docx
+  - 3 | generated | True | 조상원 대표이사_3코치용_코칭사전니즈 분석 및 심층질문 가이드_20260706.docx
+  - 4 | generated | True | 조상원 대표이사_4코치용_리더십진단 및 코칭사전니즈 통합가이드_20260706.docx
+  - 99 | generated | True | 조상원 대표이사_1회차_코칭세션자료_20260706.zip
+[3/4] 상태 판정 중...
+  - status: ready
+  - ready_count: 4/4
+  - package_ready: True
+  - missing_docs: []
+  - memo: required_ready_count=4/4; package_ready=True; missing_docs=[]
+[4/4] project_coachees 업데이트 중...
+--------------------------------------------------------------------------------
+[완료]
+project_coachee_id: e0503a22-ec82-4309-8859-9721e7c33c60
+participant_code: emro002
+report_status: session1_package_ready
+session1_documents_status: ready
+session1_documents_ready_at: 2026-07-06T11:31:23.098049+00:00
+session1_package_document_id: a6901296-88ff-4b0f-9677-c74a31f60d63
+memo: required_ready_count=4/4; package_ready=True; missing_docs=[]
+================================================================================
+
+--------------------------------------------------------------------------------
+result: SUCCESS
+returncode: 0
+elapsed_seconds: 3.29
+================================================================================
+[전체 완료] 1회차 코칭세션 제공자료 정식 파이프라인 성공
+--------------------------------------------------------------------------------
+1. 1번 리더십 역량진단 결과 리포트 PPTX/PDF 생성 → SUCCESS / 104.34s
+2. 2번 코칭 사전 니즈 조사 내용 DOCX 생성 → SUCCESS / 3.94s
+3. 3번/4번 코치용 가이드 DOCX 생성 → SUCCESS / 4.44s
+4. 1~4번 세션1 자료 DB 등록 → SUCCESS / 3.51s
+5. 세션1 ZIP 패키지 생성 → SUCCESS / 3.26s
+6. 세션1 자료 상태 업데이트 → SUCCESS / 3.29s
+--------------------------------------------------------------------------------
+FINISHED_AT: 2026-07-06 20:31:23
+================================================================================
+PS D:\coachingmate_mvp> 

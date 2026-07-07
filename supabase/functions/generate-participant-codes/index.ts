@@ -72,7 +72,7 @@ Deno.serve(async (req: Request) => {
         participant_id,
         participant_code,
         survey_token,
-        coaching_projects (
+        projects (
           id,
           client_id,
           project_name,
@@ -143,9 +143,9 @@ Deno.serve(async (req: Request) => {
         continue;
       }
 
-      const project = Array.isArray(row.coaching_projects)
-        ? row.coaching_projects[0]
-        : row.coaching_projects;
+      const project = Array.isArray(row.projects)
+        ? row.projects[0]
+        : row.projects;
 
       const coachee = Array.isArray(row.coachees)
         ? row.coachees[0]
@@ -232,21 +232,23 @@ const { data: counterRow, error: counterLookupError } =
 
       if (!counterRow) {
         console.log("[generate-participant-codes] COUNTER_CREATE_START", {
-          clientId,
-          clientCode,
-          lastNumber: 1,
-        });
+  clientId,
+  clientCode,
+  prefix,
+  lastNumber: 1,
+});
 
         const { data: insertedCounter, error: counterInsertError } =
-          await supabaseAdmin
-            .from("participant_code_counters")
-            .insert({
-              client_id: clientId,
-              client_code: clientCode,
-              last_number: 1,
-            })
-            .select("id, client_id, client_code, last_number")
-            .single();
+  await supabaseAdmin
+    .from("participant_code_counters")
+    .insert({
+      client_id: clientId,
+      client_code: clientCode,
+      prefix,
+      last_number: 1,
+    })
+    .select("id, client_id, client_code, prefix, last_number")
+    .single();
 
         if (counterInsertError || !insertedCounter) {
           console.error(

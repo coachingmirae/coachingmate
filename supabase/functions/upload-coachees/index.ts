@@ -89,7 +89,7 @@ Deno.serve(async (req: Request) => {
     console.log("[upload-coachees] PROJECT_LOOKUP_START", projectId);
 
     const { data: project, error: projectError } = await supabaseAdmin
-      .from("coaching_projects")
+      .from("projects")
       .select("id, client_id, project_name, status")
       .eq("id", projectId)
       .maybeSingle();

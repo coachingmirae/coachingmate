@@ -1,0 +1,5828 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CoachingMate Report Preview Test</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 32px;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      background: #f5f7fb;
+      color: #111827;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: #111827;
+      color: white;
+      padding: 28px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px 0;
+      font-size: 26px;
+    }
+
+    .header p {
+      margin: 0;
+      color: #d1d5db;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    input {
+      height: 42px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 0 12px;
+      font-size: 14px;
+    }
+
+    input.long {
+      flex: 1;
+      min-width: 420px;
+    }
+
+    button {
+      height: 42px;
+      border: 0;
+      border-radius: 10px;
+      padding: 0 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+
+    button.secondary {
+      background: #374151;
+    }
+
+    .muted {
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 16px;
+      background: #ffffff;
+    }
+
+    .score-big {
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .score {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .label {
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0 0 14px 0;
+    }
+
+    .sub-title {
+      font-size: 15px;
+      font-weight: 800;
+      margin: 0 0 8px 0;
+    }
+
+    .bar-wrap {
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .bar {
+      height: 100%;
+      background: #2563eb;
+      border-radius: 999px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 10px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f9fafb;
+      color: #374151;
+      font-weight: 800;
+    }
+
+    .badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.badge.primary {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.badge.ok {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge.warn {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge.bad {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge.green {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.badge.orange {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 16px;
+      border-radius: 12px;
+      max-height: 420px;
+      overflow: auto;
+      font-size: 12px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      height: auto;
+      padding: 0;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 16px;
+      }
+
+      .grid,
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      input.long {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>CoachingMate 관리자 리포트 미리보기</h1>
+      <p>get-leadership-report Edge Function 결과를 관리자 화면용으로 표시하는 테스트 페이지입니다.</p>
+    </div>
+
+    <div id="coacheeListPanel" class="panel">
+  <h2 class="title">0. 피코치 목록 선택</h2>
+  <p class="muted">
+    현재 프로젝트의 피코치 목록을 조회하고, 선택한 피코치 기준으로 리포트와 세션자료 파이프라인을 실행합니다.
+  </p>
+
+  <div class="row" style="margin-bottom: 12px;">
+    <button onclick="loadProjectCoacheeList()">피코치 목록 조회</button>
+  </div>
+
+  <div id="coacheeListContainer" class="muted">
+    아직 조회하지 않았습니다.
+  </div>
+</div>
+
+<div id="coacheeDashboardPanel" class="panel">
+  <h2 class="title">0-1. 피코치 자료 생성 상태 대시보드</h2>
+  <p class="muted">
+    현재 프로젝트 피코치들의 진단, GPT 최종본, 세션자료 생성 상태를 한눈에 확인합니다.
+  </p>
+
+<div class="row" style="margin-bottom: 12px;">
+  <button onclick="loadCoacheeReadinessDashboard()">자료 생성 상태 대시보드 조회</button>
+  <button class="secondary" onclick="setReadinessFilter('all')">전체</button>
+  <button class="secondary" onclick="setReadinessFilter('pipelineReady')">생성 가능</button>
+  <button class="secondary" onclick="setReadinessFilter('packageReady')">패키지 완료</button>
+  <button class="secondary" onclick="setReadinessFilter('needCheck')">점검 필요</button>
+</div>
+
+<div id="batchCandidatePanel" class="panel">
+  <h2 class="title">0-2. 일괄 실행 후보 점검</h2>
+  <p class="muted">
+    현재 프로젝트에서 1회차 세션자료 생성 파이프라인을 실행할 수 있는 후보를 선별합니다.
+    이미 ZIP 패키지까지 완료된 피코치는 기본 후보에서 제외합니다.
+  </p>
+
+  <div class="row" style="margin-bottom: 12px;">
+    <button onclick="loadBatchPipelineCandidates()">일괄 실행 후보 조회</button>
+  </div>
+
+  <div id="batchCandidateContainer" class="muted">
+    아직 조회하지 않았습니다.
+  </div>
+</div>
+
+  <div id="coacheeDashboardContainer" class="muted">
+    아직 조회하지 않았습니다.
+  </div>
+</div>
+
+    <div class="panel">
+      <h2 class="title">1. 로그인 / 리포트 조회</h2>
+
+      <div class="row">
+        <input id="email" type="email" placeholder="관리자 이메일" value="coachingmirae@gmail.com" />
+        <input id="password" type="password" placeholder="비밀번호" />
+        <button onclick="login()">로그인</button>
+      </div>
+
+      <p id="loginStatus" class="muted">로그인 전</p>
+
+      <div class="row" style="margin-top: 16px;">
+        <input
+          id="projectCoacheeId"
+          class="long"
+          value="e0503a22-ec82-4309-8859-9721e7c33c60"
+          placeholder="project_coachee_id"
+        />
+        <button onclick="loadReport()">리포트 조회</button>
+        <button class="secondary" onclick="toggleRaw()">Raw JSON 보기</button>
+        <button class="secondary" onclick="togglePrompt()">GPT 프롬프트 보기</button> 
+      </div>
+
+      <p id="loadStatus" class="muted"></p>
+    </div>
+
+    <div id="reportArea" class="hidden">
+      <div class="panel">
+        <h2 class="title">2. 피코치 / 프로젝트 정보</h2>
+        <div class="grid-2">
+          <div class="card">
+            <div class="label">피코치</div>
+            <div class="score" id="coacheeName">-</div>
+            <p id="coacheeMeta" class="muted"></p>
+          </div>
+
+          <div class="card">
+            <div class="label">프로젝트</div>
+            <div class="score" style="font-size: 22px;" id="projectName">-</div>
+            <p id="projectMeta" class="muted"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="title">3. 종합 결과</h2>
+        <div class="grid-2">
+  <div class="card">
+    <div class="label">전체 평균</div>
+    <div class="score-big" id="overallScore">-</div>
+    <div class="bar-wrap">
+      <div class="bar" id="overallBar" style="width: 0%;"></div>
+    </div>
+    <p id="overallSummary" class="muted"></p>
+  </div>
+
+  <div class="card">
+    <div class="label">상태</div>
+    <p>
+      <span class="badge green" id="reportStatus">-</span>
+      <span class="badge" id="diagnosisStatus">-</span>
+      <span class="badge" id="needsStatus">-</span>
+    </p>
+    <p id="submittedAt" class="muted"></p>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top: 14px;">
+  <div class="card">
+    <div class="label">상대적 강점 요약</div>
+    <p id="strengthHint" style="font-weight: 700;"></p>
+  </div>
+
+  <div class="card">
+    <div class="label">개발 필요 영역 요약</div>
+    <p id="developmentHint" style="font-weight: 700;"></p>
+  </div>
+</div>
+
+          <div class="card">
+            <div class="label">상태</div>
+            <p>
+              <span class="badge green" id="reportStatus">-</span>
+              <span class="badge" id="diagnosisStatus">-</span>
+              <span class="badge" id="needsStatus">-</span>
+            </p>
+            <p id="submittedAt" class="muted"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+          <h2 class="title">4. 리더십 상위영역 결과 G1~G4</h2>
+        <div id="groupScores" class="grid"></div>
+      </div>
+
+      <div class="panel">
+        <h2 class="title">5. 세부 리더십 요인 결과 F1~F8</h2>
+        <div id="factorScores" class="grid-2"></div>
+      </div>
+
+      <div class="panel">
+        <h2 class="title">6. 강점 / 개발 필요 영역</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3 class="sub-title">상대적 강점</h3>
+            <div id="highestFactors"></div>
+          </div>
+          <div class="card">
+            <h3 class="sub-title">우선 개발 검토 영역</h3>
+            <div id="lowestFactors"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="title">7. 코칭 니즈 사전조사 응답</h2> 
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 180px;">항목</th>
+              <th>응답</th>
+            </tr>
+          </thead>
+          <tbody id="needsTable"></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h2 class="title">8. 리더십 진단 문항별 원점수 Q01~Q32</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>문항코드</th>
+              <th>점수</th>
+            </tr>
+          </thead>
+          <tbody id="questionTable"></tbody>
+        </table>
+      </div>
+      
+    <div id="generationModePanel" class="panel">
+  <h2 class="title">9. GPT 생성 방식 설정</h2>
+  <p class="muted">
+    GPT 결과를 얻는 방식을 선택합니다. 웹 수동 운영은 운영자가 원하는 GPT 웹서비스를 사용하고, API 자동 운영은 시스템에 등록된 API 설정을 사용합니다.
+  </p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="sub-title">생성 방식</div>
+      <label>
+        <input type="radio" name="generationMode" value="web_manual" checked>
+        웹 수동 운영
+      </label>
+      <br>
+      <label>
+        <input type="radio" name="generationMode" value="api_auto">
+        API 자동 운영
+      </label>
+    </div>
+
+    <div class="card">
+      <div class="sub-title">검토 방식</div>
+      <label>
+        <input type="radio" name="reviewMode" value="single">
+        GPT1 단일 생성
+      </label>
+      <br>
+      <label>
+        <input type="radio" name="reviewMode" value="dual_review" checked>
+        GPT1 + GPT2 이중검토 후 통합
+      </label>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top: 14px;">
+    <div class="card">
+      <div class="sub-title">GPT 1차 생성</div>
+      <select id="gptConfigGpt1" style="width: 100%; height: 40px;"></select>
+    </div>
+
+    <div class="card">
+      <div class="sub-title">GPT 더블체크</div>
+      <select id="gptConfigGpt2" style="width: 100%; height: 40px;"></select>
+    </div>
+
+    <div class="card">
+  <div class="sub-title">GPT 최종 통합</div>
+  <p class="muted" style="margin-top: 0;">
+    GPT 1차 생성 결과와 GPT 더블체크 결과를 MECE 기준으로 통합하여 최종 JSON을 만드는 단계입니다.
+  </p>
+  <select id="gptConfigIntegrator" style="width: 100%; height: 40px;"></select>
+</div>
+
+    <div class="card">
+      <div class="sub-title">예비/참고 API 선택</div>
+      <select id="gptConfigFinalReviewer" style="width: 100%; height: 40px;"></select>
+    </div>
+  </div>
+
+  <p id="generationModeStatus" class="muted" style="margin-top: 12px;">
+    기본값: 웹 수동 운영 + GPT1/GPT2 이중검토
+  </p>
+</div>
+
+    <div id="promptPanel" class="panel hidden">
+  <h2 class="title">10. GPT 코칭가이드 생성용 프롬프트</h2>
+  <p class="muted">
+    아래 내용을 복사하여 GPT에 붙여넣으면, 리더십 진단 결과 요약과 1회차 코칭가이드 초안을 생성할 수 있습니다.
+  </p>
+
+  <div class="grid-2" style="margin-bottom: 12px;">
+  <div class="card">
+    <div class="sub-title">3번 자료: 코칭사전니즈 분석 및 심층질문 가이드</div>
+    <p class="muted">
+      GPT 1차 생성과 GPT 더블체크 결과를 각각 만든 뒤, GPT 최종 통합에서 최종 JSON을 생성합니다.
+    </p>
+
+    <div class="row" style="margin-bottom: 8px;">
+      <button onclick="generateDoc3PromptForGpt1()">3번 GPT 1차 생성 프롬프트</button>
+      <button onclick="generateDoc3PromptForGpt2()">3번 GPT 더블체크 프롬프트</button>
+      <button onclick="generateDoc3IntegrationPrompt()">3번 GPT 최종 통합 프롬프트</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sub-title">4번 자료: 리더십진단 및 니즈 통합가이드</div>
+    <p class="muted">
+      리더십 진단 결과와 니즈 응답을 통합하여 코치용 운영 가이드를 생성합니다.
+    </p>
+
+    <div class="row" style="margin-bottom: 8px;">
+      <button onclick="generateDoc4PromptForGpt1()">4번 GPT 1차 생성 프롬프트</button>
+      <button onclick="generateDoc4PromptForGpt2()">4번 GPT 더블체크 프롬프트</button>
+      <button onclick="generateDoc4IntegrationPrompt()">4번 GPT 최종 통합 프롬프트</button>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom: 12px;">
+  <div class="sub-title">현재 프롬프트 작업</div>
+  <p class="muted" style="margin-top: 0;">
+    위 버튼으로 프롬프트를 생성한 뒤, 복사하거나 DB에 저장합니다.
+  </p>
+
+  <div class="row">
+    <button class="secondary" onclick="copyGptPrompt()">프롬프트 복사</button>
+    <button class="secondary" onclick="saveGptPromptLog()">프롬프트 DB 저장</button>
+  </div>
+</div>
+
+  <p id="promptTypeStatus" class="muted">프롬프트 유형: -</p>
+  <pre id="gptPromptText"></pre>
+  <p id="promptSaveStatus" class="muted"></p>
+</div>
+
+<div id="gptOutputPanel" class="panel">
+  <h2 class="title">11. GPT 결과 JSON 저장</h2>
+<p class="muted">
+  웹 GPT에서 생성된 JSON 결과를 저장합니다.
+  GPT 1차 생성 결과는 draft_1, GPT 더블체크 결과는 draft_2,
+  GPT 최종 통합 결과는 integrated_final로 저장합니다.
+  DOCX 생성에는 integrated_final 최종본이 우선 사용됩니다.
+</p>
+
+  <div class="row" style="margin-bottom: 12px;">
+  <select id="gptOutputType" style="height: 42px; border: 1px solid #d1d5db; border-radius: 10px; padding: 0 12px;">
+    <option value="doc3_needs_analysis_deep_question_guide">3번 니즈분석 결과 JSON</option>
+    <option value="doc4_integrated_feedback_guide">4번 통합가이드 결과 JSON</option>
+  </select>
+
+  <button onclick="validateGptOutputJson()">JSON 유효성 검사</button>
+  <button class="secondary" onclick="saveManualGptOutput()">GPT 결과 DB 저장</button>
+</div>
+
+<div class="card" style="margin-bottom: 12px;">
+  <div class="sub-title">GPT 결과 라운드</div>
+  <p class="muted" style="margin-top: 0;">
+    GPT 1차 생성 결과는 draft_1, GPT 더블체크 결과는 draft_2, GPT 최종 통합 결과는 integrated_final로 저장하세요.
+  </p>
+
+  <label>
+    <input type="radio" name="gptOutputRound" value="draft_1" checked>
+    GPT 1차 생성 결과 draft_1
+  </label>
+  <br>
+
+  <label>
+    <input type="radio" name="gptOutputRound" value="draft_2">
+    GPT 더블체크 결과 draft_2
+  </label>
+  <br>
+
+  <label>
+    <input type="radio" name="gptOutputRound" value="integrated_final">
+    GPT 최종 통합 결과 integrated_final
+  </label>
+</div>
+
+  <textarea
+    id="gptOutputJsonText"
+    placeholder="GPT가 생성한 JSON 객체를 여기에 붙여넣으세요."
+    style="width: 100%; min-height: 280px; border: 1px solid #d1d5db; border-radius: 12px; padding: 14px; font-family: Consolas, monospace; font-size: 13px; box-sizing: border-box;"
+  ></textarea>
+
+  <p id="gptOutputStatus" class="muted"></p>
+</div>
+
+<div id="pipelineCommandPanel" class="panel">
+  <h2 class="title">12. 1회차 세션자료 생성 파이프라인</h2>
+  <p class="muted">
+    통합 GPT 결과 저장 후, 아래 명령을 PowerShell에서 실행하면
+    1번/2번/3번/4번 자료 생성, 자료 DB 등록, 상태 업데이트가 한 번에 실행됩니다. ZIP은 기본 생성하지 않습니다.
+  </p>
+
+  <div class="card" style="margin-bottom: 12px;">
+    <div class="sub-title">PowerShell 실행 명령</div>
+    <pre id="pipelineCommandText">cd D:\coachingmate_mvp
+python scripts\docx_generation\run_session1_material_pipeline.py --participant-code emro002 --project-coachee-id e0503a22-ec82-4309-8859-9721e7c33c60</pre>
+
+    <div class="row" style="margin-top: 12px;">
+      <button id="runPipelineButton" onclick="runSession1PipelineFromLocalRunner(false)">파이프라인 바로 실행</button>
+      <button class="secondary" onclick="runSession1PipelineFromLocalRunner(true)">실패 테스트 실행</button>
+      <button class="secondary" onclick="copyPipelineCommand()">파이프라인 명령 복사</button>
+      <button class="secondary" onclick="loadSessionDocuments()">생성자료 다시 조회</button>
+    </div>
+    <p id="pipelineCommandStatus" class="muted"></p>
+    <pre id="pipelineRunLog" style="max-height: 520px;"></pre>
+  </div>
+
+  <div class="card">
+    <div class="sub-title">현재 자동화 범위</div>
+    <p class="muted" style="margin-top: 0;">
+      현재는 보안상 브라우저에서 로컬 Python을 직접 실행하지 않고,
+      명령어 복사 후 PowerShell에서 실행하는 방식입니다.
+      다음 단계에서 Local Runner API를 붙이면 관리자 버튼으로 직접 실행할 수 있습니다.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 80px;">순서</th>
+          <th>작업</th>
+          <th>실행 스크립트</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>1~4번 세션1 자료 생성</td>
+          <td>run_session1_material_pipeline.py</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>세션1 자료 DB 등록</td>
+          <td>register_session1_documents.py</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>ZIP 패키지 생성, 선택</td>
+          <td>--create-zip 옵션 사용 시에만 실행</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>자료 상태 업데이트</td>
+          <td>update_session1_document_status.py</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div id="sessionFileStatusPanel" class="panel">
+  <h2 class="title">13. 세션자료 파일 상태 점검</h2>
+  <p class="muted">
+    1회차 세션자료 1~4번 및 ZIP 패키지의 DB 등록 상태와 다운로드 경로를 확인합니다.
+  </p>
+
+  <div class="row" style="margin-bottom: 12px;">
+    <button onclick="loadSessionFileStatus()">세션자료 파일 상태 조회</button>
+  </div>
+
+<div id="downloadTokenStatusPanel" class="panel">
+  <h2 class="title">13-1. 다운로드 토큰 발급 이력</h2>
+  <p class="muted">
+    현재 피코치의 세션자료 다운로드 토큰 발급/비활성화 이력을 조회합니다.
+  </p>
+
+  <div class="row" style="margin-bottom: 12px;">
+    <button onclick="loadDocumentDownloadTokens()">다운로드 토큰 이력 조회</button>
+  </div>
+
+<div id="downloadLogPanel" class="panel">
+  <h2 class="title">13-2. 다운로드 로그 조회</h2>
+  <p class="muted">
+    현재 피코치의 토큰 다운로드 성공/차단/오류 이력을 조회합니다.
+  </p>
+
+  <div class="row" style="margin-bottom: 12px;">
+    <button onclick="loadDocumentDownloadLogs()">다운로드 로그 조회</button>
+  </div>
+
+  <div id="downloadLogContainer" class="muted">
+    아직 조회하지 않았습니다.
+  </div>
+</div>
+
+  <div id="downloadTokenStatusContainer" class="muted">
+    아직 조회하지 않았습니다.
+  </div>
+</div>
+
+  <div id="sessionFileStatusContainer" class="muted">
+    아직 조회하지 않았습니다.
+  </div>
+</div>
+
+<div id="gptOutputStatusPanel" class="panel">
+  <h2 class="title">14. GPT 결과 저장 상태 점검</h2>
+  <p class="muted">
+    3번/4번 코치용 자료 생성을 위한 GPT 결과 저장 상태를 확인합니다.
+  </p>
+
+  <div class="row" style="margin-bottom: 12px;">
+    <button onclick="loadGptOutputStatus()">GPT 결과 상태 조회</button>
+  </div>
+
+  <div id="gptOutputStatusContainer" class="muted">
+    아직 조회하지 않았습니다.
+  </div>
+</div>
+
+<div id="pipelinePrecheckPanel" class="panel">
+  <h2 class="title">15. 파이프라인 실행 전 사전점검</h2>
+  <p class="muted">
+    1회차 세션자료 생성 파이프라인을 실행하기 전에 필요한 데이터가 준비되어 있는지 확인합니다.
+  </p>
+
+  <div class="row" style="margin-bottom: 12px;">
+    <button onclick="runSession1PipelinePrecheck()">사전점검 실행</button>
+  </div>
+
+  <div id="pipelinePrecheckContainer" class="muted">
+    아직 사전점검을 실행하지 않았습니다.
+  </div>
+</div>
+
+<div id="pipelineRecoveryPanel" class="panel">
+  <h2 class="title">16. 파이프라인 실패 후 복구 가이드</h2>
+  <p class="muted">
+    파이프라인 실행이 failed로 표시될 때, 아래 순서로 원인을 확인하고 복구합니다.
+  </p>
+  <p id="pipelineRecoveryStatus" class="muted">
+    최근 failed 행을 선택하면 여기에서 복구 힌트를 표시합니다.
+  </p>
+  <div class="grid-2">
+    <div class="card">
+      <div class="sub-title">1. 먼저 확인할 것</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 160px;">확인 항목</th>
+            <th>점검 방법</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Local Runner</td>
+            <td>PowerShell에서 <b>coachingmate_local_runner.py</b>가 실행 중인지 확인</td>
+          </tr>
+          <tr>
+            <td>로그</td>
+            <td>아래 실행 이력에서 failed 행의 <b>보기</b>를 클릭해 STDERR 확인</td>
+          </tr>
+          <tr>
+            <td>GPT 최종 결과</td>
+            <td>3번/4번 integrated_final JSON이 저장되어 있는지 확인</td>
+          </tr>
+          <tr>
+            <td>템플릿</td>
+            <td>DOCX 템플릿 파일이 templates 폴더에 존재하는지 확인</td>
+          </tr>
+          <tr>
+            <td>생성 파일</td>
+            <td>generated 폴더에 1번 PDF, 2번 DOCX, 3번/4번 DOCX가 있는지 확인</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="sub-title">2. 자주 발생하는 실패 유형</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 180px;">오류 유형</th>
+            <th>복구 방법</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>FORCE_FAIL 테스트</td>
+            <td>의도적 실패입니다. 정상 실행 버튼으로 다시 실행하면 됩니다.</td>
+          </tr>
+          <tr>
+            <td>GPT 결과 없음</td>
+            <td>GPT 결과 JSON 저장 영역에서 integrated_final 최종 결과를 저장하세요.</td>
+          </tr>
+          <tr>
+            <td>템플릿 파일 없음</td>
+            <td>templates/docx/coach_guides 폴더의 current 템플릿 파일명을 확인하세요.</td>
+          </tr>
+          <tr>
+            <td>파일 없음</td>
+            <td>1번 PDF 또는 2번 DOCX가 generated 폴더에 있는지 확인 후 다시 등록하세요.</td>
+          </tr>
+          <tr>
+            <td>Supabase 로그인 실패</td>
+            <td>.env의 SUPABASE_LOGIN_EMAIL / PASSWORD 값을 확인하세요.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 14px;">
+    <div class="sub-title">3. 권장 복구 순서</div>
+    <ol style="margin-top: 8px;">
+      <li>실행 이력에서 failed 행의 <b>보기</b>를 클릭합니다.</li>
+      <li>STDERR / ERROR FIRST 영역의 마지막 오류 문장을 확인합니다.</li>
+      <li>오류 유형에 맞게 GPT 결과, 템플릿, 파일, .env를 보정합니다.</li>
+      <li><b>파이프라인 바로 실행</b> 버튼을 다시 클릭합니다.</li>
+      <li>상태가 success로 바뀌고 1~4번 자료와 ZIP이 generated인지 확인합니다.</li>
+    </ol>
+  </div>
+</div>
+
+<div id="pipelineRunsPanel" class="panel">
+  <h2 class="title">17. 파이프라인 실행 이력</h2>
+  <p class="muted">
+    현재 피코치 기준으로 최근 1회차 세션자료 생성 파이프라인 실행 이력을 조회합니다.
+  </p>
+
+<div class="row" style="margin-bottom: 12px;">
+  <button onclick="loadPipelineRuns(false)">최근 실행 이력 조회</button>
+  <button class="secondary" onclick="loadPipelineRuns(true)">숨김 포함 조회</button>
+</div>
+
+  <div id="pipelineRunsContainer" class="muted">
+    아직 조회하지 않았습니다.
+  </div>
+
+  <pre id="pipelineRunDetailLog" style="max-height: 520px;"></pre>
+</div>
+
+<div id="sessionDocsPanel" class="panel">
+  <h2 class="title">18. 1번째 세션 제공자료</h2>
+  <p class="muted">
+    피코치 1번째 세션에 제공할 1~4번 자료의 생성 상태와 다운로드 링크를 확인합니다.
+  </p>
+
+  <div class="row" style="margin-bottom: 12px;">
+    <button onclick="loadSessionDocuments()">1번째 세션 자료 조회</button>
+  </div>
+
+  <div id="sessionDocumentsContainer" class="muted">
+    아직 조회하지 않았습니다.
+  </div>
+</div>
+
+    <div id="rawPanel" class="panel hidden">
+      <h2 class="title">Raw JSON</h2>
+      <pre id="rawJson"></pre>
+    </div>
+  </div>
+</div><!-- container -->
+
+  <script>
+    const SUPABASE_URL = "https://kvmhibfxysqnrfekiatf.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2bWhpYmZ4eXNxbnJmZWtpYXRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk5OTEsImV4cCI6MjA5NzkzNTk5MX0.lig9PP0rJy0O4dVUWllwDZEUN739c0bwvm9kBybfGtI";
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentSession = null;
+    let latestReport = null;
+
+    const CURRENT_PROJECT_ID = "3fb12af2-ca6d-4c8e-b829-f182e1fc71b6";
+    let latestProjectCoachees = [];
+
+    let latestCoacheeReadinessRows = [];
+    let currentReadinessFilter = "all";
+
+    let currentPromptType = null;
+    let currentPromptTitle = null;
+
+    // Phase 31: 현재 화면에 생성된 프롬프트가 어느 GPT 슬롯/라운드용인지 기록
+    let currentPromptGptSlot = "gpt1";
+    let currentPromptRound = "draft_1";
+    let currentParentPromptLogId = null;
+
+    let latestDocumentTokenMap = {};
+
+    const NEED_LABELS = {
+      currentWork: "현재 역할/업무 맥락",
+      need1: "이번 코칭을 통해 얻고 싶은 목표",
+      need2: "코칭 종료 후 기대하는 변화",
+      need3: "현재 리더십에서 가장 고민되는 점",
+      need4: "조직/팀 운영에서 가장 중요한 과제",
+      need5: "현재 본인이 강화하고 싶은 리더십 역량",
+      need6: "현재 본인의 강점이라고 생각하는 부분",
+      need7: "조직/팀의 주요 이슈 또는 장애요인",
+      need8: "성과 창출을 위해 개선이 필요한 영역",
+      need9: "인재 육성/후계자/리더십 승계 관련 고민",
+      need10: "코칭에서 다루고 싶은 구체적 상황",
+      need11: "코치에게 사전에 공유하고 싶은 사항"
+    };
+
+const NEED_ORDER = [
+  "currentWork",
+  "need1",
+  "need2",
+  "need3",
+  "need4",
+  "need5",
+  "need6",
+  "need7",
+  "need8",
+  "need9",
+  "need10",
+  "need11"
+  ];
+    
+    function scoreWidth(score) {
+      const n = Number(score || 0);
+      return Math.max(0, Math.min(100, (n / 5) * 100));
+    }
+
+    function safe(value, fallback = "-") {
+      return value === null || value === undefined || value === "" ? fallback : value;
+    }
+
+    async function login() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  document.getElementById("loginStatus").textContent = "로그인 중...";
+
+  const { data, error } = await sb.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    document.getElementById("loginStatus").textContent =
+      "로그인 실패: " + error.message;
+    return;
+  }
+
+  currentSession = data.session;
+
+  document.getElementById("loginStatus").textContent =
+    "로그인 완료: " + data.user.email;
+
+  if (typeof loadGptProviderConfigs === "function") {
+    await loadGptProviderConfigs();
+  }
+} 
+
+async function loadProjectCoacheeList() {
+  const container = document.getElementById("coacheeListContainer");
+
+  container.textContent = "피코치 목록 조회 중...";
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    container.textContent = "먼저 로그인하세요.";
+    return;
+  }
+
+  const { data, error } = await sb
+    .from("project_coachees")
+    .select(`
+      id,
+      project_id,
+      coachee_id,
+      participant_id,
+      participant_code,
+      onboarding_status,
+      diagnosis_status,
+      needs_status,
+      report_status,
+      session1_documents_status,
+      session1_documents_ready_at,
+      coachees (
+        id,
+        name,
+        email,
+        organization,
+        department,
+        position,
+        job_level,
+        job_title
+      )
+    `)
+    .eq("project_id", CURRENT_PROJECT_ID)
+    .order("participant_code", { ascending: true });
+
+  if (error) {
+    container.textContent = "피코치 목록 조회 실패: " + error.message;
+    return;
+  }
+
+  latestProjectCoachees = data || [];
+  renderProjectCoacheeList(latestProjectCoachees);
+}
+
+function renderProjectCoacheeList(rows) {
+  const container = document.getElementById("coacheeListContainer");
+
+  if (!rows.length) {
+    container.textContent = "조회된 피코치가 없습니다.";
+    return;
+  }
+
+  const html = `
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 90px;">선택</th>
+          <th style="width: 110px;">참여코드</th>
+          <th style="width: 140px;">성명</th>
+          <th style="width: 140px;">직책</th>
+          <th style="width: 150px;">진단</th>
+          <th style="width: 150px;">니즈</th>
+          <th style="width: 180px;">리포트</th>
+          <th style="width: 180px;">1회차 자료</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(row => {
+          const coachee = row.coachees || {};
+
+          return `
+            <tr>
+              <td>
+                <button class="secondary" onclick="selectProjectCoachee('${escapeHtml(row.id)}')">
+                  선택
+                </button>
+              </td>
+              <td>${escapeHtml(row.participant_code || "-")}</td>
+              <td>${escapeHtml(coachee.name || "-")}</td>
+              <td>${escapeHtml(coachee.position || coachee.job_title || "-")}</td>
+              <td>${renderStatusBadge(row.diagnosis_status)}</td>
+              <td>${renderStatusBadge(row.needs_status)}</td>
+              <td>${renderStatusBadge(row.report_status)}</td>
+              <td>
+                ${renderStatusBadge(row.session1_documents_status)}
+                ${row.session1_documents_ready_at ? `<div class="muted">${escapeHtml(row.session1_documents_ready_at)}</div>` : ""}
+              </td>
+            </tr>
+          `;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+
+  container.innerHTML = html;
+}
+
+function renderStatusBadge(status) {
+  const value = status || "-";
+
+  let badgeClass = "";
+
+  if (
+    value === "completed" ||
+    value === "ready" ||
+    value === "session1_package_ready" ||
+    value === "generated" ||
+    value === "success"
+  ) {
+    badgeClass = "ok";
+  } else if (
+    value === "failed" ||
+    value === "error" ||
+    value === "rejected" ||
+    value === "not_ready"
+  ) {
+    badgeClass = "warn";
+  }
+
+  return `<span class="badge ${badgeClass}">${escapeHtml(value)}</span>`;
+}
+
+
+async function loadCoacheeReadinessDashboard() {
+  const container = document.getElementById("coacheeDashboardContainer");
+
+  container.textContent = "자료 생성 상태 대시보드 조회 중...";
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    container.textContent = "먼저 로그인하세요.";
+    return;
+  }
+
+  const { data: coachees, error: coacheeError } = await sb
+    .from("project_coachees")
+    .select(`
+      id,
+      project_id,
+      coachee_id,
+      participant_id,
+      participant_code,
+      diagnosis_status,
+      needs_status,
+      report_status,
+      session1_documents_status,
+      session1_documents_ready_at,
+      coachees (
+        id,
+        name,
+        email,
+        organization,
+        department,
+        position,
+        job_title
+      )
+    `)
+    .eq("project_id", CURRENT_PROJECT_ID)
+    .order("participant_code", { ascending: true });
+
+  if (coacheeError) {
+    container.textContent =
+      "피코치 목록 조회 실패: " + coacheeError.message;
+    return;
+  }
+
+  const rows = coachees || [];
+
+  if (!rows.length) {
+    container.textContent = "조회된 피코치가 없습니다.";
+    return;
+  }
+
+  // 대시보드에서 바로 선택해도 selectProjectCoachee가 찾을 수 있도록 전역 목록을 갱신합니다.
+  latestProjectCoachees = rows;
+
+  const projectCoacheeIds = rows.map(row => row.id);
+
+  const { data: gptRows, error: gptError } = await sb
+    .from("manual_gpt_outputs")
+    .select(`
+      id,
+      project_coachee_id,
+      output_type,
+      output_round,
+      parse_status,
+      status,
+      is_selected_final,
+      created_at
+    `)
+    .in("project_coachee_id", projectCoacheeIds)
+    .eq("output_round", "integrated_final")
+    .eq("is_selected_final", true)
+    .eq("parse_status", "parsed")
+    .eq("status", "saved");
+
+  if (gptError) {
+    container.textContent =
+      "GPT 최종본 상태 조회 실패: " + gptError.message;
+    return;
+  }
+
+  const { data: documentRows, error: documentError } = await sb
+    .from("session_document_outputs")
+    .select(`
+      id,
+      project_coachee_id,
+      session_no,
+      document_no,
+      file_exists,
+      status,
+      file_name,
+      registered_at
+    `)
+    .in("project_coachee_id", projectCoacheeIds)
+    .eq("session_no", 1)
+    .in("document_no", [1, 2, 3, 4, 99]);
+
+  if (documentError) {
+    container.textContent =
+      "세션자료 상태 조회 실패: " + documentError.message;
+    return;
+  }
+
+  const evaluated = rows.map(row => evaluateCoacheeReadiness(
+  row,
+  gptRows || [],
+  documentRows || []
+  ));
+
+  latestCoacheeReadinessRows = evaluated;
+  window.latestCoacheeReadinessRows = evaluated;
+
+  renderCoacheeReadinessDashboard(evaluated);
+
+  const batchContainer = document.getElementById("batchCandidateContainer");
+  if (batchContainer && batchContainer.textContent !== "아직 조회하지 않았습니다.") {
+    await loadBatchPipelineCandidates();
+  }
+}
+
+async function loadBatchPipelineCandidates() {
+  const container = document.getElementById("batchCandidateContainer");
+
+  container.textContent = "일괄 실행 후보 조회 중...";
+
+  if (!latestCoacheeReadinessRows.length) {
+    await loadCoacheeReadinessDashboard();
+  }
+
+  if (!latestCoacheeReadinessRows.length) {
+    container.textContent = "대시보드 데이터를 조회하지 못했습니다.";
+    return;
+  }
+
+  const candidates = latestCoacheeReadinessRows.filter(row =>
+    row.readiness?.pipelineReady === true &&
+    row.readiness?.packageReady !== true
+  );
+
+  const alreadyDone = latestCoacheeReadinessRows.filter(row =>
+    row.readiness?.packageReady === true
+  );
+
+  const needCheck = latestCoacheeReadinessRows.filter(row =>
+    row.readiness?.pipelineReady !== true &&
+    row.readiness?.packageReady !== true
+  );
+
+  renderBatchPipelineCandidates({
+    candidates,
+    alreadyDone,
+    needCheck,
+    allRows: latestCoacheeReadinessRows,
+  });
+}
+
+async function runSingleBatchCandidate(projectCoacheeId) {
+  const container = document.getElementById("batchCandidateContainer");
+
+  if (!projectCoacheeId) {
+    alert("project_coachee_id가 없습니다.");
+    return;
+  }
+
+  const row = (latestCoacheeReadinessRows || []).find(item =>
+    item.id === projectCoacheeId
+  );
+
+  if (!row) {
+    alert("일괄 실행 후보 목록에서 해당 피코치를 찾을 수 없습니다. 후보를 다시 조회하세요.");
+    return;
+  }
+
+  if (row.readiness?.packageReady === true) {
+    alert("이미 패키지 완료 상태인 피코치입니다. 후보 실행 대상에서 제외됩니다.");
+    return;
+  }
+
+  if (row.readiness?.pipelineReady !== true) {
+    alert("아직 파이프라인 실행 가능 상태가 아닙니다. 점검 필요 항목을 먼저 확인하세요.");
+    return;
+  }
+
+  if (container) {
+    container.insertAdjacentHTML(
+      "afterbegin",
+      `
+        <div class="card" style="margin-bottom: 12px;">
+          <div class="sub-title">개별 후보 실행 준비</div>
+          <p class="muted">
+            선택한 피코치로 화면을 전환한 뒤, 기존 파이프라인 실행 안전장치를 통해 실행합니다.
+          </p>
+        </div>
+      `
+    );
+  }
+
+  await selectProjectCoachee(projectCoacheeId);
+
+  if (typeof runSession1PipelineFromLocalRunner === "function") {
+    await runSession1PipelineFromLocalRunner(false);
+  }
+
+  if (typeof loadBatchPipelineCandidates === "function") {
+    await loadBatchPipelineCandidates();
+  }
+}
+
+function renderBatchPipelineCandidates({ candidates, alreadyDone, needCheck, allRows }) {
+  const container = document.getElementById("batchCandidateContainer");
+
+  const html = `
+    <div class="grid" style="margin-bottom: 14px;">
+      ${renderDashboardMetricCard("전체", allRows.length, "명")}
+      ${renderDashboardMetricCard("일괄 실행 후보", candidates.length, "명")}
+      ${renderDashboardMetricCard("이미 완료", alreadyDone.length, "명")}
+      ${renderDashboardMetricCard("점검 필요", needCheck.length, "명")}
+    </div>
+
+    <div class="card" style="margin-bottom: 14px;">
+      <div class="sub-title">일괄 실행 후보 기준</div>
+      <p class="muted">
+        후보는 진단/니즈/GPT3/GPT4/1번/2번 자료가 모두 준비되어 있고,
+        아직 1회차 ZIP 패키지가 완료되지 않은 피코치입니다.
+      </p>
+      <p>
+        <span class="badge primary">후보 ${candidates.length}명</span>
+        <span class="badge ok">이미 완료 ${alreadyDone.length}명</span>
+        <span class="badge warn">점검 필요 ${needCheck.length}명</span>
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="sub-title">일괄 실행 후보 목록</div>
+      ${renderBatchCandidateTable(candidates, "candidate")}
+    </div>
+
+    <div class="card" style="margin-top: 14px;">
+      <details>
+        <summary>이미 패키지 완료된 피코치 보기 (${alreadyDone.length}명)</summary>
+        ${renderBatchCandidateTable(alreadyDone, "done")}
+      </details>
+    </div>
+
+    <div class="card" style="margin-top: 14px;">
+      <details>
+        <summary>점검 필요 피코치 보기 (${needCheck.length}명)</summary>
+        ${renderBatchCandidateTable(needCheck, "needCheck")}
+      </details>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+function renderBatchCandidateTable(rows, mode = "candidate") {
+  if (!rows.length) {
+    return `
+      <p class="muted" style="margin-top: 10px;">
+        해당 조건의 피코치가 없습니다.
+      </p>
+    `;
+  }
+
+  return `
+    <table style="margin-top: 10px;">
+      <thead>
+        <tr>
+          <th style="width: 160px;">작업</th>
+          <th style="width: 110px;">참여코드</th>
+          <th style="width: 120px;">성명</th>
+          <th style="width: 140px;">상태</th>
+          <th>점검 요약</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(row => {
+          const coachee = row.coachees || {};
+          const r = row.readiness || {};
+
+          const statusClass =
+            r.packageReady
+              ? "ok"
+              : r.pipelineReady
+                ? "primary"
+                : "warn";
+
+          return `
+            <tr>
+              <td>
+                <button class="secondary" onclick="selectProjectCoachee('${escapeHtml(row.id)}')">
+                  선택
+                </button>
+                ${
+                  mode === "candidate"
+                    ? `
+                      <button onclick="runSingleBatchCandidate('${escapeHtml(row.id)}')" style="margin-left: 6px;">
+                        선택 후 실행
+                      </button>
+                `
+                : ""
+              }
+              </td>
+              <td>${escapeHtml(row.participant_code || "-")}</td>
+              <td>${escapeHtml(coachee.name || "-")}</td>
+              <td>
+                <span class="badge ${statusClass}">
+                  ${escapeHtml(r.readinessStatus || "-")}
+                </span>
+              </td>
+              <td>
+                진단 ${r.diagnosisReady ? "OK" : "NG"} /
+                니즈 ${r.needsReady ? "OK" : "NG"} /
+                GPT3 ${r.hasDoc3Gpt ? "OK" : "NG"} /
+                GPT4 ${r.hasDoc4Gpt ? "OK" : "NG"} /
+                1번 ${r.doc1Ready ? "OK" : "NG"} /
+                2번 ${r.doc2Ready ? "OK" : "NG"} /
+                ZIP ${r.zipReady ? "OK" : "NG"}
+              </td>
+            </tr>
+          `;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function evaluateCoacheeReadiness(coacheeRow, gptRows, documentRows) {
+  const projectCoacheeId = coacheeRow.id;
+
+  const gptForCoachee = gptRows.filter(row =>
+    row.project_coachee_id === projectCoacheeId
+  );
+
+  const hasDoc3Gpt = gptForCoachee.some(row =>
+    row.output_type === "doc3_needs_analysis_deep_question_guide"
+  );
+
+  const hasDoc4Gpt = gptForCoachee.some(row =>
+    row.output_type === "doc4_integrated_feedback_guide"
+  );
+
+  const docsForCoachee = documentRows.filter(row =>
+    row.project_coachee_id === projectCoacheeId
+  );
+
+  const hasReadyDocument = (documentNo) => {
+    return docsForCoachee.some(row =>
+      Number(row.document_no) === Number(documentNo) &&
+      row.status === "generated" &&
+      row.file_exists === true
+    );
+  };
+
+  const doc1Ready = hasReadyDocument(1);
+  const doc2Ready = hasReadyDocument(2);
+  const doc3Ready = hasReadyDocument(3);
+  const doc4Ready = hasReadyDocument(4);
+  const zipReady = hasReadyDocument(99);
+
+  const requiredDocumentsReady =
+    doc1Ready && doc2Ready && doc3Ready && doc4Ready;
+
+  const diagnosisReady = coacheeRow.diagnosis_status === "completed";
+  const needsReady = coacheeRow.needs_status === "completed";
+  const gptReady = hasDoc3Gpt && hasDoc4Gpt;
+
+  const pipelineReady =
+    diagnosisReady &&
+    needsReady &&
+    gptReady &&
+    doc1Ready &&
+    doc2Ready;
+
+  const packageReady =
+    requiredDocumentsReady && zipReady;
+
+  let readinessStatus = "점검 필요";
+
+  if (packageReady) {
+    readinessStatus = "패키지 완료";
+  } else if (pipelineReady) {
+    readinessStatus = "생성 가능";
+  }
+
+  return {
+    ...coacheeRow,
+    readiness: {
+      diagnosisReady,
+      needsReady,
+      hasDoc3Gpt,
+      hasDoc4Gpt,
+      gptReady,
+      doc1Ready,
+      doc2Ready,
+      doc3Ready,
+      doc4Ready,
+      requiredDocumentsReady,
+      zipReady,
+      pipelineReady,
+      packageReady,
+      readinessStatus,
+    },
+  };
+}
+
+function setReadinessFilter(filterName) {
+  currentReadinessFilter = filterName || "all";
+
+  if (!latestCoacheeReadinessRows.length) {
+    const container = document.getElementById("coacheeDashboardContainer");
+    container.textContent = "먼저 자료 생성 상태 대시보드를 조회하세요.";
+    return;
+  }
+
+  renderCoacheeReadinessDashboard(latestCoacheeReadinessRows);
+}
+
+function applyReadinessFilter(rows) {
+  if (currentReadinessFilter === "pipelineReady") {
+    return rows.filter(row =>
+      row.readiness?.pipelineReady === true &&
+      row.readiness?.packageReady !== true
+    );
+  }
+
+  if (currentReadinessFilter === "packageReady") {
+    return rows.filter(row =>
+      row.readiness?.packageReady === true
+    );
+  }
+
+  if (currentReadinessFilter === "needCheck") {
+    return rows.filter(row =>
+      row.readiness?.packageReady !== true &&
+      row.readiness?.pipelineReady !== true
+    );
+  }
+
+  return rows;
+}
+
+function getReadinessFilterLabel() {
+  if (currentReadinessFilter === "pipelineReady") return "생성 가능";
+  if (currentReadinessFilter === "packageReady") return "패키지 완료";
+  if (currentReadinessFilter === "needCheck") return "점검 필요";
+  return "전체";
+}
+
+function renderCoacheeReadinessDashboard(rows) {
+  const container = document.getElementById("coacheeDashboardContainer");
+
+  const allRows = rows || [];
+  const filteredRows = applyReadinessFilter(allRows);
+
+  const totalCount = allRows.length;
+  const diagnosisCount = allRows.filter(row => row.readiness.diagnosisReady).length;
+  const needsCount = allRows.filter(row => row.readiness.needsReady).length;
+  const gptReadyCount = allRows.filter(row => row.readiness.gptReady).length;
+  const requiredDocsReadyCount = allRows.filter(row => row.readiness.requiredDocumentsReady).length;
+  const packageReadyCount = allRows.filter(row => row.readiness.packageReady).length;
+  const pipelineReadyCount = allRows.filter(row => row.readiness.pipelineReady).length;
+
+  const html = `
+    <div class="grid" style="margin-bottom: 14px;">
+      ${renderDashboardMetricCard("전체", totalCount, "명")}
+      ${renderDashboardMetricCard("진단 완료", diagnosisCount, "명")}
+      ${renderDashboardMetricCard("니즈 완료", needsCount, "명")}
+      ${renderDashboardMetricCard("GPT 준비", gptReadyCount, "명")}
+    </div>
+
+    <div class="grid" style="margin-bottom: 14px;">
+      ${renderDashboardMetricCard("실행 가능", pipelineReadyCount, "명")}
+      ${renderDashboardMetricCard("필수자료 완료", requiredDocsReadyCount, "명")}
+      ${renderDashboardMetricCard("ZIP 완료", packageReadyCount, "명")}
+      ${renderDashboardMetricCard("점검 필요", totalCount - packageReadyCount, "명")}
+    </div>
+
+    <div class="card" style="margin-bottom: 14px;">
+  <div class="sub-title">실행 대상 안내</div>
+  <p class="muted">
+    생성 가능 상태는 진단/니즈/GPT 최종본/1번/2번 자료가 준비되어
+    3번/4번 DOCX와 ZIP 패키지 생성, 선택을 실행할 수 있는 상태입니다.
+  </p>
+  <p>
+    <span class="badge primary">생성 가능 ${pipelineReadyCount}명</span>
+    <span class="badge ok">패키지 완료 ${packageReadyCount}명</span>
+    <span class="badge warn">점검 필요 ${totalCount - packageReadyCount - pipelineReadyCount}명</span>
+  </p>
+</div>
+
+    <div class="card">
+      <div class="sub-title">
+        피코치별 자료 생성 상태
+        <span class="badge primary">${escapeHtml(getReadinessFilterLabel())}</span>
+        <span class="muted">표시 ${filteredRows.length}명 / 전체 ${allRows.length}명</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 90px;">선택</th>
+            <th style="width: 110px;">참여코드</th>
+            <th style="width: 120px;">성명</th>
+            <th style="width: 140px;">상태</th>
+            <th style="width: 90px;">진단</th>
+            <th style="width: 90px;">니즈</th>
+            <th style="width: 90px;">GPT3</th>
+            <th style="width: 90px;">GPT4</th>
+            <th style="width: 90px;">1번</th>
+            <th style="width: 90px;">2번</th>
+            <th style="width: 90px;">3번</th>
+            <th style="width: 90px;">4번</th>
+            <th style="width: 90px;">ZIP</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredRows.length
+            ? filteredRows.map(row => renderCoacheeReadinessRow(row)).join("")
+            : `
+              <tr>
+                <td colspan="13" class="muted">
+                  현재 필터 조건에 해당하는 피코치가 없습니다.
+                </td>
+              </tr>
+          `}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+function renderDashboardMetricCard(label, value, suffix = "") {
+  return `
+    <div class="card">
+      <div class="label">${escapeHtml(label)}</div>
+      <div class="score">${escapeHtml(value)}${escapeHtml(suffix)}</div>
+    </div>
+  `;
+}
+
+function renderCoacheeReadinessRow(row) {
+  const coachee = row.coachees || {};
+  const r = row.readiness || {};
+
+  const statusClass =
+    r.packageReady
+      ? "ok"
+      : r.pipelineReady
+        ? "primary"
+        : "warn";
+
+  return `
+    <tr>
+      <td>
+        <button class="secondary" onclick="selectProjectCoachee('${escapeHtml(row.id)}')">
+          선택
+        </button>
+      </td>
+      <td>${escapeHtml(row.participant_code || "-")}</td>
+      <td>${escapeHtml(coachee.name || "-")}</td>
+      <td>
+        <span class="badge ${statusClass}">
+          ${escapeHtml(r.readinessStatus || "점검 필요")}
+        </span>
+      </td>
+      <td>${renderBooleanBadge(r.diagnosisReady)}</td>
+      <td>${renderBooleanBadge(r.needsReady)}</td>
+      <td>${renderBooleanBadge(r.hasDoc3Gpt)}</td>
+      <td>${renderBooleanBadge(r.hasDoc4Gpt)}</td>
+      <td>${renderBooleanBadge(r.doc1Ready)}</td>
+      <td>${renderBooleanBadge(r.doc2Ready)}</td>
+      <td>${renderBooleanBadge(r.doc3Ready)}</td>
+      <td>${renderBooleanBadge(r.doc4Ready)}</td>
+      <td>${renderBooleanBadge(r.zipReady)}</td>
+    </tr>
+  `;
+}
+
+function renderBooleanBadge(ok) {
+  return ok
+    ? `<span class="badge ok">OK</span>`
+    : `<span class="badge warn">NG</span>`;
+}
+
+
+async function selectProjectCoachee(projectCoacheeId) {
+  // Phase 46 보정:
+  // 0번 피코치 목록에서 선택한 경우에는 latestProjectCoachees에 row가 있고,
+  // 0-1 대시보드에서 바로 선택한 경우에는 window.latestCoacheeReadinessRows에 row가 있습니다.
+  const sources = [
+    ...(latestProjectCoachees || []),
+    ...(window.latestCoacheeReadinessRows || []),
+  ];
+
+  const row = sources.find(item => item.id === projectCoacheeId);
+
+  if (!row) {
+    alert(
+      "선택한 피코치를 찾을 수 없습니다.\n" +
+      "먼저 '피코치 목록 조회' 또는 '자료 생성 상태 대시보드 조회'를 다시 실행한 뒤 선택하세요."
+    );
+    return;
+  }
+
+  // 다음 선택을 위해 목록 전역값도 보강합니다.
+  if (!latestProjectCoachees.some(item => item.id === row.id)) {
+    latestProjectCoachees = [row, ...latestProjectCoachees];
+  }
+
+  const coachee = row.coachees || {};
+  const participantCode = row.participant_code || "";
+
+  const projectCoacheeInput = document.getElementById("projectCoacheeId");
+
+  if (projectCoacheeInput) {
+    projectCoacheeInput.value = row.id;
+  }
+
+  const container = document.getElementById("coacheeListContainer");
+
+  const noticeHtml = `
+    <div class="card" style="margin-bottom: 12px;">
+      <div class="sub-title">선택된 피코치</div>
+      <p>
+        <b>${escapeHtml(coachee.name || "-")}</b>
+        / ${escapeHtml(coachee.position || coachee.job_title || "-")}
+        / ${escapeHtml(participantCode || "-")}
+      </p>
+      <p class="muted">
+        project_coachee_id=${escapeHtml(row.id)}
+      </p>
+    </div>
+  `;
+
+  if (container) {
+    renderProjectCoacheeList(latestProjectCoachees);
+    container.insertAdjacentHTML("afterbegin", noticeHtml);
+  }
+
+  if (typeof loadReport === "function") {
+    await loadReport();
+  }
+
+  if (typeof loadGptOutputStatus === "function") {
+    await loadGptOutputStatus();
+  }
+
+  if (typeof loadSessionFileStatus === "function") {
+    await loadSessionFileStatus();
+  }
+
+  if (typeof loadPipelineRuns === "function") {
+    await loadPipelineRuns(false);
+  }
+
+  if (typeof loadSessionDocuments === "function") {
+    await loadSessionDocuments();
+  }
+}
+
+
+async function loadReport() {
+  document.getElementById("loadStatus").textContent = "리포트 조회 중...";
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    document.getElementById("loadStatus").textContent = "먼저 로그인하세요.";
+    return;
+  }
+
+  // Phase 30: 로그인 세션 확인 후 GPT 설정값 로드
+  if (typeof loadGptProviderConfigs === "function" && !gptProviderConfigs.length) {
+    await loadGptProviderConfigs();
+  }
+
+      const projectCoacheeId = document.getElementById("projectCoacheeId").value.trim();
+
+      const res = await fetch(
+        "https://kvmhibfxysqnrfekiatf.supabase.co/functions/v1/get-leadership-report",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${currentSession.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            project_coachee_id: projectCoacheeId,
+          }),
+        }
+      );
+
+      const json = await res.json();
+
+      if (!json.ok) {
+        document.getElementById("loadStatus").textContent =
+          "조회 실패: " + JSON.stringify(json);
+        return;
+      }
+
+      latestReport = json.data;
+renderReport(latestReport);
+
+document.getElementById("loadStatus").textContent = "리포트 조회 완료";
+document.getElementById("rawJson").textContent = JSON.stringify(json, null, 2);
+
+generateDoc3Prompt();
+
+if (typeof loadSessionDocuments === "function") {
+  await loadSessionDocuments();
+}
+    }
+
+    function renderReport(data) {
+      const pc = data.project_coachee;
+      const client = data.client;
+      const project = data.project;
+      const coachee = data.coachee;
+      const submission = data.submission;
+      const result = data.report_result?.result_json;
+
+      if (!result) {
+        document.getElementById("loadStatus").textContent = "리포트 결과가 아직 없습니다.";
+        return;
+      }
+
+      document.getElementById("reportArea").classList.remove("hidden");
+
+      document.getElementById("coacheeName").textContent = safe(coachee?.name);
+      document.getElementById("coacheeMeta").textContent =
+        `${safe(coachee?.organization)} / ${safe(coachee?.department)} / ${safe(coachee?.position)} / ${safe(coachee?.email)}`;
+
+      document.getElementById("projectName").textContent = safe(project?.project_name);
+      document.getElementById("projectMeta").textContent =
+        `${safe(client?.client_name)} / ${safe(project?.start_date)} ~ ${safe(project?.end_date)} / ${safe(pc?.participant_code)}`;
+
+      document.getElementById("overallScore").textContent =
+        Number(result.overall_score).toFixed(2);
+
+      document.getElementById("overallBar").style.width =
+        `${scoreWidth(result.overall_score)}%`;
+
+      document.getElementById("overallSummary").textContent =
+        safe(result.interpretation?.summary);
+
+      document.getElementById("strengthHint").textContent =
+        safe(result.interpretation?.strength_hint);
+
+      document.getElementById("developmentHint").textContent =
+        safe(result.interpretation?.development_hint);
+
+      document.getElementById("reportStatus").textContent =
+        "report: " + safe(pc.report_status);
+
+      document.getElementById("diagnosisStatus").textContent =
+        "diagnosis: " + safe(pc.diagnosis_status);
+
+      document.getElementById("needsStatus").textContent =
+        "needs: " + safe(pc.needs_status);
+
+      document.getElementById("submittedAt").textContent =
+        "제출일시: " + safe(submission?.submitted_at);
+
+      renderGroupScores(result.group_scores || []);
+      renderFactorScores(result.factor_scores || []);
+      renderHighlights(result.highlights || {});
+      renderNeeds(data.needs_response?.answers || {});
+      renderQuestions(result.question_scores || []);
+    }
+
+    function renderGroupScores(groups) {
+      const el = document.getElementById("groupScores");
+      el.innerHTML = "";
+
+      groups.forEach((g) => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <div class="label">${g.group_code}</div>
+          <div class="sub-title">${g.group_name}</div>
+          <div class="score">${Number(g.score).toFixed(2)}</div>
+          <div class="bar-wrap">
+            <div class="bar" style="width: ${scoreWidth(g.score)}%;"></div>
+          </div>
+        `;
+        el.appendChild(div);
+      });
+    }
+
+    function renderFactorScores(factors) {
+      const el = document.getElementById("factorScores");
+      el.innerHTML = "";
+
+      factors.forEach((f) => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <div class="label">${f.factor_code} / ${f.group_name}</div>
+          <div class="sub-title">${f.factor_name}</div>
+          <div class="score">${Number(f.score).toFixed(2)}</div>
+          <div class="muted">${f.question_codes.join(", ")}</div>
+          <div class="bar-wrap">
+            <div class="bar" style="width: ${scoreWidth(f.score)}%;"></div>
+          </div>
+        `;
+        el.appendChild(div);
+      });
+    }
+
+    function renderHighlights(highlights) {
+      const highEl = document.getElementById("highestFactors");
+      const lowEl = document.getElementById("lowestFactors");
+
+      highEl.innerHTML = "";
+      lowEl.innerHTML = "";
+
+      (highlights.highest_factors || []).forEach((f) => {
+        const p = document.createElement("p");
+        p.innerHTML = `<span class="badge green">${f.factor_code}</span> ${f.factor_name} — <b>${Number(f.score).toFixed(2)}</b>`;
+        highEl.appendChild(p);
+      });
+
+      (highlights.lowest_factors || []).forEach((f) => {
+        const p = document.createElement("p");
+        p.innerHTML = `<span class="badge orange">${f.factor_code}</span> ${f.factor_name} — <b>${Number(f.score).toFixed(2)}</b>`;
+        lowEl.appendChild(p);
+      });
+    }
+
+    function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function renderNeeds(needs) {
+  const el = document.getElementById("needsTable");
+  el.innerHTML = "";
+
+  const keys = [
+    ...NEED_ORDER.filter((key) => Object.prototype.hasOwnProperty.call(needs, key)),
+    ...Object.keys(needs).filter((key) => !NEED_ORDER.includes(key))
+  ];
+
+  keys.forEach((key) => {
+    const tr = document.createElement("tr");
+    const label = NEED_LABELS[key] || key;
+    const value = needs[key];
+
+    tr.innerHTML = `
+      <td>
+        <b>${escapeHtml(label)}</b>
+        <div class="muted">${escapeHtml(key)}</div>
+      </td>
+      <td>${escapeHtml(value)}</td>
+    `;
+
+    el.appendChild(tr);
+  });
+}
+
+    function renderQuestions(questions) {
+      const el = document.getElementById("questionTable");
+      el.innerHTML = "";
+
+      questions.forEach((q) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${q.question_code}</td>
+          <td>${q.score}</td>
+        `;
+        el.appendChild(tr);
+      });
+    }
+
+    function toggleRaw() {
+      document.getElementById("rawPanel").classList.toggle("hidden");
+    }
+
+    function togglePrompt() {
+  document.getElementById("promptPanel").classList.toggle("hidden");
+
+  if (latestReport && !document.getElementById("gptPromptText").textContent.trim()) {
+    generateDoc3Prompt();
+  }
+}
+
+function formatScoreList(items, codeKey, nameKey) {
+  return (items || [])
+    .map((item) => {
+      const code = item[codeKey];
+      const name = item[nameKey];
+      const score = Number(item.score).toFixed(2);
+      return `- ${code} ${name}: ${score}점`;
+    })
+    .join("\n");
+}
+
+function formatQuestionScores(questions) {
+  return (questions || [])
+    .map((q) => `- ${q.question_code}: ${q.score}점`)
+    .join("\n");
+}
+
+function formatNeedsAnswers(needs) {
+  const keys = [
+    ...NEED_ORDER.filter((key) => Object.prototype.hasOwnProperty.call(needs, key)),
+    ...Object.keys(needs).filter((key) => !NEED_ORDER.includes(key))
+  ];
+
+  return keys
+    .map((key) => {
+      const label = NEED_LABELS[key] || key;
+      const value = needs[key] || "";
+      return `- ${label} (${key}): ${value}`;
+    })
+    .join("\n");
+}
+
+function formatHighlights(items) {
+  return (items || [])
+    .map((item) => `- ${item.factor_code} ${item.factor_name}: ${Number(item.score).toFixed(2)}점`)
+    .join("\n");
+}
+
+function formatJsonBlock(obj) {
+  return JSON.stringify(obj, null, 2);
+}
+
+let gptProviderConfigs = [];
+
+function getSelectedRadioValue(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : null;
+}
+
+
+function getSelectedGenerationSettings() {
+  // 확정 운영 기준:
+  // - generation_mode가 생성 방식을 대표한다.
+  // - web_manual = 운영자가 웹 GPT에서 생성한 결과를 수동 붙여넣기
+  // - api_auto = 시스템이 API로 자동 생성
+  // - generation_channel은 보조 기록값으로만 유지한다.
+  const generationMode =
+    getSelectedRadioValue("generationMode") ||
+    getSelectedRadioValue("generationChannel") ||
+    "web_manual";
+
+  const generationChannel = generationMode === "api_auto" ? "api" : "web_manual";
+
+  return {
+    generation_channel: generationChannel,
+    generation_mode: generationMode,
+    review_mode: "three_step_workflow",
+    gpt1_config_id: document.getElementById("gptConfigGpt1")?.value || null,
+    gpt2_config_id: document.getElementById("gptConfigGpt2")?.value || null,
+    gpt3_config_id: document.getElementById("gptConfigIntegrator")?.value || null,
+    integrator_config_id: document.getElementById("gptConfigIntegrator")?.value || null,
+    final_reviewer_config_id: document.getElementById("gptConfigFinalReviewer")?.value || null,
+  };
+}
+
+function getSelectedGptOutputRound() {
+  const selected = document.querySelector(`input[name="gptOutputRound"]:checked`);
+  return selected ? selected.value : "draft_1";
+}
+
+
+function getGptSlotByOutputRound(outputRound) {
+  if (outputRound === "draft_1") return "gpt1";
+  if (outputRound === "draft_2") return "gpt2";
+  if (outputRound === "integrated_final") return "gpt3";
+  return "gpt1";
+}
+
+function getReviewModeByOutputRound(outputRound) {
+  if (outputRound === "draft_1") return "primary_draft";
+  if (outputRound === "draft_2") return "secondary_review";
+  if (outputRound === "integrated_final") return "mece_integrated";
+  return "primary_draft";
+}
+
+function getIsSelectedFinalByOutputRound(outputRound) {
+  return outputRound === "integrated_final";
+}
+
+
+function getGptConfigIdBySlot(gptSlot) {
+  const generationSettings = getSelectedGenerationSettings();
+
+  if (gptSlot === "gpt1") {
+    return generationSettings.gpt1_config_id;
+  }
+
+  if (gptSlot === "gpt2") {
+    return generationSettings.gpt2_config_id;
+  }
+
+  if (gptSlot === "gpt3" || gptSlot === "integrator") {
+    return generationSettings.gpt3_config_id || generationSettings.integrator_config_id;
+  }
+
+  if (gptSlot === "final_reviewer") {
+    return generationSettings.final_reviewer_config_id;
+  }
+
+  return null;
+}
+
+function setCurrentPromptSlot(gptSlot, promptRound, parentPromptLogId = null) {
+  currentPromptGptSlot = gptSlot || "gpt1";
+  currentPromptRound = promptRound || "draft_1";
+  currentParentPromptLogId = parentPromptLogId;
+
+  const statusEl = document.getElementById("promptTypeStatus");
+  if (statusEl) {
+    statusEl.textContent =
+      `${statusEl.textContent} / ${currentPromptGptSlot} / ${currentPromptRound}`;
+  }
+}
+
+async function loadGptProviderConfigs() {
+  const statusEl = document.getElementById("generationModeStatus");
+
+  if (statusEl) {
+    statusEl.textContent = "GPT 설정 조회 중...";
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    if (statusEl) {
+      statusEl.textContent = "GPT 설정 조회 실패: 먼저 로그인하세요.";
+    }
+    return;
+  }
+
+  const { data, error } = await sb
+    .from("gpt_provider_configs")
+    .select(`
+      id,
+      config_code,
+      display_name,
+      gpt_slot,
+      execution_type,
+      provider,
+      model_name,
+      role_description,
+      is_active,
+      sort_order
+    `)
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    console.error("[loadGptProviderConfigs] error", error);
+
+    if (statusEl) {
+      statusEl.textContent =
+        "GPT 설정 조회 실패: " + error.message;
+    }
+    return;
+  }
+
+  gptProviderConfigs = data || [];
+
+  console.log("[loadGptProviderConfigs] loaded", gptProviderConfigs);
+
+  renderGptConfigSelects();
+
+  if (statusEl) {
+    statusEl.textContent =
+      `GPT 설정 ${gptProviderConfigs.length}개 로드 완료`;
+  }
+}
+
+
+function renderGptConfigSelects() {
+  // API 자동화 시 1개 provider/model을 GPT 1차 생성, GPT 더블체크, GPT 최종 통합에
+  // 중복 선택할 수 있도록 모든 active config를 각 select에 표시한다.
+  const targets = [
+    ["gptConfigGpt1", "gpt1", "GPT 1차 생성"],
+    ["gptConfigGpt2", "gpt2", "GPT 더블체크"],
+    ["gptConfigIntegrator", "gpt3", "GPT 최종 통합"],
+    ["gptConfigFinalReviewer", "common", "예비/참고"],
+  ];
+
+  for (const [selectId, preferredSlot, label] of targets) {
+    const select = document.getElementById(selectId);
+
+    if (!select) {
+      console.warn("[renderGptConfigSelects] select not found:", selectId);
+      continue;
+    }
+
+    const rows = [...gptProviderConfigs].sort((a, b) => {
+      const aPreferred = a.gpt_slot === preferredSlot || a.gpt_slot === "common" ? 0 : 1;
+      const bPreferred = b.gpt_slot === preferredSlot || b.gpt_slot === "common" ? 0 : 1;
+      if (aPreferred !== bPreferred) return aPreferred - bPreferred;
+      return (a.sort_order || 100) - (b.sort_order || 100);
+    });
+
+    if (!rows.length) {
+      select.innerHTML = `<option value="">설정 없음</option>`;
+      continue;
+    }
+
+    select.innerHTML = rows.map(row => {
+      const slotLabel = row.gpt_slot ? ` / 권장:${escapeHtml(row.gpt_slot)}` : "";
+      const providerLabel = row.provider ? ` / ${escapeHtml(row.provider)}` : "";
+      return `
+        <option value="${row.id}">
+          ${escapeHtml(row.display_name)} / ${escapeHtml(row.model_name || "-")}${providerLabel}${slotLabel}
+        </option>
+      `;
+    }).join("");
+  }
+}
+
+function getReportContext() {
+  if (!latestReport) return null;
+
+  return {
+    project_coachee: latestReport.project_coachee || {},
+    client: latestReport.client || {},
+    project: latestReport.project || {},
+    coachee: latestReport.coachee || {},
+    submission: latestReport.submission || {},
+    leadership_response: latestReport.leadership_response || {},
+    needs_response: latestReport.needs_response || {},
+    report_result: latestReport.report_result || {},
+  };
+}
+
+function getNeedsSourceText(needs) {
+  const ordered = [
+    ["currentWork", "현재 역할/업무 맥락"],
+    ["need1", "N01. 이번 코칭을 통해 꼭 이루고 싶은 목표"],
+    ["need2", "N02. 코칭 종료 후 성공 기준"],
+    ["need3", "N03. 특히 다루고 싶은 주제나 키워드"],
+    ["need4", "N04. 이상적인 리더와 조직의 모습"],
+    ["need5", "N05. 본인이 생각하는 강점"],
+    ["need6", "N06. 핵심 개선 영역"],
+    ["need7", "N07. 현재 조직문화 정의"],
+    ["need8", "N08. 목표 달성의 조직 차원 걸림돌"],
+    ["need9", "N09. 관계 만족도와 최근 피드백의 핵심"],
+    ["need10", "N10. 차세대 리더 육성의 어려움"],
+    ["need11", "N11. 코치에게 추가로 공유하고 싶은 사항"],
+  ];
+
+  return ordered
+    .map(([key, label]) => {
+      const value = needs?.[key] || "(응답 없음)";
+      return `- ${label} (${key}): ${value}`;
+    })
+    .join("\n");
+}
+
+function getLeadershipSourceText(result) {
+  const groupScores = result.group_scores || [];
+  const factorScores = result.factor_scores || [];
+  const questionScores = result.question_scores || [];
+  const highlights = result.highlights || {};
+  const interpretation = result.interpretation || {};
+
+  return `
+[리더십 진단 개요]
+- 전체 평균: ${result.overall_score ?? "-"}점
+- 해석 요약: ${interpretation.summary || "-"}
+- 상대적 강점 요약: ${interpretation.strength_hint || "-"}
+- 개발 필요 영역 요약: ${interpretation.development_hint || "-"}
+
+[4대 역량군 점수]
+${formatScoreList(groupScores, "group_code", "group_name") || "- 없음"}
+
+[8개 세부요인 점수]
+${formatScoreList(factorScores, "factor_code", "factor_name") || "- 없음"}
+
+[상대적 강점 영역]
+${formatHighlights(highlights.highest_factors) || "- 없음"}
+
+[우선 개발 검토 영역]
+${formatHighlights(highlights.lowest_factors) || "- 없음"}
+
+[문항별 점수]
+${formatQuestionScores(questionScores) || "- 없음"}
+
+[추가 수치 데이터]
+- norm_overall_score: ${result.norm_overall_score ?? "-"}
+- overall_gap: ${result.overall_gap ?? "-"}
+- group_scores_table: ${result.group_scores_table ?? "-"}
+- subfactor_scores_table: ${result.subfactor_scores_table ?? "-"}
+- question_tree_table: ${result.question_tree_table ?? "-"}
+- top_bottom_question_table: ${result.top_bottom_question_table ?? "-"}
+- norm_gap_top_bottom_table: ${result.norm_gap_top_bottom_table ?? "-"}
+- ipa_quadrant_summary_table: ${result.ipa_quadrant_summary_table ?? "-"}
+- stop_start_continue_table: ${result.stop_start_continue_table ?? "-"}
+- development_guide_table: ${result.development_guide_table ?? "-"}
+`.trim();
+} 
+
+function generateDoc3Prompt() {
+  const ctx = getReportContext();
+
+  if (!ctx) {
+    document.getElementById("gptPromptText").textContent =
+      "먼저 리포트를 조회하세요.";
+    return;
+  }
+
+  const pc = ctx.project_coachee;
+  const client = ctx.client;
+  const project = ctx.project;
+  const coachee = ctx.coachee;
+  const submission = ctx.submission;
+  const needs = ctx.needs_response?.answers || {};
+
+  currentPromptType = "doc3_needs_analysis_deep_question_guide";
+  currentPromptTitle =
+    `${coachee.name || "피코치"} 코칭사전니즈 분석 및 심층질문 가이드 생성 프롬프트`;
+
+  document.getElementById("promptTypeStatus").textContent =
+    "프롬프트 유형: 3번 코칭사전니즈 분석 및 심층질문 가이드";
+
+  const outputSchema = {
+    coachee_name: "피코치명",
+    position: "직책",
+    organization: "소속",
+    submitted_date: "제출일",
+    currentWork: "직무/역할",
+    participant_code: "참여코드",
+
+    needs_overall_summary_1: "전체 니즈 요약 bullet 1",
+    needs_overall_summary_2: "전체 니즈 요약 bullet 2",
+    needs_overall_summary_3: "전체 니즈 요약 bullet 3",
+    needs_core_agenda: "핵심 의제 요약",
+
+    N01_summary: "응답 요약",
+    N01_response: "원문 응답",
+    N01_reframe_question: "관점 전환 질문",
+    N01_case_question: "구체적 사례 질문",
+    N01_future_question: "미래상 질문",
+    N01_coaching_script: "코칭 대화 스크립트",
+
+    N02_summary: "응답 요약",
+    N02_response: "원문 응답",
+    N02_reframe_question: "관점 전환 질문",
+    N02_case_question: "구체적 사례 질문",
+    N02_future_question: "미래상 질문",
+    N02_coaching_script: "코칭 대화 스크립트",
+
+    N03_summary: "응답 요약",
+    N03_response: "원문 응답",
+    N03_reframe_question: "관점 전환 질문",
+    N03_case_question: "구체적 사례 질문",
+    N03_future_question: "미래상 질문",
+    N03_coaching_script: "코칭 대화 스크립트",
+
+    N04_summary: "응답 요약",
+    N04_response: "원문 응답",
+    N04_reframe_question: "관점 전환 질문",
+    N04_case_question: "구체적 사례 질문",
+    N04_future_question: "미래상 질문",
+    N04_coaching_script: "코칭 대화 스크립트",
+
+    N05_summary: "응답 요약",
+    N05_response: "원문 응답",
+    N05_reframe_question: "관점 전환 질문",
+    N05_case_question: "구체적 사례 질문",
+    N05_future_question: "미래상 질문",
+    N05_coaching_script: "코칭 대화 스크립트",
+
+    N06_summary: "응답 요약",
+    N06_response: "원문 응답",
+    N06_reframe_question: "관점 전환 질문",
+    N06_case_question: "구체적 사례 질문",
+    N06_future_question: "미래상 질문",
+    N06_coaching_script: "코칭 대화 스크립트",
+
+    N07_summary: "응답 요약",
+    N07_response: "원문 응답",
+    N07_reframe_question: "관점 전환 질문",
+    N07_case_question: "구체적 사례 질문",
+    N07_future_question: "미래상 질문",
+    N07_coaching_script: "코칭 대화 스크립트",
+
+    N08_summary: "응답 요약",
+    N08_response: "원문 응답",
+    N08_reframe_question: "관점 전환 질문",
+    N08_case_question: "구체적 사례 질문",
+    N08_future_question: "미래상 질문",
+    N08_coaching_script: "코칭 대화 스크립트",
+
+    N09_summary: "응답 요약",
+    N09_response: "원문 응답",
+    N09_reframe_question: "관점 전환 질문",
+    N09_case_question: "구체적 사례 질문",
+    N09_future_question: "미래상 질문",
+    N09_coaching_script: "코칭 대화 스크립트",
+
+    N10_summary: "응답 요약",
+    N10_response: "원문 응답",
+    N10_reframe_question: "관점 전환 질문",
+    N10_case_question: "구체적 사례 질문",
+    N10_future_question: "미래상 질문",
+    N10_coaching_script: "코칭 대화 스크립트",
+
+    N11_summary: "응답 요약",
+    N11_response: "원문 응답",
+    N11_reframe_question: "관점 전환 질문",
+    N11_case_question: "구체적 사례 질문",
+    N11_future_question: "미래상 질문",
+    N11_coaching_script: "코칭 대화 스크립트",
+
+    priority_agenda_1: "1회차 우선 탐색 의제 1",
+    related_needs_1: "관련 니즈 응답",
+    coach_check_question_1: "코치 확인 질문",
+
+    priority_agenda_2: "1회차 우선 탐색 의제 2",
+    related_needs_2: "관련 니즈 응답",
+    coach_check_question_2: "코치 확인 질문",
+
+    priority_agenda_3: "1회차 우선 탐색 의제 3",
+    related_needs_3: "관련 니즈 응답",
+    coach_check_question_3: "코치 확인 질문"
+  };
+
+  const prompt = `
+당신은 CEO/임원/팀장 대상 리더십 코칭을 지원하는 전문 코칭 슈퍼바이저입니다.
+
+아래 코칭 사전 니즈 조사 응답을 바탕으로,
+"코치용_코칭사전니즈 분석 및 심층질문 가이드" DOCX 템플릿에 들어갈 값을 생성해 주세요.
+
+# 작성 목적
+
+이 결과는 담당 코치가 1회차 코칭 전에 피코치의 사전 니즈를 이해하고,
+질문별로 심층 탐색할 관점 전환 질문, 사례 질문, 미래상 질문, 코칭 대화 스크립트를 준비하기 위한 자료입니다.
+
+# 작성 원칙
+
+- 피코치를 평가하거나 단정하지 말고, 코칭적 가설과 탐색 질문으로 표현해 주세요.
+- 각 질문별 응답 요약은 간결하게 작성해 주세요.
+- 관점 전환 질문은 피코치가 자신의 관점을 넓힐 수 있는 질문이어야 합니다.
+- 구체적 사례 질문은 실제 경험/장면/행동을 끌어내는 질문이어야 합니다.
+- 미래상 질문은 코칭 이후의 변화된 모습을 상상하게 하는 질문이어야 합니다.
+- 코칭 대화 스크립트는 코치가 실제 세션에서 자연스럽게 말할 수 있는 문장으로 작성해 주세요.
+- 모든 값은 한국어로 작성해 주세요.
+- 출력은 반드시 JSON 객체 하나만 제공해 주세요.
+- JSON 외 설명 문장, markdown 코드블록, 주석은 절대 넣지 마세요.
+
+# 피코치 기본정보
+
+- 고객사: ${client.client_name || "-"}
+- 프로젝트명: ${project.project_name || "-"}
+- 피코치명: ${coachee.name || "-"}
+- 조직/회사: ${coachee.organization || "-"}
+- 부서: ${coachee.department || "-"}
+- 직책: ${coachee.position || "-"}
+- 직급: ${coachee.job_level || "-"}
+- 직무/타이틀: ${coachee.job_title || "-"}
+- 참여코드: ${pc.participant_code || "-"}
+- 제출일시: ${submission.submitted_at || "-"}
+
+# 코칭 사전 니즈 응답 원문
+
+${getNeedsSourceText(needs)}
+
+# 출력 JSON 스키마
+
+아래 key를 모두 포함해 주세요.
+값이 없거나 판단이 어려운 경우에도 빈 문자열이 아니라 코치가 활용 가능한 문장으로 채워 주세요.
+
+${formatJsonBlock(outputSchema)}
+`.trim();
+
+  document.getElementById("gptPromptText").textContent = prompt;
+}
+
+function generateDoc3PromptForGpt1() {
+  generateDoc3Prompt();
+  currentPromptGptSlot = "gpt1";
+  currentPromptRound = "draft_1";
+  currentParentPromptLogId = null;
+
+  document.getElementById("promptTypeStatus").textContent =
+    "프롬프트 유형: 3번 코칭사전니즈 분석 및 심층질문 가이드 / GPT1 / draft_1";
+}
+
+function generateDoc3PromptForGpt2() {
+  generateDoc3Prompt();
+  currentPromptGptSlot = "gpt2";
+  currentPromptRound = "draft_2";
+  currentParentPromptLogId = null;
+
+  document.getElementById("promptTypeStatus").textContent =
+    "프롬프트 유형: 3번 코칭사전니즈 분석 및 심층질문 가이드 / GPT2 / draft_2";
+}
+
+function generateDoc4Prompt() {
+  const ctx = getReportContext();
+
+  if (!ctx) {
+    document.getElementById("gptPromptText").textContent =
+      "먼저 리포트를 조회하세요.";
+    return;
+  }
+
+  const pc = ctx.project_coachee;
+  const client = ctx.client;
+  const project = ctx.project;
+  const coachee = ctx.coachee;
+  const submission = ctx.submission;
+  const needs = ctx.needs_response?.answers || {};
+  const result = ctx.report_result?.result_json || {};
+
+  currentPromptType = "doc4_integrated_feedback_guide";
+  currentPromptTitle =
+    `${coachee.name || "피코치"} 리더십진단 및 코칭사전니즈 통합가이드 생성 프롬프트`;
+
+  document.getElementById("promptTypeStatus").textContent =
+    "프롬프트 유형: 4번 리더십진단 및 코칭사전니즈 통합가이드";
+
+  const outputSchema = {
+    coachee_name: "피코치명",
+    position: "직책",
+    organization: "소속",
+    submitted_date: "제출일",
+    currentWork: "직무/역할",
+    participant_code: "참여코드",
+
+    coachee_one_line_summary: "코칭 대상자 1줄 요약",
+    coachee_profile_summary: "코칭 대상자 프로파일링",
+    diagnosis_core_summary: "역량진단 핵심내용 정리",
+    diagnosis_strength_points: "진단결과 강점 포인트",
+    diagnosis_development_points: "진단결과 개발 포인트",
+    needs_core_summary: "니즈조사 핵심내용 정리",
+    needs_core_agenda: "핵심 니즈사항",
+    coach_first_reading_point: "코치가 첫 세션 전 반드시 파악해야 할 포인트",
+
+    integration_point_1: "역량진단과 니즈조사 연결 내용 1",
+    integration_coaching_meaning_1: "코칭적 의미 1",
+    integration_point_2: "역량진단과 니즈조사 연결 내용 2",
+    integration_coaching_meaning_2: "코칭적 의미 2",
+    integration_point_3: "역량진단과 니즈조사 연결 내용 3",
+    integration_coaching_meaning_3: "코칭적 의미 3",
+    integration_point_4: "역량진단과 니즈조사 연결 내용 4",
+    integration_coaching_meaning_4: "코칭적 의미 4",
+    integration_point_5: "역량진단과 니즈조사 연결 내용 5",
+    integration_coaching_meaning_5: "코칭적 의미 5",
+
+    hypothesis_1: "핵심 가설 1",
+    hypothesis_check_point_1: "확인 필요 포인트 1",
+    hypothesis_2: "핵심 가설 2",
+    hypothesis_check_point_2: "확인 필요 포인트 2",
+    hypothesis_3: "핵심 가설 3",
+    hypothesis_check_point_3: "확인 필요 포인트 3",
+
+    additional_question_1: "추가 질문 1",
+    additional_question_1_purpose: "질문 목적 1",
+    additional_question_2: "추가 질문 2",
+    additional_question_2_purpose: "질문 목적 2",
+    additional_question_3: "추가 질문 3",
+    additional_question_3_purpose: "질문 목적 3",
+    additional_question_4: "추가 질문 4",
+    additional_question_4_purpose: "질문 목적 4",
+    additional_question_5: "추가 질문 5",
+    additional_question_5_purpose: "질문 목적 5",
+
+    group_1_name: "G1 역량군명",
+    group_1_interpretation: "G1 현재 해석",
+    group_1_coaching_direction: "G1 코칭 운영 방향",
+    group_1_session_point: "G1 세션 적용 포인트",
+    group_2_name: "G2 역량군명",
+    group_2_interpretation: "G2 현재 해석",
+    group_2_coaching_direction: "G2 코칭 운영 방향",
+    group_2_session_point: "G2 세션 적용 포인트",
+    group_3_name: "G3 역량군명",
+    group_3_interpretation: "G3 현재 해석",
+    group_3_coaching_direction: "G3 코칭 운영 방향",
+    group_3_session_point: "G3 세션 적용 포인트",
+    group_4_name: "G4 역량군명",
+    group_4_interpretation: "G4 현재 해석",
+    group_4_coaching_direction: "G4 코칭 운영 방향",
+    group_4_session_point: "G4 세션 적용 포인트",
+
+    factor_1_name: "F1 세부역량명",
+    factor_1_interpretation: "F1 진단 해석",
+    factor_1_coaching_use: "F1 코칭 활용 방향",
+    factor_2_name: "F2 세부역량명",
+    factor_2_interpretation: "F2 진단 해석",
+    factor_2_coaching_use: "F2 코칭 활용 방향",
+    factor_3_name: "F3 세부역량명",
+    factor_3_interpretation: "F3 진단 해석",
+    factor_3_coaching_use: "F3 코칭 활용 방향",
+    factor_4_name: "F4 세부역량명",
+    factor_4_interpretation: "F4 진단 해석",
+    factor_4_coaching_use: "F4 코칭 활용 방향",
+    factor_5_name: "F5 세부역량명",
+    factor_5_interpretation: "F5 진단 해석",
+    factor_5_coaching_use: "F5 코칭 활용 방향",
+    factor_6_name: "F6 세부역량명",
+    factor_6_interpretation: "F6 진단 해석",
+    factor_6_coaching_use: "F6 코칭 활용 방향",
+    factor_7_name: "F7 세부역량명",
+    factor_7_interpretation: "F7 진단 해석",
+    factor_7_coaching_use: "F7 코칭 활용 방향",
+    factor_8_name: "F8 세부역량명",
+    factor_8_interpretation: "F8 진단 해석",
+    factor_8_coaching_use: "F8 코칭 활용 방향",
+
+    session_1_theme: "1회기 핵심 주제",
+    session_1_goal: "1회기 운영 목표",
+    session_1_questions_activities: "1회기 주요 질문/활동",
+    session_1_output_check: "1회기 산출물/점검 기준",
+    session_2_theme: "2회기 핵심 주제",
+    session_2_goal: "2회기 운영 목표",
+    session_2_questions_activities: "2회기 주요 질문/활동",
+    session_2_output_check: "2회기 산출물/점검 기준",
+    session_3_theme: "3회기 핵심 주제",
+    session_3_goal: "3회기 운영 목표",
+    session_3_questions_activities: "3회기 주요 질문/활동",
+    session_3_output_check: "3회기 산출물/점검 기준",
+    session_4_theme: "4회기 핵심 주제",
+    session_4_goal: "4회기 운영 목표",
+    session_4_questions_activities: "4회기 주요 질문/활동",
+    session_4_output_check: "4회기 산출물/점검 기준",
+    session_5_theme: "5회기 핵심 주제",
+    session_5_goal: "5회기 운영 목표",
+    session_5_questions_activities: "5회기 주요 질문/활동",
+    session_5_output_check: "5회기 산출물/점검 기준",
+    session_6_theme: "6회기 핵심 주제",
+    session_6_goal: "6회기 운영 목표",
+    session_6_questions_activities: "6회기 주요 질문/활동",
+    session_6_output_check: "6회기 산출물/점검 기준",
+    session_7_theme: "7회기 핵심 주제",
+    session_7_goal: "7회기 운영 목표",
+    session_7_questions_activities: "7회기 주요 질문/활동",
+    session_7_output_check: "7회기 산출물/점검 기준",
+    session_8_theme: "8회기 핵심 주제",
+    session_8_goal: "8회기 운영 목표",
+    session_8_questions_activities: "8회기 주요 질문/활동",
+    session_8_output_check: "8회기 산출물/점검 기준",
+
+    session1_objective: "세션1 목적",
+    session1_flow_0_10_stage: "0~10분 단계",
+    session1_flow_0_10_content: "0~10분 운영 내용",
+    session1_flow_0_10_coach_point: "0~10분 코치 진행 포인트",
+    session1_flow_10_25_stage: "10~25분 단계",
+    session1_flow_10_25_content: "10~25분 운영 내용",
+    session1_flow_10_25_coach_point: "10~25분 코치 진행 포인트",
+    session1_flow_25_45_stage: "25~45분 단계",
+    session1_flow_25_45_content: "25~45분 운영 내용",
+    session1_flow_25_45_coach_point: "25~45분 코치 진행 포인트",
+    session1_flow_45_65_stage: "45~65분 단계",
+    session1_flow_45_65_content: "45~65분 운영 내용",
+    session1_flow_45_65_coach_point: "45~65분 코치 진행 포인트",
+    session1_flow_65_80_stage: "65~80분 단계",
+    session1_flow_65_80_content: "65~80분 운영 내용",
+    session1_flow_65_80_coach_point: "65~80분 코치 진행 포인트",
+    session1_flow_80_90_stage: "80~90분 단계",
+    session1_flow_80_90_content: "80~90분 운영 내용",
+    session1_flow_80_90_coach_point: "80~90분 코치 진행 포인트",
+
+    session1_question_diagnosis_awareness: "진단 결과 인식 질문",
+    session1_question_strength: "강점 탐색 질문",
+    session1_question_development: "개발영역 탐색 질문",
+    session1_question_needs_deepening: "니즈 심층탐색 질문",
+    session1_question_goal_alignment: "코칭 목표 합의 질문",
+    session1_question_action_transition: "실행 전환 질문",
+
+    diagnosis_debrief_emphasis_1: "역량진단 디브리핑 강조사항 1",
+    diagnosis_debrief_emphasis_2: "역량진단 디브리핑 강조사항 2",
+    diagnosis_debrief_emphasis_3: "역량진단 디브리핑 강조사항 3",
+    diagnosis_debrief_caution: "역량진단 디브리핑 유의사항",
+    needs_debrief_emphasis_1: "니즈조사 디브리핑 강조사항 1",
+    needs_debrief_emphasis_2: "니즈조사 디브리핑 강조사항 2",
+    needs_debrief_emphasis_3: "니즈조사 디브리핑 강조사항 3",
+    needs_debrief_caution: "니즈조사 디브리핑 유의사항",
+
+    action_item_1: "Action Item 1",
+    action_item_1_check: "Action Item 1 점검 기준",
+    action_item_2: "Action Item 2",
+    action_item_2_check: "Action Item 2 점검 기준",
+    action_item_3: "Action Item 3",
+    action_item_3_check: "Action Item 3 점검 기준",
+    action_item_4: "Action Item 4",
+    action_item_4_check: "Action Item 4 점검 기준",
+    action_item_5: "Action Item 5",
+    action_item_5_check: "Action Item 5 점검 기준",
+
+    coach_caution_interpretation: "해석 유의사항",
+    coach_caution_defensiveness: "방어감 완화 포인트",
+    coach_caution_advice_mode: "조언형 접근 방지",
+    coach_caution_system_perspective: "시스템 관점 전환",
+    coach_caution_session_boundary: "1회차 세션 범위 관리",
+    coach_caution_followup: "다음 세션 연결 포인트",
+
+    overall_score_summary: "종합점수, 비교집단 평균, GAP 요약",
+    group_scores_table: "G1~G4 본인/비교/GAP",
+    subfactor_scores_table: "F1~F8 본인/비교/GAP",
+    question_tree_table: "4대 역량-8개 세부역량-32개 문항 tree",
+    top_bottom_question_table: "본인점수 기준 상위/하위 문항",
+    norm_gap_top_bottom_table: "GAP 기준 상위/하위 문항",
+    ipa_quadrant_summary_table: "IPA 4분면 요약",
+    stop_start_continue_table: "STOP/START/CONTINUE 행동지침",
+    development_guide_table: "집중 학습 키워드/액션 루틴"
+  };
+
+  const prompt = `
+당신은 CEO/임원/팀장 대상 리더십 코칭을 지원하는 전문 코칭 슈퍼바이저입니다.
+
+아래 리더십 역량진단 결과와 코칭 사전 니즈 조사 응답을 바탕으로,
+"코치용_리더십진단 및 코칭사전니즈 통합 가이드" DOCX 템플릿에 들어갈 값을 생성해 주세요.
+
+# 작성 목적
+
+이 결과는 코치가 1번째 코칭세션에 들어가기 전,
+피코치의 리더십 진단 결과와 사전 니즈를 통합적으로 이해하고,
+세션1 운영 방향과 전체 8회기 커리큘럼을 설계하기 위한 코치 전용 자료입니다.
+
+# 작성 원칙
+
+- 기존 1번 리더십 진단 리포트와 2번 니즈조사 내용을 그대로 반복하지 말고, 코칭 관점으로 통합·해석해 주세요.
+- 점수를 단정적으로 낙인찍지 말고, 코칭에서 확인해야 할 가설과 탐색 주제로 표현해 주세요.
+- 4대 역량군과 8개 세부역량 기준을 반드시 반영해 주세요.
+- 1회차 세션에 코치가 바로 사용할 수 있도록 질문, 흐름, Action Item을 구체적으로 작성해 주세요.
+- 전체 8회기 커리큘럼은 진단 결과와 니즈 응답을 모두 반영해 주세요.
+- 부록 수치 데이터 필드는 제공된 진단 결과에 기반해 최대한 구체적으로 채워 주세요.
+- 모든 값은 한국어로 작성해 주세요.
+- 출력은 반드시 JSON 객체 하나만 제공해 주세요.
+- JSON 외 설명 문장, markdown 코드블록, 주석은 절대 넣지 마세요.
+
+# 피코치 기본정보
+
+- 고객사: ${client.client_name || "-"}
+- 프로젝트명: ${project.project_name || "-"}
+- 피코치명: ${coachee.name || "-"}
+- 조직/회사: ${coachee.organization || "-"}
+- 부서: ${coachee.department || "-"}
+- 직책: ${coachee.position || "-"}
+- 직급: ${coachee.job_level || "-"}
+- 직무/타이틀: ${coachee.job_title || "-"}
+- 참여코드: ${pc.participant_code || "-"}
+- 제출일시: ${submission.submitted_at || "-"}
+
+# 리더십 역량진단 결과
+
+${getLeadershipSourceText(result)}
+
+# 코칭 사전 니즈 응답 원문
+
+${getNeedsSourceText(needs)}
+
+# 출력 JSON 스키마
+
+아래 key를 모두 포함해 주세요.
+값이 없거나 판단이 어려운 경우에도 빈 문자열이 아니라 코치가 활용 가능한 문장으로 채워 주세요.
+
+${formatJsonBlock(outputSchema)}
+`.trim();
+
+  document.getElementById("gptPromptText").textContent = prompt;
+}
+
+function generateDoc4PromptForGpt1() {
+  generateDoc4Prompt();
+  currentPromptGptSlot = "gpt1";
+  currentPromptRound = "draft_1";
+  currentParentPromptLogId = null;
+
+  document.getElementById("promptTypeStatus").textContent =
+    "프롬프트 유형: 4번 리더십진단 및 코칭사전니즈 통합가이드 / GPT1 / draft_1";
+}
+
+function generateDoc4PromptForGpt2() {
+  generateDoc4Prompt();
+  currentPromptGptSlot = "gpt2";
+  currentPromptRound = "draft_2";
+  currentParentPromptLogId = null;
+
+  document.getElementById("promptTypeStatus").textContent =
+    "프롬프트 유형: 4번 리더십진단 및 코칭사전니즈 통합가이드 / GPT2 / draft_2";
+} 
+
+async function loadLatestDraftOutputsForIntegration(outputType) {
+  if (!latestReport) {
+    throw new Error("먼저 리포트를 조회하세요.");
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    throw new Error("먼저 로그인하세요.");
+  }
+
+  const pc = latestReport.project_coachee || {};
+
+  if (!pc.id) {
+    throw new Error("project_coachee_id를 확인할 수 없습니다.");
+  }
+
+  const baseSelect = `
+    id,
+    output_type,
+    output_title,
+    raw_output,
+    parsed_output,
+    generation_channel,
+    review_mode,
+    gpt_slot,
+    gpt_config_id,
+    output_round,
+    is_selected_final,
+    parse_status,
+    status,
+    created_at
+  `;
+
+  const { data: gpt1Rows, error: gpt1Error } = await sb
+    .from("manual_gpt_outputs")
+    .select(baseSelect)
+    .eq("project_coachee_id", pc.id)
+    .eq("output_type", outputType)
+    .eq("generation_channel", "web_manual")
+    .in("review_mode", ["primary_draft", "dual_review", "single"])
+    .eq("gpt_slot", "gpt1")
+    .eq("output_round", "draft_1")
+    .eq("parse_status", "parsed")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (gpt1Error) {
+    throw new Error("GPT1 결과 조회 실패: " + gpt1Error.message);
+  }
+
+  const { data: gpt2Rows, error: gpt2Error } = await sb
+    .from("manual_gpt_outputs")
+    .select(baseSelect)
+    .eq("project_coachee_id", pc.id)
+    .eq("output_type", outputType)
+    .eq("generation_channel", "web_manual")
+    .in("review_mode", ["secondary_review", "dual_review"])
+    .eq("gpt_slot", "gpt2")
+    .eq("output_round", "draft_2")
+    .eq("parse_status", "parsed")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (gpt2Error) {
+    throw new Error("GPT2 결과 조회 실패: " + gpt2Error.message);
+  }
+
+  const gpt1Output = gpt1Rows?.[0] || null;
+  const gpt2Output = gpt2Rows?.[0] || null;
+
+  if (!gpt1Output) {
+    throw new Error("통합할 GPT1 draft_1 결과가 없습니다.");
+  }
+
+  if (!gpt2Output) {
+    throw new Error("통합할 GPT2 draft_2 결과가 없습니다.");
+  }
+
+  return {
+    gpt1Output,
+    gpt2Output,
+  };
+}
+
+async function generateIntegrationPrompt(outputType) {
+  try {
+    if (!latestReport) {
+      document.getElementById("gptPromptText").textContent =
+        "먼저 리포트를 조회하세요.";
+      return;
+    }
+
+    document.getElementById("promptTypeStatus").textContent =
+      "통합 프롬프트 생성 중...";
+
+    const { gpt1Output, gpt2Output } =
+      await loadLatestDraftOutputsForIntegration(outputType);
+
+    const ctx = getReportContext();
+    const pc = ctx.project_coachee || {};
+    const client = ctx.client || {};
+    const project = ctx.project || {};
+    const coachee = ctx.coachee || {};
+
+    const isDoc3 =
+      outputType === "doc3_needs_analysis_deep_question_guide";
+
+    const documentName = isDoc3
+      ? "3번 코치용 코칭사전니즈 분석 및 심층질문 가이드"
+      : "4번 코치용 리더십진단 및 코칭사전니즈 통합가이드";
+
+    currentPromptType = outputType;
+    currentPromptTitle =
+      `${coachee.name || "피코치"} ${documentName} 통합 프롬프트`;
+
+    currentPromptGptSlot = "gpt3";
+    currentPromptRound = "integrated_final";
+    currentParentPromptLogId = null;
+
+    const prompt = `
+당신은 CEO/임원/팀장 대상 리더십 코칭 자료를 검수하고 통합하는 전문 코칭 슈퍼바이저입니다.
+
+아래에는 동일한 피코치에 대해 서로 독립적으로 생성된 두 개의 GPT 결과가 있습니다.
+
+- GPT1 결과: 1차 코칭 분석자 관점
+- GPT2 결과: 대안 관점 검토자 관점
+
+당신의 역할은 두 결과를 비교하여,
+중복은 정리하고, 더 구체적이고 코칭에 유용한 내용을 선별하며,
+상충되는 내용은 코칭적 가설 수준으로 조정하여
+최종 ${documentName} DOCX 템플릿에 사용할 JSON 하나로 통합하는 것입니다.
+
+# 피코치 기본정보
+
+- 고객사: ${client.client_name || "-"}
+- 프로젝트명: ${project.project_name || "-"}
+- 피코치명: ${coachee.name || "-"}
+- 조직/회사: ${coachee.organization || "-"}
+- 부서: ${coachee.department || "-"}
+- 직책: ${coachee.position || "-"}
+- 직급: ${coachee.job_level || "-"}
+- 직무/타이틀: ${coachee.job_title || "-"}
+- 참여코드: ${pc.participant_code || "-"}
+
+# 통합 원칙
+
+1. 출력은 반드시 JSON 객체 하나만 제공하세요.
+2. markdown 코드블록, 설명문, 주석은 절대 넣지 마세요.
+3. GPT1과 GPT2 결과 중 더 코칭적으로 유용하고 구체적인 표현을 우선 사용하세요.
+4. 두 결과가 유사하면 중복을 제거하고 더 간결하게 통합하세요.
+5. 두 결과가 다르면 단정하지 말고 “확인할 가설”, “탐색할 질문”, “코치가 확인할 포인트” 형태로 조정하세요.
+6. 피코치를 평가하거나 낙인찍는 표현은 피하세요.
+7. 최종 JSON의 key 구조는 GPT1/GPT2 결과의 key 구조를 유지하세요.
+8. 누락된 key가 있으면 다른 결과를 참고하여 보완하세요.
+9. 모든 값은 한국어로 작성하세요.
+10. 실제 코치가 1회차 세션 전에 바로 활용할 수 있도록 구체적으로 작성하세요.
+
+# GPT1 결과 정보
+
+- output_id: ${gpt1Output.id}
+- gpt_slot: ${gpt1Output.gpt_slot}
+- output_round: ${gpt1Output.output_round}
+- created_at: ${gpt1Output.created_at}
+
+# GPT1 결과 JSON
+
+${JSON.stringify(gpt1Output.parsed_output || {}, null, 2)}
+
+# GPT2 결과 정보
+
+- output_id: ${gpt2Output.id}
+- gpt_slot: ${gpt2Output.gpt_slot}
+- output_round: ${gpt2Output.output_round}
+- created_at: ${gpt2Output.created_at}
+
+# GPT2 결과 JSON
+
+${JSON.stringify(gpt2Output.parsed_output || {}, null, 2)}
+
+# 최종 출력 지시
+
+위 GPT1 결과와 GPT2 결과를 통합하여,
+최종 ${documentName} 생성에 사용할 JSON 객체 하나만 출력하세요.
+`.trim();
+
+    document.getElementById("gptPromptText").textContent = prompt;
+
+    document.getElementById("promptTypeStatus").textContent =
+      `프롬프트 유형: ${documentName} / integrator / integrated_final`;
+
+    document.getElementById("promptSaveStatus").textContent =
+      `통합 프롬프트 생성 완료: GPT1=${gpt1Output.id}, GPT2=${gpt2Output.id}`;
+  } catch (error) {
+    document.getElementById("promptTypeStatus").textContent =
+      "통합 프롬프트 생성 실패";
+
+    document.getElementById("gptPromptText").textContent =
+      error.message;
+  }
+}
+
+function generateDoc3IntegrationPrompt() {
+  return generateIntegrationPrompt("doc3_needs_analysis_deep_question_guide");
+}
+
+function generateDoc4IntegrationPrompt() {
+  return generateIntegrationPrompt("doc4_integrated_feedback_guide");
+}
+
+async function copyPipelineCommand() {
+  const commandText = document.getElementById("pipelineCommandText").textContent;
+
+  try {
+    await navigator.clipboard.writeText(commandText);
+
+    document.getElementById("pipelineCommandStatus").textContent =
+      "파이프라인 실행 명령을 클립보드에 복사했습니다.";
+  } catch (error) {
+    document.getElementById("pipelineCommandStatus").textContent =
+      "복사 실패: " + error.message;
+  }
+}
+
+function getCurrentSelectedCoacheeSummary() {
+  const pc = latestReport?.project_coachee || {};
+  const coachee = latestReport?.coachee || {};
+  const project = latestReport?.project || {};
+
+  return {
+    projectCoacheeId: pc.id || document.getElementById("projectCoacheeId")?.value?.trim() || "",
+    participantCode: pc.participant_code || "-",
+    coacheeName: coachee.name || "-",
+    position: coachee.position || coachee.job_title || "-",
+    projectName: project.project_name || "-",
+    reportStatus: pc.report_status || "-",
+    session1DocumentsStatus: pc.session1_documents_status || "-",
+  };
+}
+
+function isCurrentSession1PackageReady() {
+  const pc = latestReport?.project_coachee || {};
+
+  return (
+    pc.report_status === "session1_package_ready" ||
+    pc.session1_documents_status === "ready"
+  );
+}
+
+function confirmSession1PipelineRun(forceFail = false) {
+  if (forceFail) {
+    return true;
+  }
+
+  const summary = getCurrentSelectedCoacheeSummary();
+  const alreadyReady = isCurrentSession1PackageReady();
+
+  let message = [
+    "1회차 세션자료 생성 파이프라인을 실행하시겠습니까?",
+    "",
+    `[피코치] ${summary.coacheeName}`,
+    `[직책] ${summary.position}`,
+    `[참여코드] ${summary.participantCode}`,
+    `[project_coachee_id] ${summary.projectCoacheeId}`,
+    `[프로젝트] ${summary.projectName}`,
+    "",
+    `[현재 report_status] ${summary.reportStatus}`,
+    `[현재 session1_documents_status] ${summary.session1DocumentsStatus}`,
+  ].join("\n");
+
+  if (alreadyReady) {
+    message += [
+      "",
+      "주의: 이 피코치는 이미 1회차 세션자료 패키지가 준비 완료 상태입니다.",
+      "재실행하면 3번/4번 DOCX와 ZIP 패키지가 다시 생성/등록될 수 있습니다.",
+      "",
+      "그래도 재실행하시겠습니까?"
+    ].join("\n");
+  } else {
+    message += [
+      "",
+      "사전점검 OK 후 파이프라인을 실행합니다.",
+      "",
+      "실행하시겠습니까?"
+    ].join("\n");
+  }
+
+  return window.confirm(message);
+}
+
+async function runSession1PipelineFromLocalRunner(forceFail = false) {
+  const statusEl = document.getElementById("pipelineCommandStatus");
+  const logEl = document.getElementById("pipelineRunLog");
+  const runButton = document.getElementById("runPipelineButton");
+
+  // confirm은 버튼 잠금 전에 먼저 실행
+  // 취소 시 버튼이 disabled 상태로 남는 문제를 방지
+  if (!confirmSession1PipelineRun(forceFail)) {
+    statusEl.textContent = "파이프라인 실행을 취소했습니다.";
+    logEl.textContent = "";
+    return;
+  }
+
+  if (runButton) {
+    runButton.disabled = true;
+    runButton.textContent = forceFail
+      ? "실패 테스트 실행 중..."
+      : "선택 피코치 자료 생성 중...";
+  }
+
+  try {
+    statusEl.textContent = forceFail
+      ? "Local Runner에 실패 테스트 실행 요청 중..."
+      : "Local Runner에 파이프라인 실행 요청 중...";
+    logEl.textContent = "";
+
+    if (!forceFail) {
+      await runSession1PipelinePrecheck();
+
+      const precheckText =
+        document.getElementById("pipelinePrecheckContainer")?.textContent || "";
+
+      if (precheckText.includes("NG") || precheckText.includes("점검 필요")) {
+        statusEl.textContent =
+          "사전점검에서 NG 항목이 있어 파이프라인 실행을 중단했습니다.";
+        logEl.textContent =
+          "사전점검 결과를 확인하고 필요한 데이터를 보정한 뒤 다시 실행하세요.";
+        return;
+      }
+    }
+
+    const res = await fetch("http://127.0.0.1:8787/run-session1-pipeline", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        project_coachee_id: latestReport?.project_coachee?.id || null,
+        participant_code: latestReport?.project_coachee?.participant_code || null,
+        force_fail: forceFail,
+        requested_at: new Date().toISOString(),
+      }),
+    });
+
+    const json = await res.json();
+
+    if (!json.ok) {
+      statusEl.textContent =
+        `파이프라인 실행 실패 / ${json.data?.participant_code || "-"} / run_id=${json.data?.pipeline_run_id || "-"}`;
+
+      const stdout = json.data?.stdout || "";
+      const stderr = json.data?.stderr || "";
+
+      logEl.textContent = [
+        "=== 실패 응답 JSON ===",
+        JSON.stringify(json, null, 2),
+        "",
+        "=== STDOUT ===",
+        stdout,
+        "",
+        "=== STDERR ===",
+        stderr || "(없음)",
+      ].join("\n");
+
+      if (typeof loadPipelineRuns === "function") {
+        await loadPipelineRuns(false);
+      }
+
+      return;
+    }
+
+    statusEl.textContent =
+      `파이프라인 실행 완료 / ${Number(json.data.elapsed_seconds || 0).toFixed(2)}초 / ${json.data.participant_code || "-"} / run_id=${json.data.pipeline_run_id || "-"}`;
+
+    const stdout = json.data.stdout || "";
+    const stderr = json.data.stderr || "";
+
+    logEl.textContent = [
+      "=== STDOUT ===",
+      stdout,
+      "",
+      "=== STDERR ===",
+      stderr || "(없음)",
+    ].join("\n");
+
+    if (!forceFail) {
+      if (typeof loadReport === "function") {
+        await loadReport();
+      }
+
+      if (typeof loadSessionDocuments === "function") {
+        await loadSessionDocuments();
+      }
+
+      if (typeof loadSessionFileStatus === "function") {
+        await loadSessionFileStatus();
+      }
+
+      if (typeof loadGptOutputStatus === "function") {
+        await loadGptOutputStatus();
+      }
+
+      if (typeof loadPipelineRuns === "function") {
+        await loadPipelineRuns(false);
+      }
+
+      if (typeof loadCoacheeReadinessDashboard === "function") {
+        await loadCoacheeReadinessDashboard();
+      }
+
+      if (typeof loadBatchPipelineCandidates === "function") {
+        await loadBatchPipelineCandidates();
+      }
+
+    } else {
+      if (typeof loadPipelineRuns === "function") {
+        await loadPipelineRuns(false);
+      }
+    }
+  } catch (error) {
+    statusEl.textContent =
+      "Local Runner 연결 실패: 먼저 로컬 서버가 실행 중인지 확인하세요.";
+
+    logEl.textContent =
+      "PowerShell에서 아래 명령을 먼저 실행하세요.\n\n" +
+      "cd D:\\coachingmate_mvp\n" +
+      "python scripts\\local_runner\\coachingmate_local_runner.py\n\n" +
+      "오류 상세:\n" +
+      error.message;
+  } finally {
+    if (runButton) {
+      runButton.disabled = false;
+      runButton.textContent = "파이프라인 바로 실행";
+    }
+  }
+}
+
+async function copyGptPrompt() {
+  const text = document.getElementById("gptPromptText").textContent;
+
+  if (!text || text.trim().length === 0) {
+    generateGptPrompt();
+  }
+
+  const finalText = document.getElementById("gptPromptText").textContent;
+
+  try {
+    await navigator.clipboard.writeText(finalText);
+    alert("GPT 프롬프트를 클립보드에 복사했습니다.");
+  } catch (error) {
+    alert("복사에 실패했습니다. 프롬프트 영역의 텍스트를 직접 선택해 복사하세요.");
+  }
+}
+
+function parseGptOutputJsonFromTextarea() {
+  const raw = document.getElementById("gptOutputJsonText").value.trim();
+
+  if (!raw) {
+    throw new Error("GPT 결과 JSON을 붙여넣으세요.");
+  }
+
+  let cleaned = raw;
+
+  // GPT가 ```json 코드블록으로 감싸서 준 경우 제거
+  cleaned = cleaned.replace(/^```json\s*/i, "");
+  cleaned = cleaned.replace(/^```\s*/i, "");
+  cleaned = cleaned.replace(/```$/i, "");
+  cleaned = cleaned.trim();
+
+  const parsed = JSON.parse(cleaned);
+
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("JSON 객체 형태여야 합니다.");
+  }
+
+  return {
+    raw,
+    cleaned,
+    parsed,
+  };
+}
+
+function validateGptOutputJson() {
+  try {
+    const { parsed } = parseGptOutputJsonFromTextarea();
+    const keys = Object.keys(parsed);
+
+    document.getElementById("gptOutputStatus").textContent =
+      `JSON 유효성 확인 완료: ${keys.length}개 key`;
+  } catch (error) {
+    document.getElementById("gptOutputStatus").textContent =
+      `JSON 오류: ${error.message}`;
+  }
+}
+
+async function saveManualGptOutput() {
+  if (!latestReport) {
+    document.getElementById("gptOutputStatus").textContent =
+      "먼저 리포트를 조회하세요.";
+    return;
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    document.getElementById("gptOutputStatus").textContent =
+      "먼저 로그인하세요.";
+    return;
+  }
+
+  let parsedResult = null;
+
+  try {
+    parsedResult = parseGptOutputJsonFromTextarea();
+  } catch (error) {
+    document.getElementById("gptOutputStatus").textContent =
+      `JSON 오류: ${error.message}`;
+    return;
+  }
+
+  const outputType = document.getElementById("gptOutputType").value;
+  const pc = latestReport.project_coachee || {};
+  const coachee = latestReport.coachee || {};
+
+  const generationSettings = getSelectedGenerationSettings();
+  const outputRound = getSelectedGptOutputRound();
+  const gptSlot = getGptSlotByOutputRound(outputRound);
+  const gptConfigId = getGptConfigIdBySlot(gptSlot);
+  const outputReviewMode = getReviewModeByOutputRound(outputRound);
+  const isSelectedFinal = getIsSelectedFinalByOutputRound(outputRound);
+
+  const outputTitle =
+    outputType === "doc3_needs_analysis_deep_question_guide"
+      ? `${coachee.name || "피코치"} 코칭사전니즈 분석 및 심층질문 가이드 GPT 결과`
+      : `${coachee.name || "피코치"} 리더십진단 및 코칭사전니즈 통합가이드 GPT 결과`;
+
+  document.getElementById("gptOutputStatus").textContent =
+    "GPT 결과 DB 저장 중...";
+
+  const res = await fetch(
+    "https://kvmhibfxysqnrfekiatf.supabase.co/functions/v1/save-manual-gpt-output",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${currentSession.access_token}`,
+        "Content-Type": "application/json",
+      },
+        body: JSON.stringify({
+        project_coachee_id: pc.id,
+        participant_code: pc.participant_code,
+        prompt_log_id: null,
+
+        output_type: outputType,
+        output_title: outputTitle,
+        output_json: parsedResult.parsed,
+        output_text: parsedResult.cleaned,
+
+        generation_channel: generationSettings.generation_channel,
+        generation_mode: generationSettings.generation_mode,
+        review_mode: outputReviewMode,
+        gpt_slot: gptSlot,
+        gpt_config_id: gptConfigId,
+        output_round: outputRound,
+        parent_output_ids: [],
+        is_selected_final: isSelectedFinal,
+      }),
+    }
+  );
+
+  const text = await res.text();
+
+  let json = null;
+  try {
+    json = JSON.parse(text);
+  } catch (e) {
+    document.getElementById("gptOutputStatus").textContent =
+      "저장 응답 파싱 실패: " + text;
+    return;
+  }
+
+  if (!json.ok) {
+    document.getElementById("gptOutputStatus").textContent =
+      "저장 실패: " + JSON.stringify(json);
+    return;
+  }
+
+    document.getElementById("gptOutputStatus").textContent =
+      `저장 완료: ${json.data.manual_gpt_output.id} / ${generationSettings.generation_mode} / ${gptSlot} / ${outputReviewMode} / ${outputRound} / final=${isSelectedFinal} / key ${json.data.json_key_count}개`;
+}
+
+async function loadSessionDocuments() {
+  if (!latestReport) {
+    document.getElementById("sessionDocumentsContainer").innerHTML =
+      `<p class="muted">먼저 리포트를 조회하세요.</p>`;
+    return;
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    document.getElementById("sessionDocumentsContainer").innerHTML =
+      `<p class="muted">먼저 로그인하세요.</p>`;
+    return;
+  }
+
+  const pc = latestReport.project_coachee || {};
+
+  document.getElementById("sessionDocumentsContainer").innerHTML =
+    `<p class="muted">1번째 세션 자료 조회 중...</p>`;
+
+  const { data, error } = await sb
+    .from("session_document_outputs")
+    .select(`
+      id,
+      project_coachee_id,
+      participant_code,
+      session_no,
+      document_no,
+      document_type,
+      document_title,
+      output_type,
+      file_name,
+      relative_url,
+      file_exists,
+      file_size_bytes,
+      status,
+      version,
+      registered_at,
+      memo
+    `)
+    .eq("project_coachee_id", pc.id)
+    .eq("session_no", 1)
+    .order("document_no", { ascending: true });
+
+  if (error) {
+    document.getElementById("sessionDocumentsContainer").innerHTML =
+      `<p class="error">자료 조회 실패: ${escapeHtml(error.message)}</p>`;
+    return;
+  }
+
+  renderSessionDocuments(data || []);
+}
+
+async function loadLatestDocumentTokenMap(projectCoacheeId) {
+  latestDocumentTokenMap = {};
+
+  if (!projectCoacheeId) {
+    return {};
+  }
+
+  const { data, error } = await sb
+    .from("document_download_tokens")
+    .select(`
+      id,
+      session_document_output_id,
+      token,
+      audience_type,
+      is_active,
+      expires_at,
+      max_download_count,
+      download_count,
+      created_at
+    `)
+    .eq("project_coachee_id", projectCoacheeId)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
+    .limit(200);
+
+  if (error) {
+    console.warn("최신 토큰 조회 실패:", error.message);
+    return {};
+  }
+
+  const rows = data || [];
+
+  for (const row of rows) {
+    const documentId = row.session_document_output_id;
+    const audienceType = row.audience_type || "unknown";
+
+    if (!latestDocumentTokenMap[documentId]) {
+      latestDocumentTokenMap[documentId] = {};
+    }
+
+    // created_at desc 정렬이므로 같은 문서+대상에서 첫 번째 row가 최신 active 토큰
+    if (!latestDocumentTokenMap[documentId][audienceType]) {
+      latestDocumentTokenMap[documentId][audienceType] = row;
+    }
+  }
+
+  return latestDocumentTokenMap;
+}
+
+async function loadDocumentDownloadLogs() {
+  const container = document.getElementById("downloadLogContainer");
+
+  container.textContent = "다운로드 로그 조회 중...";
+
+  if (!latestReport?.project_coachee?.id) {
+    container.textContent = "먼저 피코치를 선택하고 리포트를 조회하세요.";
+    return;
+  }
+
+  const projectCoacheeId = latestReport.project_coachee.id;
+
+  const { data, error } = await sb
+    .from("document_download_logs")
+    .select(`
+      id,
+      token_id,
+      session_document_output_id,
+      project_coachee_id,
+      audience_type,
+      download_result,
+      file_name,
+      file_ext,
+      file_size_bytes,
+      ip_address,
+      user_agent,
+      requested_at,
+      error_message,
+      memo
+    `)
+    .eq("project_coachee_id", projectCoacheeId)
+    .order("requested_at", { ascending: false })
+    .limit(100);
+
+  if (error) {
+    container.textContent = "다운로드 로그 조회 실패: " + error.message;
+    return;
+  }
+
+  renderDocumentDownloadLogs(data || []);
+}
+
+function renderDocumentDownloadLogs(rows) {
+  const container = document.getElementById("downloadLogContainer");
+
+  if (!rows.length) {
+    container.textContent = "다운로드 로그가 없습니다.";
+    return;
+  }
+
+  const html = `
+    <div class="card">
+      <div class="sub-title">다운로드 로그 ${rows.length}건</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 150px;">요청시각</th>
+            <th style="width: 100px;">결과</th>
+            <th style="width: 100px;">대상</th>
+            <th style="width: 80px;">확장자</th>
+            <th>파일 / IP / 메모</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(row => {
+            const resultClass =
+              row.download_result === "success"
+                ? "ok"
+                : row.download_result === "error"
+                  ? "bad"
+                  : "warn";
+
+            return `
+              <tr>
+                <td>${escapeHtml(row.requested_at || "-")}</td>
+                <td><span class="badge ${resultClass}">${escapeHtml(row.download_result || "-")}</span></td>
+                <td>${escapeHtml(row.audience_type || "-")}</td>
+                <td>${escapeHtml(row.file_ext || "-")}</td>
+                <td>
+                  <div>${escapeHtml(row.file_name || "-")}</div>
+                  <div class="muted">ip: ${escapeHtml(row.ip_address || "-")}</div>
+                  ${row.memo ? `<div class="muted">memo: ${escapeHtml(row.memo)}</div>` : ""}
+                  ${row.error_message ? `<div class="muted">error: ${escapeHtml(row.error_message)}</div>` : ""}
+                  <div class="muted">token_id: ${escapeHtml(row.token_id || "-")}</div>
+                </td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+async function loadSessionFileStatus() {
+  const container = document.getElementById("sessionFileStatusContainer");
+
+  if (!container) {
+    alert("sessionFileStatusContainer 영역을 찾을 수 없습니다.");
+    return;
+  }
+
+  try {
+    container.textContent = "세션자료 파일 상태 조회 중...";
+
+    if (!latestReport?.project_coachee?.id) {
+      container.textContent = "먼저 리포트를 조회하세요.";
+      return;
+    }
+
+    if (!currentSession) {
+      const { data } = await sb.auth.getSession();
+      currentSession = data.session;
+    }
+
+    if (!currentSession) {
+      container.textContent = "먼저 로그인하세요.";
+      return;
+    }
+
+    const projectCoacheeId = latestReport.project_coachee.id;
+
+    const { data, error } = await sb
+      .from("session_document_outputs")
+      .select(`
+        id,
+        project_id,
+        project_coachee_id,
+        coachee_id,
+        session_no,
+        document_no,
+        document_type,
+        document_title,
+        output_type,
+        source_type,
+        file_name,
+        file_ext,
+        file_exists,
+        file_size_bytes,
+        status,
+        version,
+        local_file_path,
+        relative_url,
+        share_status,
+        coach_share_allowed,
+        client_share_allowed,
+        download_policy,
+        latest_download_token_id,
+        download_memo,
+        internal_operator_access,
+        coach_access,
+        client_access,
+        access_preset,
+        access_policy_updated_at,
+        access_policy_updated_by,
+        generated_at,
+        registered_at,
+        memo
+      `)
+      .eq("project_coachee_id", projectCoacheeId)
+      .eq("session_no", 1)
+      .in("document_no", [1, 2, 3, 4, 99])
+      .order("document_no", { ascending: true });
+
+    if (error) {
+      container.textContent = "세션자료 파일 상태 조회 실패: " + error.message;
+      return;
+    }
+
+    await loadLatestDocumentTokenMap(projectCoacheeId);
+
+    renderSessionFileStatus(data || []);
+  } catch (error) {
+    console.error("[loadSessionFileStatus] error", error);
+    container.innerHTML = `
+      <div class="card">
+        <div class="sub-title">세션자료 파일 상태 조회 중 오류 발생</div>
+        <p class="muted">${escapeHtml(error?.message || String(error))}</p>
+        <pre>${escapeHtml(error?.stack || "")}</pre>
+      </div>
+    `;
+  }
+}
+
+function getAudienceLabel(audienceType) {
+  if (audienceType === "coach") return "코치";
+  if (audienceType === "client_admin") return "고객사";
+  if (audienceType === "internal_operator") return "내부 운영자";
+  return audienceType || "-";
+}
+
+function getAudienceAccessValue(row, audienceType) {
+  if (!row) return "restricted";
+
+  if (audienceType === "coach") {
+    return row.coach_access || "restricted";
+  }
+
+  if (audienceType === "client_admin") {
+    return row.client_access || "restricted";
+  }
+
+  if (audienceType === "internal_operator") {
+    return row.internal_operator_access || "allowed";
+  }
+
+  return "restricted";
+}
+
+function canShowAudienceTokenActions(row, audienceType) {
+  const accessValue = getAudienceAccessValue(row, audienceType);
+
+  return (
+    accessValue === "allowed" ||
+    accessValue === "conditional"
+  );
+}
+
+
+function getAccessLabel(value) {
+  if (value === "allowed") return "가능";
+  if (value === "conditional") return "조건부";
+  if (value === "restricted") return "제한";
+  return "-";
+}
+
+function renderAccessSelect(row, fieldName, label) {
+  if (!row) {
+    return `<div class="muted">${escapeHtml(label)}: -</div>`;
+  }
+
+  const value = row[fieldName] || "restricted";
+
+  return `
+    <label class="muted" style="display: block; margin-top: 4px;">
+      ${escapeHtml(label)}
+      <select
+        data-document-id="${escapeHtml(row.id)}"
+        data-access-field="${escapeHtml(fieldName)}"
+        style="height: 32px; border: 1px solid #d1d5db; border-radius: 8px; padding: 0 8px; margin-left: 6px;"
+      >
+        <option value="allowed" ${value === "allowed" ? "selected" : ""}>가능</option>
+        <option value="conditional" ${value === "conditional" ? "selected" : ""}>조건부</option>
+        <option value="restricted" ${value === "restricted" ? "selected" : ""}>제한</option>
+      </select>
+    </label>
+  `;
+}
+
+async function saveDocumentAccessPolicy(documentOutputId) {
+  if (!documentOutputId) {
+    alert("문서 ID가 없습니다.");
+    return;
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    alert("먼저 로그인하세요.");
+    return;
+  }
+
+  const getSelectedValue = (fieldName) => {
+    const el = document.querySelector(
+      `select[data-document-id="${documentOutputId}"][data-access-field="${fieldName}"]`
+    );
+    return el ? el.value : null;
+  };
+
+  const internalAccess = getSelectedValue("internal_operator_access") || "allowed";
+  const coachAccess = getSelectedValue("coach_access") || "allowed";
+  const clientAccess = getSelectedValue("client_access") || "restricted";
+
+  const coachShareAllowed =
+    coachAccess === "allowed" || coachAccess === "conditional";
+
+  const clientShareAllowed =
+    clientAccess === "allowed" || clientAccess === "conditional";
+
+  let shareStatus = "internal_only";
+
+  if (coachShareAllowed && clientShareAllowed) {
+    shareStatus = "shared";
+  } else if (coachShareAllowed) {
+    shareStatus = "coach_ready";
+  }
+
+  const { error } = await sb
+    .from("session_document_outputs")
+    .update({
+      internal_operator_access: internalAccess,
+      coach_access: coachAccess,
+      client_access: clientAccess,
+      coach_share_allowed: coachShareAllowed,
+      client_share_allowed: clientShareAllowed,
+      share_status: shareStatus,
+      download_policy: "token_required",
+      access_policy_updated_at: new Date().toISOString(),
+      download_memo:
+        `관리자 화면에서 권한 수정: 내부=${getAccessLabel(internalAccess)}, 코치=${getAccessLabel(coachAccess)}, 고객사=${getAccessLabel(clientAccess)}`,
+    })
+    .eq("id", documentOutputId);
+
+  if (error) {
+    alert("권한 저장 실패: " + error.message);
+    return;
+  }
+
+  alert("권한이 저장되었습니다.");
+
+  if (typeof loadSessionFileStatus === "function") {
+    await loadSessionFileStatus();
+  }
+
+  if (typeof loadDocumentDownloadTokens === "function") {
+    await loadDocumentDownloadTokens();
+  }
+}
+
+
+function renderAudienceTokenBox(row, audienceType) {
+  const documentTokens = latestDocumentTokenMap[row.id] || {};
+  const latestToken = documentTokens[audienceType];
+  const audienceLabel = getAudienceLabel(audienceType);
+  const accessValue = getAudienceAccessValue(row, audienceType);
+  const canIssue = canShowAudienceTokenActions(row, audienceType);
+
+  const accessBadgeClass =
+    accessValue === "allowed"
+      ? "ok"
+      : accessValue === "conditional"
+        ? "warn"
+        : "bad";
+
+  const tokenArea = latestToken
+    ? (() => {
+        const downloadUrl = buildTokenDownloadUrl(latestToken.token);
+
+        return `
+          <div class="muted">token_id: ${escapeHtml(latestToken.id)}</div>
+          <div class="muted">횟수: ${escapeHtml(latestToken.download_count || 0)} / ${escapeHtml(latestToken.max_download_count || "-")}</div>
+          <div class="muted">만료: ${escapeHtml(latestToken.expires_at || "-")}</div>
+
+          <div style="margin-top: 6px;">
+            <a href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener">
+              보안 다운로드 열기
+            </a>
+            <button
+              class="secondary"
+              style="height: 28px; padding: 0 8px; font-size: 12px; margin-left: 6px;"
+              onclick="copyTextToClipboard('${escapeHtml(downloadUrl)}', '${escapeHtml(audienceLabel)}용 보안 URL이 복사되었습니다.')"
+            >
+              보안 URL 복사
+            </button>
+          </div>
+        `;
+      })()
+    : `
+      <div class="muted">active 토큰 없음</div>
+      <div class="muted">${escapeHtml(audienceLabel)}용 토큰 발급이 필요합니다.</div>
+    `;
+
+  const actionArea = canIssue
+    ? `
+      <div class="row" style="margin-top: 8px;">
+        <button
+          class="secondary"
+          style="height: 32px; padding: 0 10px; font-size: 12px;"
+          onclick="issueDocumentDownloadToken('${escapeHtml(row.id)}', '${escapeHtml(audienceType)}')"
+        >
+          ${escapeHtml(audienceLabel)} 토큰 발급/재발급
+        </button>
+
+        <button
+          class="secondary"
+          style="height: 32px; padding: 0 10px; font-size: 12px;"
+          onclick="revokeAudienceDocumentDownloadToken('${escapeHtml(row.id)}', '${escapeHtml(audienceType)}')"
+        >
+          ${escapeHtml(audienceLabel)} 토큰 비활성화
+        </button>
+      </div>
+    `
+    : `
+      <div class="muted" style="margin-top: 8px;">
+        ${escapeHtml(audienceLabel)} 권한이 제한되어 토큰 발급이 차단됩니다.
+      </div>
+    `;
+
+  return `
+    <div class="card" style="padding: 10px; margin-top: 8px;">
+      <div class="sub-title" style="font-size: 14px;">
+        ${escapeHtml(audienceLabel)}용 보안 URL
+        <span class="badge ${accessBadgeClass}" style="margin-left: 6px;">
+          ${escapeHtml(getAccessLabel(accessValue))}
+        </span>
+      </div>
+
+      ${tokenArea}
+      ${actionArea}
+    </div>
+  `;
+}
+
+function renderDocumentSecurityStatus(row) {
+  if (!row) {
+    return `<span class="badge warn">미등록</span>`;
+  }
+
+  const shareStatus = row.share_status || "internal_only";
+  const policy = row.download_policy || "direct_link";
+
+  const shareBadgeClass =
+    shareStatus === "coach_ready" || shareStatus === "shared"
+      ? "ok"
+      : shareStatus === "internal_only"
+        ? "primary"
+        : "warn";
+
+  return `
+    <div>
+      <span class="badge ${shareBadgeClass}">
+        ${escapeHtml(shareStatus)}
+      </span>
+    </div>
+
+    <div class="muted">policy: ${escapeHtml(policy)}</div>
+
+    <div style="margin-top: 8px;">
+      ${renderAccessSelect(row, "internal_operator_access", "내부")}
+      ${renderAccessSelect(row, "coach_access", "코치")}
+      ${renderAccessSelect(row, "client_access", "고객사")}
+    </div>
+
+    <div class="row" style="margin-top: 8px;">
+      <button
+        class="secondary"
+        style="height: 32px; padding: 0 10px; font-size: 12px;"
+        onclick="saveDocumentAccessPolicy('${escapeHtml(row.id)}')"
+      >
+        권한 저장
+      </button>
+    </div>
+
+    <div class="muted" style="margin-top: 6px;">
+      preset: ${escapeHtml(row.access_preset || "-")}
+    </div>
+
+    ${renderAudienceTokenBox(row, "coach")}
+    ${renderAudienceTokenBox(row, "client_admin")}
+
+    ${
+      row.download_memo
+        ? `<div class="muted" style="margin-top: 8px;">memo: ${escapeHtml(row.download_memo)}</div>`
+        : ""
+    }
+  `;
+}
+
+function renderDirectDownloadDebugBlock(row) {
+  if (!row?.relative_url) {
+    return `<span class="muted">직접 경로 없음</span>`;
+  }
+
+  return `
+    <details style="margin-top: 8px;">
+      <summary class="muted" style="cursor: pointer;">
+        개발용 직접 경로 보기
+      </summary>
+      <div style="margin-top: 6px;">
+        <a href="${encodeURI(row.relative_url)}" target="_blank" rel="noopener">
+          개발용 직접 다운로드
+        </a>
+        <div class="muted" style="word-break: break-all;">
+          ${escapeHtml(row.relative_url)}
+        </div>
+      </div>
+    </details>
+  `;
+}
+
+function buildTokenDownloadUrl(token) {
+  if (!token) return "";
+
+  const functionBaseUrl =
+    "https://kvmhibfxysqnrfekiatf.supabase.co/functions/v1/download-session-document";
+
+  return `${functionBaseUrl}?token=${encodeURIComponent(token)}`;
+}
+
+async function copyTextToClipboard(text, successMessage = "복사되었습니다.") {
+  if (!text) {
+    alert("복사할 값이 없습니다.");
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(text);
+    alert(successMessage);
+  } catch (error) {
+    console.error(error);
+
+    const temp = document.createElement("textarea");
+    temp.value = text;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    document.body.removeChild(temp);
+
+    alert(successMessage);
+  }
+}
+
+function generateDownloadTokenString() {
+  const randomPart = crypto.randomUUID().replaceAll("-", "");
+  const timePart = Date.now().toString(36);
+  return `dl_${timePart}_${randomPart}`;
+}
+
+function canIssueDownloadToken(row, audienceType) {
+  if (!row) {
+    return {
+      ok: false,
+      message: "문서 정보가 없습니다.",
+    };
+  }
+
+  if (row.status !== "generated" || row.file_exists !== true) {
+    return {
+      ok: false,
+      message: "파일이 generated / file_exists=true 상태가 아닙니다.",
+    };
+  }
+
+  if (audienceType === "internal_operator") {
+    return {
+      ok: row.internal_operator_access === "allowed",
+      message: row.internal_operator_access === "allowed"
+        ? "발급 가능"
+        : "내부 운영자 접근 권한이 제한되어 있습니다.",
+    };
+  }
+
+  if (audienceType === "coach") {
+    const allowed =
+      row.coach_access === "allowed" ||
+      row.coach_access === "conditional" ||
+      row.coach_share_allowed === true;
+
+    return {
+      ok: allowed,
+      message: allowed
+        ? "발급 가능"
+        : "코치 접근 권한이 제한되어 있습니다.",
+    };
+  }
+
+  if (audienceType === "client_admin") {
+    const allowed =
+      row.client_access === "allowed" ||
+      row.client_access === "conditional" ||
+      row.client_share_allowed === true;
+
+    return {
+      ok: allowed,
+      message: allowed
+        ? "발급 가능"
+        : "고객사 접근 권한이 제한되어 있습니다.",
+    };
+  }
+
+  return {
+    ok: false,
+    message: "알 수 없는 대상 유형입니다.",
+  };
+}
+
+async function issueDocumentDownloadToken(documentOutputId, audienceType = "coach") {
+  if (!documentOutputId) {
+    alert("문서 ID가 없습니다.");
+    return;
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    alert("먼저 로그인하세요.");
+    return;
+  }
+
+  const { data: documentRow, error: documentError } = await sb
+    .from("session_document_outputs")
+    .select(`
+      id,
+      project_id,
+      project_coachee_id,
+      coachee_id,
+      session_no,
+      document_no,
+      document_title,
+      file_name,
+      file_ext,
+      file_exists,
+      file_size_bytes,
+      status,
+      internal_operator_access,
+      coach_access,
+      client_access,
+      coach_share_allowed,
+      client_share_allowed
+    `)
+    .eq("id", documentOutputId)
+    .single();
+
+  if (documentError) {
+    alert("문서 조회 실패: " + documentError.message);
+    return;
+  }
+
+  const permission = canIssueDownloadToken(documentRow, audienceType);
+
+  if (!permission.ok) {
+    alert("토큰 발급 불가: " + permission.message);
+    return;
+  }
+
+  const audienceLabel =
+    audienceType === "coach"
+      ? "코치"
+      : audienceType === "client_admin"
+        ? "고객사"
+        : "내부 운영자";
+
+  const ok = window.confirm(
+    `${audienceLabel}용 다운로드 토큰을 발급하시겠습니까?\n\n` +
+    `[자료] ${documentRow.document_no}번 ${documentRow.document_title || ""}\n` +
+    `[파일] ${documentRow.file_name || "-"}\n\n` +
+    `기존 토큰이 있으면 새 토큰이 최신 토큰으로 지정됩니다.`
+  );
+
+  if (!ok) {
+    return;
+  }
+
+  // 같은 문서 + 같은 대상의 기존 active 토큰은 새 토큰 발급 전에 비활성화한다.
+// 운영 기준: 문서 1개 + audience_type 1개당 active 토큰은 1개만 유지.
+const { error: revokeExistingError } = await sb
+  .from("document_download_tokens")
+  .update({
+    is_active: false,
+    revoked_at: new Date().toISOString(),
+    revoked_by: currentSession.user?.id || null,
+    revoke_reason: "새 토큰 재발급으로 기존 active 토큰 자동 비활성화",
+    updated_at: new Date().toISOString(),
+  })
+  .eq("session_document_output_id", documentRow.id)
+  .eq("audience_type", audienceType)
+  .eq("is_active", true);
+
+if (revokeExistingError) {
+  alert("기존 active 토큰 비활성화 실패: " + revokeExistingError.message);
+  return;
+}
+
+  const token = generateDownloadTokenString();
+
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 14);
+
+  const { data: tokenRow, error: tokenError } = await sb
+    .from("document_download_tokens")
+    .insert({
+      session_document_output_id: documentRow.id,
+      project_id: documentRow.project_id || null,
+      project_coachee_id: documentRow.project_coachee_id || null,
+      coachee_id: documentRow.coachee_id || null,
+      token,
+      audience_type: audienceType,
+      permission_scope: "download",
+      is_active: true,
+      expires_at: expiresAt.toISOString(),
+      max_download_count: 20,
+      download_count: 0,
+      created_by: currentSession.user?.id || null,
+      memo:
+        `${audienceLabel}용 다운로드 토큰 발급 / ` +
+        `${documentRow.document_no}번 / ${documentRow.file_name || ""}`,
+    })
+    .select("id, token, audience_type, expires_at")
+    .single();
+
+  if (tokenError) {
+    alert("토큰 발급 실패: " + tokenError.message);
+    return;
+  }
+
+  const { error: updateError } = await sb
+    .from("session_document_outputs")
+    .update({
+      latest_download_token_id: tokenRow.id,
+      download_policy: "token_required",
+      download_memo:
+        `${audienceLabel}용 최신 다운로드 토큰 발급 완료 / expires_at=${tokenRow.expires_at}`,
+    })
+    .eq("id", documentRow.id);
+
+  if (updateError) {
+    alert("토큰은 발급되었지만 문서 row 업데이트 실패: " + updateError.message);
+    return;
+  }
+
+  alert(
+    "다운로드 토큰이 발급되었습니다.\n\n" +
+    `대상: ${audienceLabel}\n` +
+    `token_id: ${tokenRow.id}\n` +
+    `만료: ${tokenRow.expires_at}`
+  );
+
+  if (typeof loadSessionFileStatus === "function") {
+    await loadSessionFileStatus();
+  }
+
+  if (typeof loadDocumentDownloadTokens === "function") {
+    await loadDocumentDownloadTokens();
+  }
+
+  if (typeof loadDocumentDownloadLogs === "function") {
+    await loadDocumentDownloadLogs();
+  }
+}
+
+async function revokeLatestDocumentDownloadToken(documentOutputId) {
+  if (!documentOutputId) {
+    alert("문서 ID가 없습니다.");
+    return;
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    alert("먼저 로그인하세요.");
+    return;
+  }
+
+  const { data: documentRow, error: documentError } = await sb
+    .from("session_document_outputs")
+    .select(`
+      id,
+      latest_download_token_id,
+      document_no,
+      document_title,
+      file_name
+    `)
+    .eq("id", documentOutputId)
+    .single();
+
+  if (documentError) {
+    alert("문서 조회 실패: " + documentError.message);
+    return;
+  }
+
+  if (!documentRow.latest_download_token_id) {
+    alert("비활성화할 최신 토큰이 없습니다.");
+    return;
+  }
+
+  const ok = window.confirm(
+    `최신 다운로드 토큰을 비활성화하시겠습니까?\n\n` +
+    `[자료] ${documentRow.document_no}번 ${documentRow.document_title || ""}\n` +
+    `[파일] ${documentRow.file_name || "-"}`
+  );
+
+  if (!ok) {
+    return;
+  }
+
+  const { error: revokeError } = await sb
+    .from("document_download_tokens")
+    .update({
+      is_active: false,
+      revoked_at: new Date().toISOString(),
+      revoked_by: currentSession.user?.id || null,
+      revoke_reason: "관리자 화면에서 최신 토큰 비활성화",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", documentRow.latest_download_token_id);
+
+  if (revokeError) {
+    alert("토큰 비활성화 실패: " + revokeError.message);
+    return;
+  }
+
+  const { error: updateError } = await sb
+    .from("session_document_outputs")
+    .update({
+      latest_download_token_id: null,
+      download_memo: "관리자 화면에서 최신 다운로드 토큰 비활성화",
+    })
+    .eq("id", documentRow.id);
+
+  if (updateError) {
+    alert("토큰은 비활성화되었지만 문서 row 업데이트 실패: " + updateError.message);
+    return;
+  }
+
+  alert("최신 다운로드 토큰이 비활성화되었습니다.");
+
+  if (typeof loadSessionFileStatus === "function") {
+    await loadSessionFileStatus();
+  }
+}
+
+async function revokeAudienceDocumentDownloadToken(documentOutputId, audienceType) {
+  if (!documentOutputId) {
+    alert("문서 ID가 없습니다.");
+    return;
+  }
+
+  if (!audienceType) {
+    alert("대상 유형이 없습니다.");
+    return;
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    alert("먼저 로그인하세요.");
+    return;
+  }
+
+  const audienceLabel = getAudienceLabel(audienceType);
+
+  const { data: activeTokens, error: tokenError } = await sb
+    .from("document_download_tokens")
+    .select(`
+      id,
+      session_document_output_id,
+      audience_type,
+      is_active,
+      created_at
+    `)
+    .eq("session_document_output_id", documentOutputId)
+    .eq("audience_type", audienceType)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
+  if (tokenError) {
+    alert("active 토큰 조회 실패: " + tokenError.message);
+    return;
+  }
+
+  const rows = activeTokens || [];
+
+  if (!rows.length) {
+    alert(`${audienceLabel}용 active 토큰이 없습니다.`);
+    return;
+  }
+
+  const ok = window.confirm(
+    `${audienceLabel}용 active 토큰 ${rows.length}건을 비활성화하시겠습니까?`
+  );
+
+  if (!ok) {
+    return;
+  }
+
+  const tokenIds = rows.map(row => row.id);
+
+  const { error: revokeError } = await sb
+    .from("document_download_tokens")
+    .update({
+      is_active: false,
+      revoked_at: new Date().toISOString(),
+      revoked_by: currentSession.user?.id || null,
+      revoke_reason: `${audienceLabel}용 active 토큰 관리자 비활성화`,
+      updated_at: new Date().toISOString(),
+    })
+    .in("id", tokenIds);
+
+  if (revokeError) {
+    alert("토큰 비활성화 실패: " + revokeError.message);
+    return;
+  }
+
+  // latest_download_token_id가 방금 비활성화한 토큰 중 하나라면 null 처리
+  const { data: documentRow } = await sb
+    .from("session_document_outputs")
+    .select("id, latest_download_token_id")
+    .eq("id", documentOutputId)
+    .single();
+
+  if (documentRow?.latest_download_token_id && tokenIds.includes(documentRow.latest_download_token_id)) {
+    await sb
+      .from("session_document_outputs")
+      .update({
+        latest_download_token_id: null,
+        download_memo: `${audienceLabel}용 active 토큰 비활성화`,
+      })
+      .eq("id", documentOutputId);
+  }
+
+  alert(`${audienceLabel}용 active 토큰이 비활성화되었습니다.`);
+
+  if (typeof loadSessionFileStatus === "function") {
+    await loadSessionFileStatus();
+  }
+
+  if (typeof loadDocumentDownloadTokens === "function") {
+    await loadDocumentDownloadTokens();
+  }
+}
+
+async function loadDocumentDownloadTokens() {
+  const container = document.getElementById("downloadTokenStatusContainer");
+
+  container.textContent = "다운로드 토큰 이력 조회 중...";
+
+  if (!latestReport?.project_coachee?.id) {
+    container.textContent = "먼저 피코치를 선택하고 리포트를 조회하세요.";
+    return;
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    container.textContent = "먼저 로그인하세요.";
+    return;
+  }
+
+  const projectCoacheeId = latestReport.project_coachee.id;
+
+  const { data, error } = await sb
+    .from("document_download_tokens")
+    .select(`
+      id,
+      session_document_output_id,
+      project_coachee_id,
+      token,
+      audience_type,
+      permission_scope,
+      is_active,
+      expires_at,
+      max_download_count,
+      download_count,
+      created_at,
+      revoked_at,
+      revoke_reason,
+      memo,
+      session_document_outputs (
+        document_no,
+        document_title,
+        file_name,
+        file_ext
+      )
+    `)
+    .eq("project_coachee_id", projectCoacheeId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error) {
+    container.textContent = "다운로드 토큰 이력 조회 실패: " + error.message;
+    return;
+  }
+
+  renderDocumentDownloadTokens(data || []);
+}
+
+function renderDocumentDownloadTokens(rows) {
+  const container = document.getElementById("downloadTokenStatusContainer");
+
+  if (!rows.length) {
+    container.textContent = "발급된 다운로드 토큰이 없습니다.";
+    return;
+  }
+
+  const html = `
+    <div class="card">
+      <div class="sub-title">다운로드 토큰 이력 ${rows.length}건</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 70px;">문서</th>
+            <th style="width: 120px;">대상</th>
+            <th style="width: 90px;">상태</th>
+            <th style="width: 120px;">다운로드</th>
+            <th style="width: 180px;">만료</th>
+            <th>토큰 / 다운로드 URL / 메모</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(row => {
+            const doc = row.session_document_outputs || {};
+            const statusBadge = row.is_active
+              ? `<span class="badge ok">active</span>`
+              : `<span class="badge warn">revoked</span>`;
+
+            return `
+              <tr>
+                <td>
+                  ${escapeHtml(doc.document_no || "-")}번
+                  <div class="muted">${escapeHtml(doc.file_ext || "")}</div>
+                </td>
+                <td>${escapeHtml(row.audience_type || "-")}</td>
+                <td>
+                  ${statusBadge}
+                  ${row.revoked_at ? `<div class="muted">${escapeHtml(row.revoked_at)}</div>` : ""}
+                </td>
+                <td>
+                  ${escapeHtml(row.download_count || 0)}
+                  /
+                  ${escapeHtml(row.max_download_count || "-")}
+                </td>
+                <td>${escapeHtml(row.expires_at || "-")}</td>
+                <td>
+                  ${(() => {
+  const downloadUrl = buildTokenDownloadUrl(row.token);
+
+  return `
+    <div class="muted">id=${escapeHtml(row.id)}</div>
+    <div class="muted">token=${escapeHtml(row.token)}</div>
+
+    ${
+      row.is_active
+        ? `
+          <div style="margin-top: 6px;">
+            <a href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener">
+              보안 다운로드 열기
+            </a>
+            <button
+              class="secondary"
+              style="height: 28px; padding: 0 8px; font-size: 12px; margin-left: 6px;"
+              onclick="copyTextToClipboard('${escapeHtml(downloadUrl)}', '토큰 다운로드 URL이 복사되었습니다.')"
+            >
+              URL 복사
+            </button>
+          </div>
+        `
+        : `<div class="muted" style="margin-top: 6px;">비활성화된 토큰입니다.</div>`
+    }
+
+    ${row.memo ? `<div class="muted" style="margin-top: 6px;">${escapeHtml(row.memo)}</div>` : ""}
+    ${row.revoke_reason ? `<div class="muted">revoke: ${escapeHtml(row.revoke_reason)}</div>` : ""}
+  `;
+})()}
+                </td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+function getExpectedSession1Documents() {
+  return [
+    {
+      documentNo: 1,
+      label: "1번 리더십 역량진단 결과 리포트",
+      expectedExt: ".pdf",
+      required: true,
+    },
+    {
+      documentNo: 2,
+      label: "2번 코칭 사전 니즈 조사 내용",
+      expectedExt: ".docx",
+      required: true,
+    },
+    {
+      documentNo: 3,
+      label: "3번 코치용 코칭사전니즈 분석 및 심층질문 가이드",
+      expectedExt: ".docx",
+      required: true,
+    },
+    {
+      documentNo: 4,
+      label: "4번 코치용 리더십진단 및 코칭사전니즈 통합가이드",
+      expectedExt: ".docx",
+      required: true,
+    },
+    {
+      documentNo: 99,
+      label: "99번 1회차 코칭세션자료 ZIP",
+      expectedExt: ".zip",
+      required: false,
+    },
+  ];
+}
+
+function evaluateSessionFileStatus(expectedDoc, row) {
+  if (!row) {
+    return {
+      ok: false,
+      badge: "NG",
+      detail: "DB 등록 이력이 없습니다.",
+    };
+  }
+
+  if (row.status !== "generated") {
+    return {
+      ok: false,
+      badge: "NG",
+      detail: `status=${row.status || "-"}`
+    };
+  }
+
+  if (row.file_exists !== true) {
+    return {
+      ok: false,
+      badge: "NG",
+      detail: `file_exists=${row.file_exists}`
+    };
+  }
+
+  if (expectedDoc.expectedExt && row.file_ext !== expectedDoc.expectedExt) {
+    return {
+      ok: false,
+      badge: "확인",
+      detail: `확장자 확인 필요: expected=${expectedDoc.expectedExt}, actual=${row.file_ext || "-"}`
+    };
+  }
+
+  if (!row.relative_url) {
+    return {
+      ok: false,
+      badge: "확인",
+      detail: "relative_url이 없습니다."
+    };
+  }
+
+  return {
+    ok: true,
+    badge: "OK",
+    detail: "generated / file_exists=true"
+  };
+}
+
+function formatFileSize(bytes) {
+  const value = Number(bytes || 0);
+
+  if (!value) {
+    return "-";
+  }
+
+  if (value >= 1024 * 1024) {
+    return `${(value / 1024 / 1024).toFixed(2)} MB`;
+  }
+
+  if (value >= 1024) {
+    return `${(value / 1024).toFixed(1)} KB`;
+  }
+
+  return `${value} B`;
+}
+
+function renderSessionFileStatus(rows) {
+  const container = document.getElementById("sessionFileStatusContainer");
+
+  const expectedDocs = getExpectedSession1Documents();
+
+  const rowByDocumentNo = {};
+  rows.forEach(row => {
+    rowByDocumentNo[String(row.document_no)] = row;
+  });
+
+  const evaluatedRows = expectedDocs.map(expected => {
+    const row = rowByDocumentNo[String(expected.documentNo)];
+    const evaluation = evaluateSessionFileStatus(expected, row);
+
+    return {
+      expected,
+      row,
+      evaluation,
+    };
+  });
+
+  const requiredOk = evaluatedRows
+    .filter(item => item.expected.required)
+    .every(item => item.evaluation.ok);
+
+  const packageOk = evaluatedRows
+    .filter(item => item.expected.documentNo === 99)
+    .every(item => item.evaluation.ok);
+
+  const summaryBadge = requiredOk
+    ? `<span class="badge ok">필수자료 준비 완료</span>`
+    : `<span class="badge warn">필수자료 점검 필요</span>`;
+
+  const packageBadge = packageOk
+    ? `<span class="badge ok">ZIP 준비 완료</span>`
+    : `<span class="badge warn">ZIP 없음/점검</span>`;
+
+  const html = `
+    <div class="card">
+      <div class="sub-title">세션자료 파일 상태 ${summaryBadge} ${packageBadge}</div>
+      <p class="muted">
+        필수자료는 1~4번입니다. ZIP은 99번이며, 패키징 완료 여부 확인용입니다.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 260px;">자료</th>
+            <th style="width: 90px;">상태</th>
+            <th style="width: 90px;">확장자</th>
+            <th style="width: 100px;">크기</th>
+            <th style="width: 180px;">공유/보안</th>
+            <th>파일명 / 개발용 경로</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${evaluatedRows.map(item => {
+            const row = item.row;
+            const evaluation = item.evaluation;
+
+            const badgeClass =
+              evaluation.ok
+                ? "ok"
+                : evaluation.badge === "확인"
+                  ? ""
+                  : "warn";
+
+            const downloadLink = renderDirectDownloadDebugBlock(row);
+
+            return `
+              <tr>
+                <td>
+                  ${escapeHtml(item.expected.label)}
+                  ${item.expected.required ? "" : `<div class="muted">선택/패키지</div>`}
+                </td>
+                <td>
+                  <span class="badge ${badgeClass}">${escapeHtml(evaluation.badge)}</span>
+                  <div class="muted">${escapeHtml(evaluation.detail)}</div>
+                </td>
+                <td>${escapeHtml(row?.file_ext || "-")}</td>
+                <td>${escapeHtml(formatFileSize(row?.file_size_bytes))}</td>
+                <td>
+                  ${renderDocumentSecurityStatus(row)}
+                </td>
+                <td>
+                  <div>${escapeHtml(row?.file_name || "-")}</div>
+                  ${downloadLink}
+                </td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+async function loadGptOutputStatus() {
+  const container = document.getElementById("gptOutputStatusContainer");
+
+  container.textContent = "GPT 결과 저장 상태 조회 중...";
+
+  if (!latestReport?.project_coachee?.id) {
+    container.textContent = "먼저 리포트를 조회하세요.";
+    return;
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    container.textContent = "먼저 로그인하세요.";
+    return;
+  }
+
+  const projectCoacheeId = latestReport.project_coachee.id;
+
+  const outputTypes = [
+    {
+      outputType: "doc3_needs_analysis_deep_question_guide",
+      label: "3번 코칭사전니즈 분석 및 심층질문 가이드",
+    },
+    {
+      outputType: "doc4_integrated_feedback_guide",
+      label: "4번 리더십진단 및 코칭사전니즈 통합가이드",
+    },
+  ];
+
+  const results = [];
+
+  for (const item of outputTypes) {
+    const status = await fetchGptOutputStatusByType(projectCoacheeId, item.outputType);
+    results.push({
+      ...item,
+      ...status,
+    });
+  }
+
+  renderGptOutputStatus(results);
+}
+
+async function fetchGptOutputStatusByType(projectCoacheeId, outputType) {
+  const { data, error } = await sb
+    .from("manual_gpt_outputs")
+    .select(`
+      id,
+      output_type,
+      output_title,
+      generation_channel,
+      review_mode,
+      gpt_slot,
+      gpt_config_id,
+      output_round,
+      parse_status,
+      status,
+      is_selected_final,
+      created_at,
+      updated_at
+    `)
+    .eq("project_coachee_id", projectCoacheeId)
+    .eq("output_type", outputType)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return {
+      rows: [],
+      error: error.message,
+      summary: {
+        hasDraft1: false,
+        hasDraft2: false,
+        hasIntegratedFinal: false,
+        hasSelectedFinal: false,
+        readyForDocx: false,
+      },
+    };
+  }
+
+  const rows = data || [];
+
+  const draft1 = rows.find(row =>
+    row.output_round === "draft_1" &&
+    row.gpt_slot === "gpt1" &&
+    row.parse_status === "parsed" &&
+    row.status === "saved"
+  );
+
+  const draft2 = rows.find(row =>
+    row.output_round === "draft_2" &&
+    row.gpt_slot === "gpt2" &&
+    row.parse_status === "parsed" &&
+    row.status === "saved"
+  );
+
+  const integratedFinal = rows.find(row =>
+    row.output_round === "integrated_final" &&
+    row.parse_status === "parsed" &&
+    row.status === "saved"
+  );
+
+  const selectedFinal = rows.find(row =>
+    row.output_round === "integrated_final" &&
+    row.is_selected_final === true &&
+    row.parse_status === "parsed" &&
+    row.status === "saved"
+  );
+
+  return {
+    rows,
+    error: null,
+    summary: {
+      hasDraft1: Boolean(draft1),
+      hasDraft2: Boolean(draft2),
+      hasIntegratedFinal: Boolean(integratedFinal),
+      hasSelectedFinal: Boolean(selectedFinal),
+      readyForDocx: Boolean(selectedFinal),
+      draft1,
+      draft2,
+      integratedFinal,
+      selectedFinal,
+    },
+  };
+}
+
+function renderGptOutputStatus(results) {
+  const container = document.getElementById("gptOutputStatusContainer");
+
+  const html = results.map(result => {
+    if (result.error) {
+      return `
+        <div class="card">
+          <div class="sub-title">${escapeHtml(result.label)}</div>
+          <p><span class="badge warn">조회 실패</span></p>
+          <p class="muted">${escapeHtml(result.error)}</p>
+        </div>
+      `;
+    }
+
+    const summary = result.summary || {};
+    const rows = result.rows || [];
+
+    const readyBadge = summary.readyForDocx
+      ? `<span class="badge ok">DOCX 생성 가능</span>`
+      : `<span class="badge warn">최종본 필요</span>`;
+
+    return `
+      <div class="card" style="margin-bottom: 14px;">
+        <div class="sub-title">${escapeHtml(result.label)} ${readyBadge}</div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 180px;">점검 항목</th>
+              <th style="width: 90px;">상태</th>
+              <th>상세</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${renderGptOutputCheckRow(
+              "GPT1 draft_1",
+              summary.hasDraft1,
+              summary.draft1
+            )}
+            ${renderGptOutputCheckRow(
+              "GPT2 draft_2",
+              summary.hasDraft2,
+              summary.draft2
+            )}
+            ${renderGptOutputCheckRow(
+              "통합 integrated_final",
+              summary.hasIntegratedFinal,
+              summary.integratedFinal
+            )}
+            ${renderGptOutputCheckRow(
+              "최종본 선택",
+              summary.hasSelectedFinal,
+              summary.selectedFinal
+            )}
+          </tbody>
+        </table>
+
+        <details style="margin-top: 12px;">
+          <summary>저장된 GPT 결과 전체 보기 (${rows.length}건)</summary>
+          ${renderGptOutputRowsTable(rows)}
+        </details>
+      </div>
+    `;
+  }).join("");
+
+  container.innerHTML = html;
+}
+
+function renderGptOutputCheckRow(label, ok, row) {
+  const badge = ok
+    ? `<span class="badge ok">OK</span>`
+    : `<span class="badge warn">NG</span>`;
+
+  const detail = row
+    ? `id=${row.id} / ${row.gpt_slot || "-"} / ${row.output_round || "-"} / final=${row.is_selected_final === true} / ${row.created_at || "-"}`
+    : "저장된 parsed/saved 결과가 없습니다.";
+
+  return `
+    <tr>
+      <td>${escapeHtml(label)}</td>
+      <td>${badge}</td>
+      <td>${escapeHtml(detail)}</td>
+    </tr>
+  `;
+}
+
+function renderGptOutputRowsTable(rows) {
+  if (!rows.length) {
+    return `<p class="muted">저장된 GPT 결과가 없습니다.</p>`;
+  }
+
+  return `
+    <table style="margin-top: 10px;">
+      <thead>
+        <tr>
+          <th style="width: 180px;">created_at</th>
+          <th style="width: 120px;">round</th>
+          <th style="width: 100px;">slot</th>
+          <th style="width: 110px;">parse</th>
+          <th style="width: 90px;">status</th>
+          <th style="width: 70px;">final</th>
+          <th>id</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(row => `
+          <tr>
+            <td>${escapeHtml(row.created_at || "-")}</td>
+            <td>${escapeHtml(row.output_round || "-")}</td>
+            <td>${escapeHtml(row.gpt_slot || "-")}</td>
+            <td>${escapeHtml(row.parse_status || "-")}</td>
+            <td>${escapeHtml(row.status || "-")}</td>
+            <td>${row.is_selected_final === true ? "Y" : ""}</td>
+            <td><span class="muted">${escapeHtml(row.id)}</span></td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}function renderGptOutputRowsTable(rows) {
+  if (!rows.length) {
+    return `<p class="muted">저장된 GPT 결과가 없습니다.</p>`;
+  }
+
+  return `
+    <table style="margin-top: 10px;">
+      <thead>
+        <tr>
+          <th style="width: 180px;">created_at</th>
+          <th style="width: 120px;">round</th>
+          <th style="width: 100px;">slot</th>
+          <th style="width: 110px;">parse</th>
+          <th style="width: 90px;">status</th>
+          <th style="width: 70px;">final</th>
+          <th>id</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(row => `
+          <tr>
+            <td>${escapeHtml(row.created_at || "-")}</td>
+            <td>${escapeHtml(row.output_round || "-")}</td>
+            <td>${escapeHtml(row.gpt_slot || "-")}</td>
+            <td>${escapeHtml(row.parse_status || "-")}</td>
+            <td>${escapeHtml(row.status || "-")}</td>
+            <td>${row.is_selected_final === true ? "Y" : ""}</td>
+            <td><span class="muted">${escapeHtml(row.id)}</span></td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+async function runSession1PipelinePrecheck() {
+  const container = document.getElementById("pipelinePrecheckContainer");
+
+  container.textContent = "사전점검 실행 중...";
+
+  if (!latestReport?.project_coachee?.id) {
+    container.textContent = "먼저 리포트를 조회하세요.";
+    return;
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    container.textContent = "먼저 로그인하세요.";
+    return;
+  }
+
+  const pc = latestReport.project_coachee;
+  const projectCoacheeId = pc.id;
+  const participantCode = pc.participant_code || "";
+
+  if (typeof loadGptOutputStatus === "function") {
+    await loadGptOutputStatus();
+  }
+
+  if (typeof loadSessionFileStatus === "function") {
+    await loadSessionFileStatus();
+  }
+
+  const checks = [];
+
+  checks.push({
+    key: "project_coachee",
+    label: "피코치 연결 정보",
+    ok: Boolean(projectCoacheeId && participantCode),
+    detail: `project_coachee_id=${projectCoacheeId || "-"} / participant_code=${participantCode || "-"}`
+  });
+
+  const doc3Check = await checkIntegratedFinalGptOutput(
+    projectCoacheeId,
+    "doc3_needs_analysis_deep_question_guide"
+  );
+
+  checks.push({
+    key: "doc3_gpt",
+    label: "3번 GPT integrated_final",
+    ok: doc3Check.ok,
+    detail: doc3Check.detail
+  });
+
+  const doc4Check = await checkIntegratedFinalGptOutput(
+    projectCoacheeId,
+    "doc4_integrated_feedback_guide"
+  );
+
+  checks.push({
+    key: "doc4_gpt",
+    label: "4번 GPT integrated_final",
+    ok: doc4Check.ok,
+    detail: doc4Check.detail
+  });
+
+  const doc1Check = await checkSessionDocument(projectCoacheeId, 1);
+  checks.push({
+    key: "doc1",
+    label: "1번 리더십 역량진단 결과 리포트",
+    ok: doc1Check.ok,
+    detail: doc1Check.detail
+  });
+
+  const doc2Check = await checkSessionDocument(projectCoacheeId, 2);
+  checks.push({
+    key: "doc2",
+    label: "2번 코칭 사전 니즈 조사 내용",
+    ok: doc2Check.ok,
+    detail: doc2Check.detail
+  });
+
+  const allOk = checks.every(item => item.ok);
+
+  renderSession1PipelinePrecheck(checks, allOk);
+}
+
+async function checkIntegratedFinalGptOutput(projectCoacheeId, outputType) {
+  const { data, error } = await sb
+    .from("manual_gpt_outputs")
+    .select(`
+      id,
+      output_type,
+      output_round,
+      gpt_slot,
+      review_mode,
+      parse_status,
+      status,
+      is_selected_final,
+      created_at
+    `)
+    .eq("project_coachee_id", projectCoacheeId)
+    .eq("output_type", outputType)
+    .eq("output_round", "integrated_final")
+    .eq("is_selected_final", true)
+    .eq("parse_status", "parsed")
+    .eq("status", "saved")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (error) {
+    return {
+      ok: false,
+      detail: `조회 실패: ${error.message}`
+    };
+  }
+
+  if (!data || !data.length) {
+    return {
+      ok: false,
+      detail: "integrated_final 최종 GPT 결과가 없습니다."
+    };
+  }
+
+  const row = data[0];
+
+  return {
+    ok: true,
+    detail: `OK / id=${row.id} / ${row.gpt_slot || "-"} / ${row.review_mode || "-"} / ${row.created_at || "-"}`
+  };
+}
+
+async function checkSessionDocument(projectCoacheeId, documentNo) {
+  const { data, error } = await sb
+    .from("session_document_outputs")
+    .select(`
+      id,
+      document_no,
+      document_type,
+      document_title,
+      file_name,
+      file_exists,
+      status,
+      relative_url,
+      registered_at
+    `)
+    .eq("project_coachee_id", projectCoacheeId)
+    .eq("session_no", 1)
+    .eq("document_no", documentNo)
+    .order("registered_at", { ascending: false })
+    .limit(1);
+
+  if (error) {
+    return {
+      ok: false,
+      detail: `조회 실패: ${error.message}`
+    };
+  }
+
+  if (!data || !data.length) {
+    return {
+      ok: false,
+      detail: `${documentNo}번 자료 등록 이력이 없습니다.`
+    };
+  }
+
+  const row = data[0];
+
+  if (row.status !== "generated" || row.file_exists !== true) {
+    return {
+      ok: false,
+      detail: `등록은 되어 있으나 준비 상태가 아닙니다. status=${row.status}, file_exists=${row.file_exists}`
+    };
+  }
+
+  return {
+    ok: true,
+    detail: `OK / ${row.file_name || "-"}`
+  };
+}
+
+function renderSession1PipelinePrecheck(checks, allOk) {
+  const container = document.getElementById("pipelinePrecheckContainer");
+
+  const summaryBadge = allOk
+    ? `<span class="badge ok">실행 가능</span>`
+    : `<span class="badge warn">점검 필요</span>`;
+
+  const html = `
+    <div class="card">
+      <div class="sub-title">사전점검 결과 ${summaryBadge}</div>
+      <p class="muted">
+        ${allOk
+          ? "필수 항목이 준비되어 있습니다. 파이프라인을 실행해도 됩니다."
+          : "필수 항목 중 일부가 준비되지 않았습니다. 아래 항목을 보정한 후 다시 실행하세요."}
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 220px;">점검 항목</th>
+            <th style="width: 90px;">결과</th>
+            <th>상세</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${checks.map(item => `
+            <tr>
+              <td>${escapeHtml(item.label)}</td>
+              <td>
+                ${item.ok
+                  ? `<span class="badge ok">OK</span>`
+                  : `<span class="badge warn">NG</span>`}
+              </td>
+              <td>${escapeHtml(item.detail || "-")}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+async function loadPipelineRuns(includeHidden = false) {
+  const container = document.getElementById("pipelineRunsContainer");
+  const detailLog = document.getElementById("pipelineRunDetailLog");
+
+  container.textContent = "파이프라인 실행 이력 조회 중...";
+  detailLog.textContent = "";
+
+  if (!latestReport?.project_coachee?.id) {
+    container.textContent = "먼저 리포트를 조회하세요.";
+    return;
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    container.textContent = "먼저 로그인하세요.";
+    return;
+  }
+
+  const projectCoacheeId = latestReport.project_coachee.id;
+
+  let query = sb
+    .from("pipeline_runs")
+    .select(`
+      id,
+      pipeline_type,
+      trigger_source,
+      project_coachee_id,
+      participant_code,
+      status,
+      returncode,
+      elapsed_seconds,
+      started_at,
+      finished_at,
+      error_message,
+      stdout,
+      stderr,
+      is_test_run,
+      is_hidden,
+      run_label,
+      retention_policy,
+      hidden_reason
+    `)
+    .eq("project_coachee_id", projectCoacheeId);
+
+  if (!includeHidden) {
+    query = query.eq("is_hidden", false);
+  }
+
+  const { data, error } = await query
+    .order("started_at", { ascending: false })
+    .limit(10);
+
+  if (error) {
+    container.textContent = "실행 이력 조회 실패: " + error.message;
+    return;
+  }
+
+  renderPipelineRuns(data || []);
+}
+
+function summarizePipelineError(errorMessage, maxLength = 120) {
+  if (!errorMessage) {
+    return "";
+  }
+
+  const text = String(errorMessage || "").trim();
+
+  const lines = text
+    .split("\n")
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  const runtimeLine =
+    lines.find(line => line.startsWith("RuntimeError:")) ||
+    lines.find(line => line.includes("Error:")) ||
+    lines[lines.length - 1] ||
+    text;
+
+  if (runtimeLine.length <= maxLength) {
+    return runtimeLine;
+  }
+
+  return runtimeLine.slice(0, maxLength) + "...";
+}
+
+function getPipelineStatusBadgeClass(status) {
+  if (status === "success") return "ok";
+  if (status === "failed") return "warn";
+  if (status === "running") return "primary";
+  return "";
+}
+
+function renderPipelineRuns(rows) {
+  const container = document.getElementById("pipelineRunsContainer");
+
+  if (!rows.length) {
+    container.textContent = "최근 실행 이력이 없습니다.";
+    return;
+  }
+
+  const html = `
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 180px;">실행시각</th>
+          <th style="width: 90px;">상태</th>
+          <th style="width: 90px;">소요</th>
+          <th style="width: 110px;">참여코드</th>
+          <th style="width: 150px;">라벨</th>
+          <th>run_id / 에러 요약</th>
+          <th style="width: 100px;">로그</th>
+        </tr>
+      <tbody>
+        ${rows.map((row, index) => {
+          const badgeClass = getPipelineStatusBadgeClass(row.status);
+          const errorSummary = summarizePipelineError(row.error_message);
+
+          return `
+            <tr>
+              <td>${escapeHtml(row.started_at || "-")}</td>
+              <td><span class="badge ${badgeClass}">${escapeHtml(row.status || "-")}</span></td>
+              <td>${Number(row.elapsed_seconds || 0).toFixed(2)}초</td>
+              <td>${escapeHtml(row.participant_code || "-")}</td>
+              <td>
+                ${escapeHtml(row.run_label || "-")}
+                ${row.is_hidden ? `<div class="muted">숨김</div>` : ""}
+                ${row.is_test_run ? `<div class="muted">테스트</div>` : ""}
+              </td>
+            <td>
+  <span class="muted">${escapeHtml(row.id)}</span>
+                ${errorSummary ? `<div class="muted" style="margin-top: 4px;">error: ${escapeHtml(errorSummary)}</div>` : ""}
+                </td>
+              <td>
+                <button class="secondary" onclick="showPipelineRunLog(${index})">보기</button>
+              </td>
+            </tr>
+          `;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+
+  window.latestPipelineRuns = rows;
+  container.innerHTML = html;
+}
+
+function getPipelineRecoveryHint(row) {
+  const errorText = `${row.error_message || ""}\n${row.stderr || ""}`;
+
+  if (errorText.includes("FORCE_FAIL 테스트")) {
+    return "복구 힌트: FORCE_FAIL은 의도적 실패 테스트입니다. 정상 실행 버튼으로 다시 실행하면 됩니다.";
+  }
+
+  if (errorText.includes("manual_gpt_outputs") || errorText.includes("GPT 결과")) {
+    return "복구 힌트: GPT 결과 JSON 저장 여부를 확인하세요. doc3/doc4 integrated_final 최종본이 필요합니다.";
+  }
+
+  if (errorText.includes("템플릿 파일 없음") || errorText.includes("template")) {
+    return "복구 힌트: templates/docx/coach_guides 폴더의 current 템플릿 파일 경로와 manifest를 확인하세요.";
+  }
+
+  if (errorText.includes("파일 없음") || errorText.includes("FileNotFoundError")) {
+    return "복구 힌트: generated 폴더에 필요한 1~4번 파일이 있는지 확인하세요.";
+  }
+
+  if (errorText.includes("Supabase 로그인 실패") || errorText.includes("Invalid login")) {
+    return "복구 힌트: .env의 Supabase 로그인 이메일/비밀번호를 확인하세요.";
+  }
+
+  if (errorText.includes("RLS") || errorText.includes("row-level security")) {
+    return "복구 힌트: Supabase RLS 정책을 확인하세요. authenticated insert/update 권한이 필요할 수 있습니다.";
+  }
+
+  return "복구 힌트: STDERR 마지막 오류 문장을 확인한 뒤, 관련 파일·DB·환경변수를 점검하세요.";
+}
+
+function showPipelineRunLog(index) {
+  const rows = window.latestPipelineRuns || [];
+  const row = rows[index];
+
+  const recoveryStatus = document.getElementById("pipelineRecoveryStatus");
+
+  if (!row) {
+    document.getElementById("pipelineRunDetailLog").textContent =
+      "선택한 실행 이력을 찾을 수 없습니다.";
+    return;
+  }
+
+
+  if (recoveryStatus) {
+    if (row.status === "failed") {
+      recoveryStatus.textContent = getPipelineRecoveryHint(row);
+    } else {
+    recoveryStatus.textContent =
+      "선택한 실행 이력은 success입니다. 별도 복구 조치가 필요하지 않습니다.";
+    }
+  }
+
+  const commonHeader = [
+  `run_id: ${row.id}`,
+  `status: ${row.status}`,
+  `returncode: ${row.returncode}`,
+  `elapsed_seconds: ${row.elapsed_seconds}`,
+  `started_at: ${row.started_at}`,
+  `finished_at: ${row.finished_at}`,
+  "",
+];
+
+let logLines;
+
+if (row.status === "failed") {
+  logLines = [
+    ...commonHeader,
+    "=== STDERR / ERROR FIRST ===",
+    row.stderr || row.error_message || "(없음)",
+    "",
+    "=== STDOUT ===",
+    row.stdout || "",
+  ];
+} else {
+  logLines = [
+    ...commonHeader,
+    "=== STDOUT ===",
+    row.stdout || "",
+    "",
+    "=== STDERR ===",
+    row.stderr || "(없음)",
+  ];
+}
+
+document.getElementById("pipelineRunDetailLog").textContent =
+  logLines.join("\n");
+}
+
+function renderSessionDocuments(rows) {
+  const container = document.getElementById("sessionDocumentsContainer");
+
+  if (!rows.length) {
+    container.innerHTML = `
+      <p class="muted">
+        등록된 세션 자료가 없습니다. 먼저 register_session1_documents.py를 실행하세요.
+      </p>
+    `;
+    return;
+  }
+
+  const packageRow = rows.find(row => row.document_no === 99);
+  const documentRows = rows.filter(row => row.document_no !== 99);
+
+  const allDocsReady =
+  documentRows.length >= 4 &&
+  documentRows
+    .filter(row => [1, 2, 3, 4].includes(row.document_no))
+    .every(row => row.status === "generated" && row.file_exists);
+
+const packageReady =
+  packageRow &&
+  packageRow.status === "generated" &&
+  packageRow.file_exists;
+
+const readinessHtml =
+  allDocsReady && packageReady
+    ? `
+      <div class="card" style="margin-bottom: 16px; border-color: #bbf7d0; background: #f0fdf4;">
+        <div class="sub-title">자료 준비 상태</div>
+        <p style="margin: 0;">
+          <span class="badge ok">1회차 자료 준비 완료</span>
+          1~4번 개별 자료와 ZIP 패키지가 모두 생성되었습니다.
+        </p>
+      </div>
+    `
+    : `
+      <div class="card" style="margin-bottom: 16px; border-color: #fde68a; background: #fffbeb;">
+        <div class="sub-title">자료 준비 상태</div>
+        <p style="margin: 0;">
+          <span class="badge warn">자료 준비 미완료</span>
+          일부 자료가 아직 생성되지 않았습니다.
+        </p>
+      </div>
+    `;
+
+  const statusBadge = (row) => {
+    if (row.status === "generated" && row.file_exists) {
+      return `<span class="badge ok">generated</span>`;
+    }
+
+    if (row.status === "missing" || !row.file_exists) {
+      return `<span class="badge warn">missing</span>`;
+    }
+
+    return `<span class="badge">${escapeHtml(row.status || "-")}</span>`;
+  };
+
+  const fileSizeText = (bytes) => {
+    if (!bytes && bytes !== 0) return "-";
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+  };
+
+  const downloadCell = (row, label = "다운로드") => {
+    if (!row.file_exists || !row.relative_url) {
+      return `<span class="muted">-</span>`;
+    }
+
+    return `
+      <a href="${encodeURI(row.relative_url)}" target="_blank" rel="noopener">
+        ${label}
+      </a>
+    `;
+  };
+
+  const packageHtml = packageRow
+    ? `
+      <div class="card" style="margin-bottom: 16px; border-color: #bfdbfe; background: #eff6ff;">
+        <div class="sub-title">1회차 자료 패키지</div>
+        <p style="margin: 0 0 8px 0;">
+          <strong>${escapeHtml(packageRow.file_name || packageRow.document_title || "-")}</strong>
+        </p>
+        <p class="muted" style="margin: 0 0 12px 0;">
+          상태: ${statusBadge(packageRow)}
+          &nbsp; | &nbsp;
+          크기: ${fileSizeText(packageRow.file_size_bytes)}
+          &nbsp; | &nbsp;
+          등록일시: ${escapeHtml(packageRow.registered_at || "-")}
+        </p>
+        <p style="margin: 0;">
+          ${downloadCell(packageRow, "패키지 다운로드")}
+        </p>
+      </div>
+    `
+    : `
+      <div class="card" style="margin-bottom: 16px;">
+        <div class="sub-title">1회차 자료 패키지</div>
+        <p class="muted" style="margin: 0;">
+          아직 ZIP 패키지가 생성되지 않았습니다.
+        </p>
+      </div>
+    `;
+
+  const tableHtml = `
+    <table>
+      <thead>
+        <tr>
+          <th>번호</th>
+          <th>자료명</th>
+          <th>상태</th>
+          <th>파일명</th>
+          <th>크기</th>
+          <th>다운로드</th>
+          <th>등록일시</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${documentRows.map(row => `
+          <tr>
+            <td>${row.document_no}</td>
+            <td>${escapeHtml(row.document_title || "-")}</td>
+            <td>${statusBadge(row)}</td>
+            <td>${escapeHtml(row.file_name || "-")}</td>
+            <td>${fileSizeText(row.file_size_bytes)}</td>
+            <td>${downloadCell(row)}</td>
+            <td>${escapeHtml(row.registered_at || "-")}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+
+  container.innerHTML = `
+    ${readinessHtml}
+    ${packageHtml}
+    <div class="sub-title">개별 자료</div>
+    ${tableHtml}
+  `;
+}
+
+async function saveGptPromptLog() {
+  if (!latestReport) {
+    document.getElementById("promptSaveStatus").textContent =
+      "먼저 리포트를 조회하세요.";
+    return;
+  }
+
+  if (!currentSession) {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+  }
+
+  if (!currentSession) {
+    document.getElementById("promptSaveStatus").textContent =
+      "먼저 로그인하세요.";
+    return;
+  }
+
+  let promptText = document.getElementById("gptPromptText").textContent || "";
+
+  // 프롬프트가 비어 있으면 기본적으로 3번 프롬프트를 생성
+  if (!promptText.trim()) {
+    if (typeof generateDoc3Prompt === "function") {
+      generateDoc3Prompt();
+    } else if (typeof generateGptPrompt === "function") {
+      generateGptPrompt();
+    }
+
+    promptText = document.getElementById("gptPromptText").textContent || "";
+  }
+
+  if (!promptText.trim()) {
+    document.getElementById("promptSaveStatus").textContent =
+      "저장할 프롬프트가 없습니다.";
+    return;
+  }
+
+  const pc = latestReport.project_coachee || {};
+  const coachee = latestReport.coachee || {};
+
+  const generationSettings =
+    typeof getSelectedGenerationSettings === "function"
+      ? getSelectedGenerationSettings()
+      : {
+          generation_channel: "web_manual",
+          review_mode: "dual_review",
+          gpt1_config_id: null,
+          gpt2_config_id: null,
+          integrator_config_id: null,
+          final_reviewer_config_id: null,
+        };
+
+  const promptRound =
+  generationSettings.review_mode === "dual_review"
+    ? currentPromptRound || "draft_1"
+    : "single";
+
+const gptSlot =
+  generationSettings.review_mode === "dual_review"
+    ? currentPromptGptSlot || "gpt1"
+    : "gpt1";
+
+const gptConfigId = getGptConfigIdBySlot(gptSlot);
+const promptReviewMode = getReviewModeByOutputRound(promptRound);
+
+  document.getElementById("promptSaveStatus").textContent =
+    "프롬프트 DB 저장 중...";
+
+  const res = await fetch(
+    "https://kvmhibfxysqnrfekiatf.supabase.co/functions/v1/save-generated-prompt",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${currentSession.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        project_coachee_id: pc.id,
+        participant_code: pc.participant_code,
+
+        prompt_type:
+          currentPromptType || "doc3_needs_analysis_deep_question_guide",
+        prompt_title:
+          currentPromptTitle ||
+          `${coachee.name || "피코치"} 코칭자료 생성 프롬프트`,
+        prompt_text: promptText,
+
+        generation_channel: generationSettings.generation_channel,
+        generation_mode: generationSettings.generation_mode,
+        review_mode: promptReviewMode,
+
+        // gpt_slot은 브랜드명이 아니라 절차 단계명입니다.
+        // gpt1 = GPT 1차 생성, gpt2 = GPT 더블체크, gpt3 = GPT 최종 통합
+        gpt_slot: gptSlot,
+        gpt_config_id: gptConfigId,
+        prompt_round: promptRound,
+        parent_prompt_log_id: currentParentPromptLogId,
+
+        prompt_payload: {
+          source: "report-preview-test.html",
+          report_result_id: latestReport.report_result?.id || null,
+          leadership_response_id: latestReport.leadership_response?.id || null,
+          needs_response_id: latestReport.needs_response?.id || null,
+          submission_id: latestReport.submission?.id || null,
+
+          generation_settings: generationSettings,
+          current_prompt_type: currentPromptType || null,
+          current_prompt_title: currentPromptTitle || null,
+        },
+      }),
+    }
+  );
+
+  const text = await res.text();
+
+  let json = null;
+  try {
+    json = JSON.parse(text);
+  } catch (e) {
+    document.getElementById("promptSaveStatus").textContent =
+      "저장 응답 파싱 실패: " + text;
+    return;
+  }
+
+  if (!json.ok) {
+    document.getElementById("promptSaveStatus").textContent =
+      "저장 실패: " + JSON.stringify(json);
+    return;
+  }
+
+  const promptLogId = json.data?.prompt_log?.id || "-";
+
+  document.getElementById("promptSaveStatus").textContent =
+      `저장 완료: ${promptLogId} / ${generationSettings.generation_mode} / ${promptReviewMode} / ${gptSlot} / ${promptRound}`;
+}
+
+async function initPage() {
+  const loginStatusEl = document.getElementById("loginStatus");
+
+  try {
+    const { data } = await sb.auth.getSession();
+    currentSession = data.session;
+
+    if (currentSession) {
+      loginStatusEl.textContent =
+        "기존 로그인 세션 사용 중: " + currentSession.user.email;
+
+      if (typeof loadGptProviderConfigs === "function") {
+        await loadGptProviderConfigs();
+      }
+    } else {
+      loginStatusEl.textContent = "로그인 전";
+    }
+  } catch (error) {
+    console.error("[initPage] error", error);
+    loginStatusEl.textContent = "초기 세션 확인 실패: " + error.message;
+  }
+}
+
+window.addEventListener("DOMContentLoaded", initPage);
+  </script>
+</body>
+</html>
